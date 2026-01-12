@@ -33,7 +33,7 @@
    ```
 
 3. **访问数据库配置页面**：
-   - 打开浏览器访问 `http://localhost:5173`
+   - 打开浏览器访问 `http://localhost:3000`
    - 系统会自动检测数据库配置状态
    - 如果未配置，会自动跳转到 `/setup` 页面
 
@@ -51,7 +51,9 @@
 
 6. **保存配置**：
    - 连接测试成功后，点击"保存配置"按钮
-   - 配置会保存到 `application-local.yml` 文件
+   - 配置会同时保存到以下两个文件：
+     - `application-local.yml` - Spring Boot 会自动加载（推荐使用）
+     - `.env` - 环境变量文件（可用于环境变量方式启动）
    - 系统会自动激活 `local` profile
 
 7. **重启后端服务**：
@@ -59,21 +61,25 @@
    - 重启后，后端会使用新的数据库配置
 
 **配置说明**：
-- 配置信息保存在 `backend/aihub-api/src/main/resources/application-local.yml`
-- 该文件已在 `.gitignore` 中，不会被提交到 Git
+- 配置信息会同时保存到两个文件：
+  - `backend/aihub-api/src/main/resources/application-local.yml` - Spring Boot 自动加载
+  - `backend/aihub-api/.env` - 环境变量文件，可用于 `export $(cat .env | xargs) && mvn spring-boot:run`
+- 这两个文件都在 `.gitignore` 中，不会被提交到 Git
 - 支持空密码（如果 MySQL 用户没有密码）
 
 ### 方式二：使用环境变量
+
+**注意**：如果已经通过页面引导配置（方式一），`.env` 文件会自动生成，无需手动创建。
 
 1. **创建环境变量文件**（在 `backend/aihub-api/` 目录下）：
 
    ```bash
    cd backend/aihub-api
-   # 如果存在 .env.example，可以复制它
-   # 否则直接创建 .env 文件
+   # 如果已通过页面配置，.env 文件已自动生成，可直接使用
+   # 否则手动创建 .env 文件
    ```
 
-2. **编辑 `.env` 文件**，填写实际值：
+2. **编辑 `.env` 文件**，填写实际值（如果文件不存在或需要修改）：
 
    ```bash
    DB_HOST=localhost
@@ -92,6 +98,11 @@
    # 或使用 dotenv（需要安装 dotenv-cli）
    dotenv -f .env -- mvn spring-boot:run
    ```
+
+**说明**：
+- 如果使用页面引导配置（方式一），`.env` 文件会在保存配置时自动生成
+- 如果手动创建 `.env` 文件，需要确保格式正确
+- Spring Boot 不会自动加载 `.env` 文件，需要手动通过环境变量方式加载
 
 ### 方式三：使用 IDE 环境变量
 
@@ -144,7 +155,8 @@ spring:
 - **主配置文件**: `backend/aihub-api/src/main/resources/application.yml`
 - **开发环境配置**: `backend/aihub-api/src/main/resources/application-dev.yml`
 - **生产环境配置**: `backend/aihub-api/src/main/resources/application-prod.yml`
-- **本地配置**（不提交）: `backend/aihub-api/src/main/resources/application-local.yml`
+- **本地配置**（不提交）: `backend/aihub-api/src/main/resources/application-local.yml` - 页面配置时自动生成
+- **环境变量文件**（不提交）: `backend/aihub-api/.env` - 页面配置时自动生成
 
 ## 注意事项
 
