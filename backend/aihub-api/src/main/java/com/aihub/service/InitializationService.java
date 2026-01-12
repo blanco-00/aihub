@@ -1,5 +1,6 @@
 package com.aihub.service;
 
+import com.aihub.dto.DatabaseStatusDTO;
 import com.aihub.dto.InitSuperAdminDTO;
 
 public interface InitializationService {
@@ -9,6 +10,18 @@ public interface InitializationService {
      * @return true-已初始化，false-未初始化
      */
     boolean isInitialized();
+    
+    /**
+     * 检查数据库状态
+     * @return 数据库状态信息
+     */
+    DatabaseStatusDTO checkDatabaseStatus();
+    
+    /**
+     * 初始化数据库表结构
+     * @throws com.aihub.exception.BusinessException 如果初始化失败，抛出异常
+     */
+    void initializeDatabase();
     
     /**
      * 创建超级管理员（仅在没有超级管理员时可用）

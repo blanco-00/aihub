@@ -30,9 +30,24 @@
 
 ## 🎯 快速开始
 
-> 项目正在开发中，敬请期待...
+### 前置要求
 
-详细步骤请参考：[后端快速开始指南](./docs/backend/quick-start.md)
+- **后端环境**: JDK 17+、Maven 3.6+、MySQL 8.0+
+- **前端环境**: Node.js 18+、pnpm
+
+### 快速开始步骤
+
+1. **创建数据库**：`mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS aihub DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`
+2. **启动后端服务**：`cd backend/aihub-api && mvn spring-boot:run`
+3. **安装前端依赖**：`cd frontend && pnpm install`
+4. **启动前端服务**：`cd frontend && pnpm dev`
+5. **访问系统**：打开浏览器访问 `http://localhost:3000`，按照页面引导完成配置和初始化
+
+### 详细文档
+
+- **[快速开始指南](./docs/backend/quick-start.md)** - 完整的初始化流程和详细说明
+- **[数据库配置说明](./docs/backend/config.md)** - 配置数据库连接（重要：安全配置）
+- **[系统初始化文档](./docs/backend/initialization.md)** - 数据库初始化和超级管理员创建
 
 ## 🛠️ 技术栈
 
@@ -90,9 +105,10 @@ AIHub/
 
 #### 后端开发
 - **[后端开发指南](./docs/backend/guide.md)** - 后端技术栈、项目结构、开发规范
+- **[快速开始指南](./docs/backend/quick-start.md)** - 快速初始化项目、启动应用
+- **[数据库配置说明](./docs/backend/config.md)** - 数据库连接配置和安全指南
 - **[数据库设计文档](./docs/backend/database.md)** - 数据库选型、表结构设计、设计规范
 - **[系统初始化文档](./docs/backend/initialization.md)** - 数据库初始化、超级管理员创建
-- **[快速开始指南](./docs/backend/quick-start.md)** - 快速初始化项目
 - **[SQL 脚本管理](./docs/sql/guide.md)** - SQL 脚本存放方式和管理规范
 - API设计文档（待完善）
 
@@ -112,13 +128,6 @@ AIHub/
 - **[规范管理](.cursor/rules/rule-management.mdc)** - 规范添加流程、规则文件组织
 
 > **文档规范**: 所有代码相关的功能、模块、架构设计都应该在 `docs/` 目录下有对应的设计文档说明。文档应该与代码保持同步更新。
-
-## 📋 项目阶段
-
-- **MVP阶段**：最小可行产品
-- **AI基础设施**：具备基础AI管理能力
-- **AI SAAS通用服务**：快速开发saas化的AI服务
-- **企业级AI平台**：为企业提供快速使用AI服务的能力
 
 ## 🤝 贡献指南
 

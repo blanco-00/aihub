@@ -264,15 +264,15 @@ spring:
 
 ### SQL 脚本管理
 
-- **SQL 脚本位置**: [`docs/sql/`](../sql/guide.md)
+- **SQL 脚本位置**: `backend/aihub-api/src/main/resources/db/migration/`
 - **存放方式**: 增量方式为主，全量脚本为辅
 - **详细说明**: 请参考 [SQL 脚本管理文档](../sql/guide.md)
 
-### 使用Flyway（推荐）
+### 使用Flyway（可选，仅开发环境）
 - 版本化数据库迁移
 - 自动执行SQL脚本
 - 支持回滚
-- SQL 脚本存放在 `docs/sql/migrations/` 目录
+- SQL 脚本存放在 `backend/aihub-api/src/main/resources/db/migration/` 目录
 
 ### 使用Liquibase
 - 另一种数据库迁移工具

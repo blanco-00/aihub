@@ -1,0 +1,27 @@
+# 环境变量文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
+# 配置文件（包含敏感信息，不应提交）
+application-local.yml
+application-local.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 编译输出
+target/
+*.class
+*.jar
+*.war
+
+# 日志
+*.log
+logs/
+
+# 操作系统
+.DS_Store
+Thumbs.db

@@ -1,7 +1,7 @@
 ---
-alwaysApply: true
+description: 编写或修改文档时生效（README、docs、注释等）
+alwaysApply: false
 ---
-
 # 文档规范
 
 ## 文档入口规范

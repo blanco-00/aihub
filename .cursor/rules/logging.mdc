@@ -1,7 +1,7 @@
 ---
-alwaysApply: true
+description: 编写或修改日志相关代码时生效（log.info、log.error等）
+alwaysApply: false
 ---
-
 # 日志规范
 
 ## 日志等级使用

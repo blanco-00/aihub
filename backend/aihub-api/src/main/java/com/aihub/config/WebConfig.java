@@ -18,7 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns(
                         "/api/init/**",
+                        "/api/setup/**",  // 排除配置相关 API，允许在未配置数据库时访问
                         "/init",
+                        "/setup",  // 排除配置页面
                         "/static/**",
                         "/assets/**",
                         "/error"

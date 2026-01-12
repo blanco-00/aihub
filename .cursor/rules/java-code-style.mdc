@@ -1,7 +1,7 @@
 ---
-alwaysApply: true
+description: 编写或修改Java代码时生效
+alwaysApply: false
 ---
-
 # Java 代码规范
 
 ## Import 规范

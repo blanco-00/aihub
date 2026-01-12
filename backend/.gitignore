@@ -31,6 +31,11 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Application
+# Application - 本地配置文件（包含敏感信息，不应提交）
 application-local.yml
 application-local.properties
+
+# 环境变量文件（包含敏感信息）
+.env
+.env.local
+.env.*.local

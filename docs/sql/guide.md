@@ -40,19 +40,31 @@
 
 ## 📁 目录结构
 
+### SQL 脚本实际位置（后端项目）
+
+```
+backend/aihub-api/src/main/resources/
+└── db/
+    └── migration/         # Flyway 迁移脚本（实际位置）
+        ├── V1.0.0__init_tables.sql
+        ├── V1.0.1__add_user_index.sql
+        └── V1.0.2__add_agent_table.sql
+```
+
+### 文档目录（仅用于说明）
+
 ```
 docs/sql/
-├── guide.md              # 本文件
-├── migrations/            # 增量脚本（Flyway 迁移脚本）
-│   ├── V1.0.0__init_tables.sql
-│   ├── V1.0.1__add_user_index.sql
-│   └── V1.0.2__add_agent_table.sql
-├── init/                  # 全量初始化脚本
-│   ├── init_v1.0.0.sql    # 版本化全量脚本
-│   └── schema_latest.sql  # 最新全量脚本（自动生成）
+├── guide.md              # 本文件（SQL 脚本管理规范）
+├── init/                  # 全量初始化脚本（可选，用于手动执行）
+│   └── init_v1.0.0.sql    # 全量脚本（包含 CREATE DATABASE）
 └── data/                  # 测试数据脚本（可选）
     └── test_data.sql
 ```
+
+**注意**: 
+- 增量脚本（migrations）统一存放在后端项目的 `resources/db/migration/` 目录
+- 文档目录中的 `init/` 目录可以保留全量脚本，用于手动执行和参考
 
 ---
 
@@ -150,8 +162,8 @@ docs/sql/
 
 1. **创建增量脚本**
    ```bash
-   # 创建新的迁移脚本
-   touch docs/sql/migrations/V1.0.1__add_new_feature.sql
+   # 在后端项目的 resources 目录创建新的迁移脚本
+   touch backend/aihub-api/src/main/resources/db/migration/V1.0.1__add_new_feature.sql
    ```
 
 2. **编写 SQL**
@@ -217,9 +229,18 @@ spring:
 
 ### 脚本位置
 
-- 开发时：`docs/sql/migrations/`（文档目录）
-- 运行时：`src/main/resources/db/migration/`（资源目录）
-- 部署时：将 `docs/sql/migrations/` 中的脚本复制到资源目录
+**SQL 脚本统一存放在后端项目的资源目录**：
+
+- **位置**: `backend/aihub-api/src/main/resources/db/migration/`
+- **原因**: 
+  - 单一数据源，避免重复维护
+  - 运行时直接可用，无需复制
+  - 版本控制清晰，SQL 脚本与代码版本对应
+  - 符合 Spring Boot 资源管理规范
+
+**文档目录说明**：
+- `docs/sql/` 目录仅用于文档说明和参考
+- 实际 SQL 脚本存放在后端项目的 `resources` 目录
 
 ### 环境配置说明
 

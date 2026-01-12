@@ -1,0 +1,48 @@
+# 依赖目录
+node_modules/
+.pnp
+.pnp.js
+
+# 构建输出
+dist/
+build/
+target/
+*.jar
+*.war
+*.ear
+
+# 日志文件
+*.log
+logs/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+*.example
+
+# IDE 配置
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 操作系统文件
+Thumbs.db
+.DS_Store
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 锁文件（可选，根据团队约定）
+# pnpm-lock.yaml
+# package-lock.json
+# yarn.lock

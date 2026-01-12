@@ -21,8 +21,32 @@ public class InitializationController {
      */
     @GetMapping("/status")
     public Result<Boolean> getInitStatus() {
-        boolean initialized = initializationService.isInitialized();
-        return Result.success(initialized);
+        try {
+            boolean initialized = initializationService.isInitialized();
+            return Result.success(initialized);
+        } catch (Exception e) {
+            log.error("检查初始化状态失败", e);
+            // 如果数据库连接失败，返回 false（未初始化）
+            return Result.success(false);
+        }
+    }
+    
+    /**
+     * 检查数据库状态
+     */
+    @GetMapping("/database/status")
+    public Result<com.aihub.dto.DatabaseStatusDTO> getDatabaseStatus() {
+        com.aihub.dto.DatabaseStatusDTO status = initializationService.checkDatabaseStatus();
+        return Result.success(status);
+    }
+    
+    /**
+     * 初始化数据库表结构
+     */
+    @PostMapping("/database/init")
+    public Result<Void> initializeDatabase() {
+        initializationService.initializeDatabase();
+        return Result.success();
     }
     
     /**

@@ -1,12 +1,18 @@
 spring:
+  profiles:
+    active: local
   application:
     name: aihub-api
   
+  # 配置文件加载顺序：application.yml -> application-local.yml (如果存在)
+  # application-local.yml 会覆盖 application.yml 中的配置
+  # 也可以通过环境变量覆盖：DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD
+  
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/aihub?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: mysql!@#$%^
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:aihub}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
