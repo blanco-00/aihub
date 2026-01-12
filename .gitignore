@@ -1,5 +1,8 @@
 # 依赖目录
 node_modules/
+**/node_modules/
+frontend/node_modules/
+backend/node_modules/
 .pnp
 .pnp.js
 
@@ -19,7 +22,8 @@ logs/
 .env
 .env.local
 .env.*.local
-*.example
+# 注意：配置模板文件（如 application.yml.example）应该被提交，所以不忽略 *.example
+# 如果需要忽略特定的 .example 文件，可以在子目录的 .gitignore 中配置
 
 # IDE 配置
 .idea/
