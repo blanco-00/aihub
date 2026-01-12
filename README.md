@@ -92,8 +92,8 @@ AIHub/
 - **[系统架构总览](./docs/architecture/overview.md)** - 系统整体架构设计
 - **[网关架构设计](./docs/architecture/gateways.md)** - Agents网关、模型网关、MCP网关详细
 
-### ✨ 功能文档
-- **[AI功能清单](./docs/features.md)** - 已实现功能和未来规划完整清单
+### 📋 功能规划与实施清单
+- **[功能清单](./docs/features.md)** - 功能规划、开发状态和实施进度跟踪
 
 ### 🏗️ 架构文档
 - **[系统架构总览](./docs/architecture/overview.md)** - 系统整体架构设计
@@ -158,6 +158,4 @@ AIHub/
 - **精细化Token统计** - 多维度统计、成本分析、实时监控
 - **权限管理** - 三级权限控制、API Key管理、服务订阅
 - **内容合规检测** - 敏感词库、不合规引导检测、违规内容拦截
-
-> 📋 查看 [完整功能清单](./docs/features.md) 了解详细功能规划和开发状态
 
