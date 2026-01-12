@@ -1,0 +1,7 @@
+# 测试数据脚本目录
+
+此目录存放测试数据脚本（可选）。
+
+示例：
+- test_data.sql
+- sample_data.sql
