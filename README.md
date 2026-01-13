@@ -30,23 +30,71 @@
 
 ## 🎯 快速开始
 
-### 前置要求
+### 方式一：Docker Compose 一键启动（推荐，最简单）
 
-- **后端环境**: JDK 17+、Maven 3.6+、MySQL 8.0+
-- **前端环境**: Node.js 18+、pnpm
+**前置要求**: Docker 20.10+、Docker Compose 2.0+
 
-### 快速开始步骤
+```bash
+# 1. 进入 docker 目录
+cd docker
+
+# 2. 配置环境变量（可选，使用默认配置可直接跳过）
+cp env.example .env
+# 编辑 .env 文件修改密码和密钥（生产环境必须修改）
+
+# 3. 一键启动所有服务
+docker compose up -d
+
+# 4. 查看服务状态
+docker compose ps
+
+# 5. 访问系统
+# 前端: http://localhost:3000
+# 后端: http://localhost:8080
+```
+
+**详细文档**: [Docker Compose 部署指南](./docs/deployment/docker-compose.md)
+
+### 方式二：混合开发方式（推荐，适合日常开发）
+
+**前置要求**: Docker 20.10+、Docker Compose 2.0+、JDK 17+、Maven 3.6+、Node.js 20.19.0+（或 22.13.0+）、pnpm >= 9
+
+**优势**: 基础设施容器化（无需本地安装 MySQL/Redis），应用本地运行（支持热重载，开发效率高）
+
+```bash
+# 1. 启动基础设施（MySQL + Redis）
+cd docker
+docker compose -f docker-compose.dev.yml up -d
+
+# 2. 本地运行后端（支持热重载，自动连接 Docker 开发环境的数据库）
+cd backend/aihub-api
+mvn spring-boot:run
+
+# 4. 本地运行前端（支持热重载）
+cd frontend
+pnpm install  # 首次需要安装依赖
+pnpm dev
+```
+
+**详细文档**: [Docker Compose 部署指南 - 本地开发](./docs/deployment/docker-compose.md#场景二本地开发推荐)
+
+### 方式三：完全本地开发
+
+**前置要求**:
+- **后端环境**: JDK 17+、Maven 3.6+、MySQL 8.0+（需本地安装）
+- **前端环境**: Node.js 20.19.0+（或 22.13.0+）、pnpm >= 9
+
+**快速开始步骤**:
 
 1. **创建数据库**：`mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS aihub DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"`
 2. **启动后端服务**：`cd backend/aihub-api && mvn spring-boot:run`
 3. **安装前端依赖**：`cd frontend && pnpm install`
 4. **启动前端服务**：`cd frontend && pnpm dev`
-5. **访问系统**：打开浏览器访问 `http://localhost:3000`，按照页面引导完成配置和初始化
+5. **访问系统**：打开浏览器访问 `http://localhost:3000`，按照页面引导完成系统初始化
 
-### 详细文档
-
+**详细文档**:
 - **[快速开始指南](./docs/backend/quick-start.md)** - 完整的初始化流程和详细说明
-- **[数据库配置说明](./docs/backend/config.md)** - 配置数据库连接（重要：安全配置）
+- **[数据库配置说明](./docs/backend/config.md)** - 数据库连接配置说明（开发环境已自动配置）
 - **[系统初始化文档](./docs/backend/initialization.md)** - 数据库初始化和超级管理员创建
 
 ## 🛠️ 技术栈
@@ -119,6 +167,9 @@ AIHub/
 
 ### 🎯 方案设计
 - **[Agent模板化方案](./docs/agent-template-solution.md)** - Agent模板化方案设计、架构和实现计划
+
+### 🚀 部署指南
+- **[Docker Compose 部署指南](./docs/deployment/docker-compose.md)** - 使用 Docker Compose 一键部署
 
 ### 📋 开发规范
 - **[Java 代码规范](.cursor/rules/java-code-style.mdc)** - Import规范、代码简洁性、抽象复用、实用主义

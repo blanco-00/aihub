@@ -4,6 +4,8 @@
 .env.*.local
 
 # 配置文件（包含敏感信息，不应提交）
+# application-local.yml - 个人本地配置，用于个性化覆盖（不提交）
+# application-dev.yml - 开发环境通用配置，应该被提交
 application-local.yml
 application-local.properties
 

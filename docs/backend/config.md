@@ -1,110 +1,96 @@
 # 数据库配置说明
 
-> 本文档说明如何安全地配置数据库连接信息。
+> 本文档说明如何配置数据库连接信息。
 
 ## 📚 相关文档
 
 - [后端开发指南](./guide.md) - 返回后端文档总览
 - [快速开始指南](./quick-start.md) - 快速初始化项目
+- [Docker Compose 部署指南](../deployment/docker-compose.md) - Docker 部署相关配置
 - [项目主文档](../../README.md) - 返回项目文档入口
 
-## 安全配置指南
+## 默认配置
 
-为了安全，**永远不要**将包含真实密码的配置文件提交到 Git。
+**开发环境**：系统已配置好 Docker 开发环境的数据库连接（在 `application-dev.yml` 中）：
+- 主机: `localhost`
+- 端口: `3306`
+- 数据库名: `aihub`
+- 用户名: `aihub`
+- 密码: `aihub123456`
+
+**启动 Docker 开发环境**：
+```bash
+cd docker
+docker compose -f docker-compose.dev.yml up -d
+```
+
+详细说明请参考 [Docker Compose 部署指南 - 本地开发](../deployment/docker-compose.md#场景二本地开发推荐)
 
 ## 配置方式
 
-### 方式一：页面引导配置（推荐，最简单）
+### 方式一：修改 application-dev.yml（开发环境通用配置）
 
-**重要**: 系统提供了页面引导的数据库配置功能，无需手动编辑配置文件，更加安全和便捷。
+编辑 `backend/aihub-api/src/main/resources/application-dev.yml`：
 
-#### 配置步骤
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/aihub?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: aihub
+    password: aihub123456
+```
 
-1. **启动后端服务**（即使数据库未配置，后端也能启动）：
-   ```bash
-   cd backend/aihub-api
-   mvn spring-boot:run
-   ```
+**注意**：此文件会被提交到代码库，包含的是通用配置。
 
-2. **启动前端服务**：
-   ```bash
-   cd frontend
-   pnpm dev
-   ```
+### 方式二：使用环境变量（推荐用于个性化配置）
 
-3. **访问数据库配置页面**：
-   - 打开浏览器访问 `http://localhost:3000`
-   - 系统会自动检测数据库配置状态
-   - 如果未配置，会自动跳转到 `/setup` 页面
+在启动命令中设置环境变量：
 
-4. **填写数据库信息**：
-   - 数据库主机：`localhost` 或 IP 地址
-   - 数据库端口：`3306`（默认）
-   - 数据库名称：`aihub`
-   - 用户名：`root`（或你的 MySQL 用户名）
-   - 密码：你的 MySQL 密码
+```bash
+DB_HOST=localhost DB_USERNAME=root DB_PASSWORD=your_password mvn spring-boot:run
+```
 
-5. **测试连接**：
-   - 点击"测试连接"按钮
-   - 系统会验证连接信息是否正确
-   - 如果连接成功，会显示连接耗时和数据库是否存在
+或创建 `.env` 文件（不提交）：
 
-6. **保存配置**：
-   - 连接测试成功后，点击"保存配置"按钮
-   - 配置会同时保存到以下两个文件：
-     - `application-local.yml` - Spring Boot 会自动加载（推荐使用）
-     - `.env` - 环境变量文件（可用于环境变量方式启动）
-   - 系统会自动激活 `local` profile
+```bash
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=aihub
+DB_USERNAME=root
+DB_PASSWORD=your_actual_password
+```
 
-7. **重启后端服务**：
-   - 保存配置后，需要重启后端服务才能生效
-   - 重启后，后端会使用新的数据库配置
+然后启动：
 
-**配置说明**：
-- 配置信息会同时保存到两个文件：
-  - `backend/aihub-api/src/main/resources/application-local.yml` - Spring Boot 自动加载
-  - `backend/aihub-api/.env` - 环境变量文件，可用于 `export $(cat .env | xargs) && mvn spring-boot:run`
-- 这两个文件都在 `.gitignore` 中，不会被提交到 Git
-- 支持空密码（如果 MySQL 用户没有密码）
+```bash
+# Linux/macOS
+export $(cat .env | xargs) && mvn spring-boot:run
 
-### 方式二：使用环境变量
+# 或使用 dotenv（需要安装 dotenv-cli）
+dotenv -f .env -- mvn spring-boot:run
+```
 
-**注意**：如果已经通过页面引导配置（方式一），`.env` 文件会自动生成，无需手动创建。
+### 方式三：使用 application-local.yml（个人本地配置）
 
-1. **创建环境变量文件**（在 `backend/aihub-api/` 目录下）：
+创建 `application-local.yml`（此文件在 `.gitignore` 中，不会被提交）：
 
-   ```bash
-   cd backend/aihub-api
-   # 如果已通过页面配置，.env 文件已自动生成，可直接使用
-   # 否则手动创建 .env 文件
-   ```
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/aihub?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: your_password_here
+```
 
-2. **编辑 `.env` 文件**，填写实际值（如果文件不存在或需要修改）：
+然后在 `application.yml` 中激活本地配置：
 
-   ```bash
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_NAME=aihub
-   DB_USERNAME=root
-   DB_PASSWORD=your_actual_password
-   ```
+```yaml
+spring:
+  profiles:
+    active: local,dev  # 同时激活 local 和 dev profile
+```
 
-3. **启动应用**：
-
-   ```bash
-   # Linux/macOS
-   export $(cat .env | xargs) && mvn spring-boot:run
-   
-   # 或使用 dotenv（需要安装 dotenv-cli）
-   dotenv -f .env -- mvn spring-boot:run
-   ```
-
-**说明**：
-- 如果使用页面引导配置（方式一），`.env` 文件会在保存配置时自动生成
-- 如果手动创建 `.env` 文件，需要确保格式正确
-- Spring Boot 不会自动加载 `.env` 文件，需要手动通过环境变量方式加载
-
-### 方式三：使用 IDE 环境变量
+### 方式四：使用 IDE 环境变量
 
 在 IntelliJ IDEA 的 Run Configuration 中设置环境变量：
 
@@ -118,9 +104,9 @@
    DB_PASSWORD=your_password
    ```
 
-### 方式四：使用外部配置文件（仅开发环境）
-
-创建 `application-local.yml`（此文件不会被提交到 Git）：
+**注意**：方式三和方式四都使用 `application-local.yml`，区别在于：
+- **方式三**：在 `application.yml` 中激活 `local` profile
+- **方式四**：通过 IDE 环境变量或启动参数激活 `local` profile
 
 ```yaml
 spring:
@@ -153,16 +139,17 @@ spring:
 ### 配置文件位置
 
 - **主配置文件**: `backend/aihub-api/src/main/resources/application.yml`
-- **开发环境配置**: `backend/aihub-api/src/main/resources/application-dev.yml`
+- **开发环境配置**: `backend/aihub-api/src/main/resources/application-dev.yml`（提交到代码库）
 - **生产环境配置**: `backend/aihub-api/src/main/resources/application-prod.yml`
-- **本地配置**（不提交）: `backend/aihub-api/src/main/resources/application-local.yml` - 页面配置时自动生成
-- **环境变量文件**（不提交）: `backend/aihub-api/.env` - 页面配置时自动生成
+- **本地配置**（不提交）: `backend/aihub-api/src/main/resources/application-local.yml` - 用于个性化配置
+- **环境变量文件**（不提交）: `backend/aihub-api/.env` - 用于环境变量方式配置
 
 ## 注意事项
 
 - ⚠️ **`.env` 文件已在 `.gitignore` 中，不会被提交**
 - ⚠️ **`application-local.yml` 已在 `.gitignore` 中，不会被提交**
-- ⚠️ **永远不要将包含真实密码的配置文件提交到 Git**
+- ⚠️ **`application-dev.yml` 包含通用配置，会被提交到代码库**
+- ⚠️ **如果需要个性化配置，使用环境变量或 `application-local.yml`**
 - ⚠️ **生产环境建议使用配置中心（如 Nacos、Consul）或 Kubernetes Secrets**
 
 ## 验证配置
@@ -184,6 +171,33 @@ spring:
    ```
 
 ## 常见问题
+
+### Q: 数据库连接失败怎么办？
+
+A: 检查以下几点：
+1. **Docker 容器是否运行**（如果使用 Docker 开发环境）：
+   ```bash
+   cd docker
+   docker compose -f docker-compose.dev.yml ps
+   ```
+   - 如果容器未运行，执行 `docker compose -f docker-compose.dev.yml up -d`
+
+2. **数据库配置是否正确**：
+   - 检查 `application-dev.yml` 中的数据库配置
+   - 确认主机、端口、数据库名、用户名、密码是否正确
+
+3. **查看应用日志**：
+   - 查看控制台输出的错误信息
+   - 常见错误：
+     - `Unknown database 'aihub'` - 数据库不存在，检查 Docker 容器日志
+     - `Access denied` - 用户名或密码错误，检查配置
+     - `Communications link failure` - 无法连接到 MySQL 服务器，检查容器是否运行
+
+4. **检查 Docker 容器日志**（如果使用 Docker）：
+   ```bash
+   cd docker
+   docker compose -f docker-compose.dev.yml logs mysql
+   ```
 
 ### Q: 环境变量没有生效怎么办？
 

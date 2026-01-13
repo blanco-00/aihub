@@ -1,16 +1,54 @@
+# AIHub Development Environment Configuration
+# 此文件用于开发环境，连接 Docker 开发环境的数据库和 Redis
+# 此文件包含 Docker dev 环境的通用配置，应该被提交到代码库
+# 所有开发者都应该使用相同的 Docker dev 环境配置（localhost:3306, localhost:6379）
+# 
+# 如果需要个性化配置（如使用不同的端口或密码），可以：
+# 1. 使用环境变量覆盖：DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+# 2. 创建 application-local.yml（此文件在 .gitignore 中，不会被提交）
+#
+# Spring Boot will automatically load this file when 'dev' profile is active
+# Note: This file only overrides database configuration in application.yml
+# Other configurations (MyBatis Plus, server, logging, etc.) will still be loaded from application.yml
+
 spring:
+  # 数据库配置（连接 Docker 开发环境）
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:aihub}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:aihub}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:aihub}
+    password: ${DB_PASSWORD:aihub123456}
+    # 也可以使用 root 用户：
+    # username: root
+    # password: aihub123456
+    hikari:
+      # 启动时立即初始化连接池（不延迟加载）
+      initialization-fail-timeout: 0  # 0 表示立即初始化，失败时立即报错
+      connection-test-query: SELECT 1  # 连接测试查询
+  
+  # Redis 配置（连接 Docker 开发环境）
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:aihub123456}
+      database: 0
+      timeout: 3000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
   
   # 开发环境启用 Flyway（可选）
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    baseline-version: 1.0.0
+    enabled: false  # 开发环境使用 Docker 初始化脚本，Flyway 关闭
+    # 如需使用 Flyway，可设置为 true
+    # enabled: true
+    # locations: classpath:db/migration
+    # baseline-on-migrate: true
+    # baseline-version: 1.0.0
 
+# 日志配置（开发环境使用 debug 级别）
 logging:
   level:
     com.aihub: debug

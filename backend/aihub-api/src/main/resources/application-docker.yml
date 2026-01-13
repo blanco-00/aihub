@@ -1,0 +1,66 @@
+# Docker 环境配置
+# 此配置用于 Docker Compose 部署环境
+
+spring:
+  profiles:
+    active: docker
+  application:
+    name: aihub-api
+  
+  # 数据库配置（通过环境变量注入）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:mysql}:${DB_PORT:3306}/${DB_NAME:aihub}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:aihub}
+    password: ${DB_PASSWORD:}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      # 启动时立即初始化连接池（不延迟加载）
+      initialization-fail-timeout: 0  # 0 表示立即初始化，失败时立即报错
+      connection-test-query: SELECT 1  # 连接测试查询
+  
+  # Flyway 配置（Docker 环境禁用，使用初始化脚本）
+  flyway:
+    enabled: false
+
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.aihub.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# JWT配置（通过环境变量注入）
+jwt:
+  secret: ${JWT_SECRET:aihub-secret-key-change-in-production-environment-minimum-32-characters}
+  expiration: 86400000  # Token过期时间：24小时（毫秒）
+  refresh-expiration: 604800000  # 刷新Token过期时间：7天（毫秒）
+
+# 验证码配置
+verification:
+  code:
+    expiration: 300000  # 验证码过期时间：5分钟（毫秒）
+    length: 6  # 验证码长度
+    dev-mode: false  # Docker 环境关闭开发模式
+
+# 日志配置（Docker 环境使用 INFO 级别）
+logging:
+  level:
+    com.aihub: info
+    com.aihub.service.impl.InitializationServiceImpl: info
+    org.springframework: info
+    org.apache.ibatis: warn
+    org.springframework.jdbc: warn
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

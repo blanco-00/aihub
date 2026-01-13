@@ -1,11 +1,14 @@
 spring:
   profiles:
-    active: local
+    active: dev  # 默认使用 dev profile（开发环境通用配置）
+    # 如果需要个性化配置，可以激活 local profile：active: local,dev
+    # application-local.yml 会覆盖 application-dev.yml 中的配置
   application:
     name: aihub-api
   
-  # 配置文件加载顺序：application.yml -> application-local.yml (如果存在)
-  # application-local.yml 会覆盖 application.yml 中的配置
+  # 配置文件加载顺序：
+  # application.yml -> application-dev.yml (dev profile) -> application-local.yml (local profile, 如果存在)
+  # application-local.yml 会覆盖 application-dev.yml 中的配置
   # 也可以通过环境变量覆盖：DB_HOST, DB_PORT, DB_NAME, DB_USERNAME, DB_PASSWORD
   
   datasource:
@@ -19,6 +22,9 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      # 启动时立即初始化连接池（不延迟加载）
+      initialization-fail-timeout: 0  # 0 表示立即初始化，失败时立即报错
+      connection-test-query: SELECT 1  # 连接测试查询
   
   # Flyway 配置（可选，仅开发环境启用）
   flyway:
@@ -41,8 +47,39 @@ server:
   servlet:
     context-path: /
 
+# JWT配置
+jwt:
+  secret: aihub-secret-key-change-in-production-environment-minimum-32-characters
+  expiration: 86400000  # Token过期时间：24小时（毫秒）
+  refresh-expiration: 604800000  # 刷新Token过期时间：7天（毫秒）
+
+# 验证码配置
+verification:
+  code:
+    expiration: 300000  # 验证码过期时间：5分钟（毫秒）
+    length: 6  # 验证码长度
+    dev-mode: true  # 开发模式：打印验证码到日志（生产环境应设置为false）
+
 # 日志配置
+# 日志等级说明：
+#   TRACE: 最详细（通常关闭）
+#   DEBUG: 调试信息（开发环境开启，生产环境关闭）
+#   INFO:  重要业务信息（开发和生产都开启）
+#   WARN:  警告信息（开发和生产都开启）
+#   ERROR: 错误信息（开发和生产都开启）
 logging:
   level:
-    com.aihub: debug
+    # 项目代码：info（生产环境），如需调试可改为 debug
+    com.aihub: info
+    
+    # 初始化服务：debug（用于调试初始化状态，可改为 info 减少日志）
+    com.aihub.service.impl.InitializationServiceImpl: debug
+    
+    # Spring 框架：info（减少框架日志）
     org.springframework: info
+    
+    # MyBatis SQL 日志：warn（减少 SQL 输出，如需查看 SQL 可改为 debug）
+    org.apache.ibatis: warn
+    
+    # JDBC 连接日志：warn（减少数据库连接日志）
+    org.springframework.jdbc: warn

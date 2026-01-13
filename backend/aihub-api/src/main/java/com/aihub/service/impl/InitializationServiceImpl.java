@@ -35,30 +35,61 @@ public class InitializationServiceImpl implements InitializationService {
     @Autowired
     private DataSource dataSource;
     
+    // 缓存初始化状态（避免重复查询数据库）
+    // 启动时预加载，除非明确清除缓存，否则一直有效
+    private Boolean cachedInitialized = null;
+    private long cacheTimestamp = 0;
+    private static final long CACHE_DURATION = 300000; // 缓存5分钟（毫秒），启动时预加载后基本不会过期
+    
     @Override
     public boolean isInitialized() {
+        // 检查缓存是否有效
+        long currentTime = System.currentTimeMillis();
+        if (cachedInitialized != null) {
+            // 如果缓存时间在有效期内，直接返回
+            if ((currentTime - cacheTimestamp) < CACHE_DURATION) {
+                return cachedInitialized;
+            }
+            // 如果缓存过期但存在，且是已初始化状态，继续使用缓存（已初始化状态不会改变，除非手动删除）
+            // 这样可以避免频繁查询数据库
+            if (cachedInitialized) {
+                log.debug("使用已过期的初始化状态缓存（已初始化状态通常不会改变）");
+                return cachedInitialized;
+            }
+        }
+        
+        // 缓存失效或不存在，查询数据库
         try {
-            // 先检查数据库连接状态（不抛出异常）
-            DatabaseStatusDTO dbStatus = checkDatabaseStatus();
-            if (!dbStatus.isConnected() || !dbStatus.isDatabaseExists()) {
-                log.debug("数据库未连接或不存在，系统未初始化");
-                return false;
+            Long count = userMapper.countByRoleAndNotDeleted(UserRole.SUPER_ADMIN.getCode());
+            boolean initialized = count != null && count > 0;
+            
+            // 更新缓存
+            cachedInitialized = initialized;
+            cacheTimestamp = currentTime;
+            
+            // 记录日志
+            if (initialized) {
+                log.debug("系统已初始化，存在超级管理员（已缓存）");
+            } else {
+                log.debug("系统未初始化，不存在超级管理员（已缓存）");
             }
             
-            // 数据库连接正常，检查是否存在超级管理员
-            try {
-                Long count = userMapper.countByRoleAndNotDeleted(UserRole.SUPER_ADMIN.getCode());
-                return count != null && count > 0;
-            } catch (Exception e) {
-                // 如果查询失败（可能是表不存在），返回 false
-                log.debug("查询超级管理员失败: {}", e.getMessage());
-                return false;
-            }
+            return initialized;
         } catch (Exception e) {
-            // 检查数据库状态失败，返回 false
-            log.debug("检查初始化状态失败: {}", e.getMessage());
+            // 如果查询失败（可能是表不存在或数据库连接问题），返回 false
+            log.debug("查询超级管理员失败: {}", e.getMessage());
+            // 查询失败时不缓存，下次继续尝试
             return false;
         }
+    }
+    
+    /**
+     * 清除初始化状态缓存（当创建或删除超级管理员时调用）
+     */
+    public void clearCache() {
+        cachedInitialized = null;
+        cacheTimestamp = 0;
+        log.debug("初始化状态缓存已清除");
     }
     
     @Override
@@ -200,6 +231,8 @@ public class InitializationServiceImpl implements InitializationService {
         admin.setUpdatedAt(LocalDateTime.now());
         
         userMapper.insert(admin);
+        // 清除初始化状态缓存
+        clearCache();
         log.info("超级管理员创建成功：{}", dto.getUsername());
     }
 }
