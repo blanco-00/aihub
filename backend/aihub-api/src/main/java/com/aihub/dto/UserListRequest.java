@@ -37,4 +37,9 @@ public class UserListRequest {
      * 状态筛选（1-启用，0-禁用）
      */
     private Integer status;
+    
+    /**
+     * 部门ID筛选
+     */
+    private Long departmentId;
 }

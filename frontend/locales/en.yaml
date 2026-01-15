@@ -73,6 +73,7 @@ menus:
   pureSystemMenu: Menu Manage
   pureDept: Dept Manage
   pureSysMonitor: System Monitor
+  pureSystemMonitor: System Status
   pureOnlineUser: Online User
   pureLoginLog: Login Log
   pureOperationLog: Operation Log

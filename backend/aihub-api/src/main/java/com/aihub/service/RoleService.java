@@ -35,4 +35,14 @@ public interface RoleService {
      * 删除角色（逻辑删除）
      */
     void deleteRole(Long id);
+    
+    /**
+     * 获取角色的菜单ID列表
+     */
+    List<Long> getMenuIdsByRoleId(Long roleId);
+    
+    /**
+     * 保存角色菜单关联
+     */
+    void saveRoleMenus(Long roleId, List<Long> menuIds);
 }

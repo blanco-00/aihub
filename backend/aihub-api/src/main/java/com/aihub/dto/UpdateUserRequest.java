@@ -33,6 +33,11 @@ public class UpdateUserRequest {
     private String role;
     
     /**
+     * 部门ID（可选，0表示未分配）
+     */
+    private Long departmentId;
+    
+    /**
      * 状态（1-启用，0-禁用）
      */
     private Integer status;
@@ -42,4 +47,9 @@ public class UpdateUserRequest {
      */
     @Size(min = 8, max = 50, message = "密码长度必须在8-50个字符之间")
     private String password;
+    
+    /**
+     * 备注
+     */
+    private String remark;
 }

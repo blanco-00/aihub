@@ -6,6 +6,7 @@ import com.aihub.dto.UpdateRoleRequest;
 import com.aihub.entity.Role;
 import com.aihub.exception.BusinessException;
 import com.aihub.mapper.RoleMapper;
+import com.aihub.mapper.RoleMenuMapper;
 import com.aihub.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +27,9 @@ public class RoleServiceImpl implements RoleService {
     
     @Autowired
     private RoleMapper roleMapper;
+    
+    @Autowired
+    private RoleMenuMapper roleMenuMapper;
     
     @Override
     public List<RoleResponse> getAllRoles() {
@@ -123,6 +127,39 @@ public class RoleServiceImpl implements RoleService {
         role.setUpdatedAt(LocalDateTime.now());
         roleMapper.updateById(role);
         log.info("删除角色成功: id={}, code={}, name={}", role.getId(), role.getCode(), role.getName());
+    }
+    
+    @Override
+    public List<Long> getMenuIdsByRoleId(Long roleId) {
+        // 检查角色是否存在
+        Role role = roleMapper.selectById(roleId);
+        if (role == null || role.getIsDeleted() == 1) {
+            log.warn("查询角色菜单失败，角色不存在: roleId={}", roleId);
+            throw new BusinessException("角色不存在");
+        }
+        
+        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveRoleMenus(Long roleId, List<Long> menuIds) {
+        // 检查角色是否存在
+        Role role = roleMapper.selectById(roleId);
+        if (role == null || role.getIsDeleted() == 1) {
+            log.warn("保存角色菜单失败，角色不存在: roleId={}", roleId);
+            throw new BusinessException("角色不存在");
+        }
+        
+        // 先删除原有的关联
+        roleMenuMapper.deleteByRoleId(roleId);
+        
+        // 如果有菜单ID，批量插入新的关联
+        if (menuIds != null && !menuIds.isEmpty()) {
+            roleMenuMapper.batchInsert(roleId, menuIds);
+        }
+        
+        log.info("保存角色菜单关联成功: roleId={}, menuCount={}", roleId, menuIds != null ? menuIds.size() : 0);
     }
     
     /**

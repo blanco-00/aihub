@@ -1,5 +1,8 @@
 package com.aihub.service;
 
+import com.aihub.dto.LoginLogListRequest;
+import com.aihub.dto.LoginLogResponse;
+import com.aihub.dto.PageResult;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -16,4 +19,9 @@ public interface LoginLogService {
      * @param request HTTP请求对象（用于获取IP、User-Agent等信息）
      */
     void recordLogin(Long userId, String username, Integer status, String message, HttpServletRequest request);
+    
+    /**
+     * 查询登录日志列表（分页）
+     */
+    PageResult<LoginLogResponse> getLoginLogList(LoginLogListRequest request);
 }

@@ -75,3 +75,17 @@ export const updateRole = (id: number, data: UpdateRoleRequest) => {
 export const deleteRole = (id: number) => {
   return http.request<Result<void>>("delete", `/api/roles/${id}`);
 };
+
+/**
+ * 获取角色的菜单ID列表
+ */
+export const getRoleMenus = (id: number) => {
+  return http.request<Result<number[]>>("get", `/api/roles/${id}/menus`);
+};
+
+/**
+ * 保存角色菜单关联
+ */
+export const saveRoleMenus = (id: number, menuIds: number[]) => {
+  return http.request<Result<void>>("post", `/api/roles/${id}/menus`, { data: menuIds });
+};

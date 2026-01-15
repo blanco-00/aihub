@@ -9,6 +9,7 @@ import {
   type CreateUserRequest,
   type UpdateUserRequest
 } from "./user";
+import { getDeptList as getDeptListNew } from "./department";
 
 type Result = {
   code: number;
@@ -35,7 +36,7 @@ type ResultTable = {
 export const getUserList = (data?: any) => {
   const transformStartTime = performance.now();
   
-  // 转换参数格式：从 { username, phone, status, currentPage, pageSize } 转换为 { keyword, role, status, current, size }
+  // 转换参数格式：从 { username, phone, status, currentPage, pageSize, departmentId } 转换为 { keyword, role, status, departmentId, current, size }
   const params: UserListParams = {};
   if (data) {
     params.current = data.currentPage || 1;
@@ -51,6 +52,9 @@ export const getUserList = (data?: any) => {
     }
     if (data.status !== undefined && data.status !== "") {
       params.status = Number(data.status);
+    }
+    if (data.departmentId !== undefined && data.departmentId !== null) {
+      params.departmentId = Number(data.departmentId);
     }
   }
   
@@ -85,6 +89,8 @@ export const getUserList = (data?: any) => {
         status: item.status,
         role: item.role,
         roleDescription: item.roleDescription,
+        departmentId: item.departmentId || 0,
+        departmentName: item.departmentName || "未分配",
         createTime: item.createdAt,
         updatedAt: item.updatedAt
       }));
@@ -147,7 +153,9 @@ export const updateUser = (id: number, data: any) => {
     email: data.email,
     phone: data.phone,
     role: data.role || "USER",
+    departmentId: data.departmentId !== undefined ? data.departmentId : undefined, // 包含部门ID
     status: data.status,
+    remark: data.remark, // 包含备注
     password: data.password || undefined // 只有提供密码时才更新
   };
   return updateUserNew(id, request);
@@ -190,7 +198,7 @@ export const getMenuList = (data?: object) => {
 
 /** 获取系统管理-部门管理列表 */
 export const getDeptList = (data?: object) => {
-  return http.request<Result>("post", "/dept", { data });
+  return getDeptListNew();
 };
 
 /** 获取系统监控-在线用户列表 */

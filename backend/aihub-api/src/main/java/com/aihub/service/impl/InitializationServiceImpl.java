@@ -2,9 +2,11 @@ package com.aihub.service.impl;
 
 import com.aihub.dto.DatabaseStatusDTO;
 import com.aihub.dto.InitSuperAdminDTO;
+import com.aihub.entity.Department;
 import com.aihub.entity.User;
 import com.aihub.enums.UserRole;
 import com.aihub.exception.BusinessException;
+import com.aihub.mapper.DepartmentMapper;
 import com.aihub.mapper.UserMapper;
 import com.aihub.service.InitializationService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,9 @@ public class InitializationServiceImpl implements InitializationService {
     
     @Autowired
     private UserMapper userMapper;
+    
+    @Autowired
+    private DepartmentMapper departmentMapper;
     
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;

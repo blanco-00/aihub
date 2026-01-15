@@ -37,7 +37,17 @@ public class CreateUserRequest {
     private String role;
     
     /**
+     * 部门ID（可选，0表示未分配）
+     */
+    private Long departmentId;
+    
+    /**
      * 状态（1-启用，0-禁用），默认启用
      */
     private Integer status = 1;
+    
+    /**
+     * 备注
+     */
+    private String remark;
 }

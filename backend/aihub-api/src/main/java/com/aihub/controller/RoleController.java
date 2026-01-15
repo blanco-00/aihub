@@ -82,4 +82,22 @@ public class RoleController {
         roleService.deleteRole(id);
         return Result.success();
     }
+    
+    /**
+     * 获取角色的菜单ID列表
+     */
+    @GetMapping("/{id}/menus")
+    public Result<List<Long>> getRoleMenus(@PathVariable Long id) {
+        List<Long> menuIds = roleService.getMenuIdsByRoleId(id);
+        return Result.success(menuIds);
+    }
+    
+    /**
+     * 保存角色菜单关联
+     */
+    @PostMapping("/{id}/menus")
+    public Result<Void> saveRoleMenus(@PathVariable Long id, @RequestBody List<Long> menuIds) {
+        roleService.saveRoleMenus(id, menuIds);
+        return Result.success();
+    }
 }

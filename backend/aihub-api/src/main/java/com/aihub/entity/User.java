@@ -27,7 +27,12 @@ public class User {
     
     private String role;
     
+    @TableField("department_id")
+    private Long departmentId;
+    
     private Integer status;
+    
+    private String remark;
     
     @TableField("created_at")
     private LocalDateTime createdAt;

@@ -91,6 +91,10 @@ verification:
     length: 6  # 验证码长度
     dev-mode: true  # 开发模式：打印验证码到日志（生产环境应设置为false）
 
+# 部门配置
+department:
+  max-level: 5  # 部门最大层级深度（推荐5层，满足99%的企业需求）
+
 # 日志配置
 # 日志等级说明：
 #   TRACE: 最详细（通常关闭）

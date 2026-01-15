@@ -70,6 +70,16 @@ const systemMonitorRouter = {
   },
   children: [
     {
+      path: "/monitor/system",
+      component: "monitor/system/index",
+      name: "SystemMonitor",
+      meta: {
+        icon: "ep:monitor",
+        title: "menus.pureSystemMonitor",
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
+      }
+    },
+    {
       path: "/monitor/online-user",
       component: "monitor/online/index",
       name: "OnlineUser",

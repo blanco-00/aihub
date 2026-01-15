@@ -95,6 +95,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- OSHI (Operating System and Hardware Information) -->
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.4.8</version>
+        </dependency>
+
         <!-- Spring Boot Starter Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

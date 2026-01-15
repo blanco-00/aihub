@@ -9,6 +9,7 @@ interface FormItemProps {
   email: string;
   sex: string | number;
   role?: string;
+  departmentId?: number;
   status: number;
   remark: string;
   /** 是否是最后一个超级管理员 */

@@ -31,7 +31,10 @@ export type UserInfo = {
   phone?: string;
   role: string;
   roleDescription: string;
+  departmentId?: number;
+  departmentName?: string;
   status: number;
+  remark?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -46,6 +49,7 @@ export type UserListParams = {
   phone?: string;
   role?: string;
   status?: number;
+  departmentId?: number;
 };
 
 /**
@@ -58,7 +62,9 @@ export type CreateUserRequest = {
   phone?: string;
   password: string;
   role: string;
+  departmentId?: number;
   status?: number;
+  remark?: string;
 };
 
 /**
@@ -70,8 +76,10 @@ export type UpdateUserRequest = {
   email: string;
   phone?: string;
   role: string;
+  departmentId?: number;
   status?: number;
   password?: string;
+  remark?: string;
 };
 
 /**

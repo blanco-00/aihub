@@ -9,7 +9,7 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getAllRoles, createRole, updateRole, deleteRole, type CreateRoleRequest, type UpdateRoleRequest } from "@/api/role";
+import { getAllRoles, createRole, updateRole, deleteRole, getRoleMenus, saveRoleMenus, type CreateRoleRequest, type UpdateRoleRequest } from "@/api/role";
 import { getMenuTree } from "@/api/menu";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 
@@ -307,9 +307,19 @@ export function useRole(treeRef: Ref) {
     if (id) {
       curRow.value = row;
       isShow.value = true;
-      // TODO: 后续实现角色菜单关联接口后，从后端获取已选中的菜单ID
-      // 目前先清空选中状态
-      treeRef.value.setCheckedKeys([]);
+      
+      // 从后端获取已选中的菜单ID
+      try {
+        const response = await getRoleMenus(id);
+        if (response.code === 200 && response.data) {
+          treeRef.value.setCheckedKeys(response.data);
+        } else {
+          treeRef.value.setCheckedKeys([]);
+        }
+      } catch (error: any) {
+        message(error.message || "获取角色菜单权限失败", { type: "error" });
+        treeRef.value.setCheckedKeys([]);
+      }
     } else {
       curRow.value = null;
       isShow.value = false;
@@ -329,20 +339,12 @@ export function useRole(treeRef: Ref) {
     const { id, name } = curRow.value;
     const checkedKeys = treeRef.value.getCheckedKeys();
     try {
-      // TODO: 后续实现角色菜单关联接口后，调用后端接口保存
-      // 目前先提示功能待实现
-      // 调试用，已注释
-      // console.log("角色ID:", id, "选中的菜单ID:", checkedKeys);
-      message(`角色名称为${name}的菜单权限保存功能待实现`, {
-        type: "warning"
-      });
-      // 实际实现示例：
-      // const response = await saveRoleMenu(id, checkedKeys);
-      // if (response.code === 200) {
-      //   message(`角色名称为${name}的菜单权限修改成功`, { type: "success" });
-      // } else {
-      //   message(response.message || "保存菜单权限失败", { type: "error" });
-      // }
+      const response = await saveRoleMenus(id, checkedKeys);
+      if (response.code === 200) {
+        message(`角色名称为${name}的菜单权限修改成功`, { type: "success" });
+      } else {
+        message(response.message || "保存菜单权限失败", { type: "error" });
+      }
     } catch (error: any) {
       message(error.message || "保存菜单权限失败", { type: "error" });
     }

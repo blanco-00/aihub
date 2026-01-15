@@ -47,7 +47,8 @@ export function useUser(tableRef: Ref) {
   const form = reactive({
     username: "",
     phone: "",
-    status: ""
+    status: "",
+    departmentId: undefined as number | undefined
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -121,6 +122,11 @@ export function useUser(tableRef: Ref) {
       formatter: ({ phone }) => hideTextAtIndex(phone, { start: 3, end: 6 })
     },
     {
+      label: "部门",
+      prop: "departmentName",
+      minWidth: 120
+    },
+    {
       label: "状态",
       prop: "status",
       minWidth: 90,
@@ -145,6 +151,12 @@ export function useUser(tableRef: Ref) {
       prop: "createTime",
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "备注",
+      prop: "remark",
+      minWidth: 200,
+      showOverflowTooltip: true
     },
     {
       label: "操作",
@@ -344,7 +356,17 @@ export function useUser(tableRef: Ref) {
     const loadingStartTime = performance.now();
     
     try {
-      const { code, data } = await getUserList(toRaw(form));
+      // 构建查询参数，包含 departmentId
+      // 注意：如果 departmentId 是 0，表示未分配，应该传递 0 而不是 undefined
+      // 如果 departmentId 是 undefined 或 null，则不传递该参数（显示所有用户）
+      const params: any = {
+        ...toRaw(form)
+      };
+      // 明确处理 departmentId：只有非 undefined 和非 null 时才传递
+      if (form.departmentId !== undefined && form.departmentId !== null) {
+        params.departmentId = form.departmentId;
+      }
+      const { code, data } = await getUserList(params);
       
       if (code === 0 && data) {
         dataList.value = data.list || [];
@@ -407,6 +429,7 @@ export function useUser(tableRef: Ref) {
           email: row?.email ?? "",
           sex: row?.sex ?? "",
           role: row?.role ?? "USER",
+          departmentId: row?.departmentId ?? 0,
           status: row?.status ?? 1,
           remark: row?.remark ?? "",
           isLastSuperAdmin: isLastSuperAdmin // 传递是否是最后一个超级管理员
@@ -441,7 +464,9 @@ export function useUser(tableRef: Ref) {
                   phone: curData.phone,
                   password: curData.password,
                   role: curData.role || "USER",
-                  status: curData.status
+                  departmentId: curData.departmentId || 0,
+                  status: curData.status,
+                  remark: curData.remark || ""
                 });
                 if (code === 200) {
                   message(`成功创建用户 ${curData.username}`, {
@@ -461,8 +486,14 @@ export function useUser(tableRef: Ref) {
                   email: curData.email,
                   phone: curData.phone,
                   role: curData.role || "USER",
-                  status: curData.status
+                  status: curData.status,
+                  remark: curData.remark || ""
                 };
+                // 处理部门ID：如果 departmentId 是 undefined 或 null，则传递 0（未分配）
+                // 如果 departmentId 是 0 或其他数字，则正常传递
+                updateData.departmentId = curData.departmentId !== undefined && curData.departmentId !== null 
+                  ? curData.departmentId 
+                  : 0;
                 // 如果提供了新密码，则更新密码
                 if (curData.password) {
                   updateData.password = curData.password;

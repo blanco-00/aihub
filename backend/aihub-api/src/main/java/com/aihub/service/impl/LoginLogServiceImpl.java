@@ -1,5 +1,8 @@
 package com.aihub.service.impl;
 
+import com.aihub.dto.LoginLogListRequest;
+import com.aihub.dto.LoginLogResponse;
+import com.aihub.dto.PageResult;
 import com.aihub.entity.LoginLog;
 import com.aihub.mapper.LoginLogMapper;
 import com.aihub.service.LoginLogService;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 登录日志服务实现
@@ -76,5 +80,30 @@ public class LoginLogServiceImpl implements LoginLogService {
             ip = ip.split(",")[0].trim();
         }
         return ip;
+    }
+    
+    @Override
+    public PageResult<LoginLogResponse> getLoginLogList(LoginLogListRequest request) {
+        // 计算偏移量
+        Long offset = (long) (request.getCurrent() - 1) * request.getSize();
+        
+        // 查询登录日志列表
+        List<LoginLogResponse> logs = loginLogMapper.selectLoginLogList(request, offset, request.getSize());
+        
+        // 统计总数
+        Long total = loginLogMapper.countLoginLogList(request);
+        
+        // 计算总页数
+        Long pages = (total + request.getSize() - 1) / request.getSize();
+        
+        // 构建分页结果
+        PageResult<LoginLogResponse> result = new PageResult<>();
+        result.setRecords(logs);
+        result.setTotal(total);
+        result.setCurrent(request.getCurrent());
+        result.setSize(request.getSize());
+        result.setPages(pages);
+        
+        return result;
     }
 }

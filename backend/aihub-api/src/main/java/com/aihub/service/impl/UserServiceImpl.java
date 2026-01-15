@@ -27,6 +27,9 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     
     @Autowired
+    private com.aihub.mapper.DepartmentMapper departmentMapper;
+    
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     
     @Override
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService {
             request.getPhone(),
             request.getRole(),
             request.getStatus(),
+            request.getDepartmentId(),
             offset,
             request.getSize()
         );
@@ -67,7 +71,8 @@ public class UserServiceImpl implements UserService {
             request.getKeyword(),
             request.getPhone(),
             request.getRole(),
-            request.getStatus()
+            request.getStatus(),
+            request.getDepartmentId()
         );
         long countTime = System.currentTimeMillis() - countStart;
         if (countTime > 500) {
@@ -108,7 +113,9 @@ public class UserServiceImpl implements UserService {
         response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
         response.setRole(user.getRole());
+        response.setDepartmentId(user.getDepartmentId() != null ? user.getDepartmentId() : 0L);
         response.setStatus(user.getStatus());
+        response.setRemark(user.getRemark());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         
@@ -118,6 +125,18 @@ public class UserServiceImpl implements UserService {
             response.setRoleDescription(role.getDescription());
         } catch (Exception e) {
             response.setRoleDescription("未知角色");
+        }
+        
+        // 设置部门名称（如果有部门ID）
+        if (user.getDepartmentId() != null && user.getDepartmentId() > 0) {
+            try {
+                com.aihub.entity.Department dept = departmentMapper.selectById(user.getDepartmentId());
+                response.setDepartmentName(dept != null ? dept.getName() : "未知部门");
+            } catch (Exception e) {
+                response.setDepartmentName("未知部门");
+            }
+        } else {
+            response.setDepartmentName("未分配");
         }
         
         return response;
@@ -153,7 +172,9 @@ public class UserServiceImpl implements UserService {
         user.setPhone(request.getPhone());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
+        user.setDepartmentId(request.getDepartmentId() != null ? request.getDepartmentId() : 0L);
         user.setStatus(request.getStatus() != null ? request.getStatus() : 1);
+        user.setRemark(request.getRemark());
         user.setIsDeleted(0);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -209,8 +230,19 @@ public class UserServiceImpl implements UserService {
             user.setPhone(request.getPhone());
         }
         user.setRole(request.getRole());
+        // 更新部门ID：如果请求中提供了 departmentId（包括0），则更新
+        // 0 表示未分配部门，null 表示不更新（保持原值）
+        if (request.getDepartmentId() != null) {
+            user.setDepartmentId(request.getDepartmentId());
+        } else {
+            // 如果前端传递的是 null 或未传递，保持原值不变
+            // 但通常前端会传递 0 表示未分配，所以这里主要是处理 null 的情况
+        }
         if (request.getStatus() != null) {
             user.setStatus(request.getStatus());
+        }
+        if (request.getRemark() != null) {
+            user.setRemark(request.getRemark());
         }
         
         // 如果提供了新密码，则更新密码

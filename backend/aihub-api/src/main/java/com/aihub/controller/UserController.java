@@ -29,6 +29,7 @@ public class UserController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) Long departmentId,
             jakarta.servlet.http.HttpServletRequest httpRequest) {
         
         long startTime = System.currentTimeMillis();
@@ -53,6 +54,7 @@ public class UserController {
         request.setPhone(phone);
         request.setRole(role);
         request.setStatus(status);
+        request.setDepartmentId(departmentId);
         
         PageResult<UserListResponse> result = userService.getUserList(request);
         

@@ -16,7 +16,10 @@ public class UserListResponse {
     private String phone;
     private String role;
     private String roleDescription;
+    private Long departmentId;
+    private String departmentName;
     private Integer status;
+    private String remark;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

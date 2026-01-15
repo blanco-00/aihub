@@ -31,6 +31,7 @@ public interface UserMapper extends BaseMapper<User> {
                                           @Param("phone") String phone,
                                           @Param("role") String role, 
                                           @Param("status") Integer status,
+                                          @Param("departmentId") Long departmentId,
                                           @Param("offset") Long offset,
                                           @Param("limit") Integer limit);
     
@@ -40,5 +41,6 @@ public interface UserMapper extends BaseMapper<User> {
     Long countUserList(@Param("keyword") String keyword, 
                       @Param("phone") String phone,
                       @Param("role") String role, 
-                      @Param("status") Integer status);
+                      @Param("status") Integer status,
+                      @Param("departmentId") Long departmentId);
 }

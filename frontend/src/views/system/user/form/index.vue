@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "../utils/rule";
 import { FormProps } from "../utils/types";
 import { usePublicHooks } from "../../hooks";
+import { getDepartmentTree } from "@/api/department";
+import type { DepartmentInfo } from "@/api/department";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -15,6 +17,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     email: "",
     sex: "",
     role: "USER",
+    departmentId: 0,
     status: 1,
     remark: ""
   })
@@ -48,6 +51,25 @@ const roleOptions = [
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
 const newFormInline = ref(props.formInline);
+const departmentTree = ref<DepartmentInfo[]>([]);
+const departmentProps = {
+  value: "id",
+  label: "name",
+  children: "children"
+};
+
+// 加载部门树
+onMounted(async () => {
+  try {
+    const { code, data } = await getDepartmentTree();
+    if (code === 200 && data) {
+      // 后端已经返回树结构，直接使用，不需要再用 handleTree 处理
+      departmentTree.value = data as DepartmentInfo[];
+    }
+  } catch (error) {
+    console.error("加载部门树失败", error);
+  }
+});
 
 function getRef() {
   return ruleFormRef.value;
@@ -152,6 +174,20 @@ defineExpose({ getRef });
           <div v-if="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'" class="text-xs text-yellow-600 mt-1">
             不能修改最后一个超级管理员的角色
           </div>
+        </el-form-item>
+      </re-col>
+      <re-col :value="12" :xs="24" :sm="24">
+        <el-form-item label="所属部门">
+          <el-tree-select
+            v-model="newFormInline.departmentId"
+            :data="departmentTree"
+            :props="departmentProps"
+            placeholder="请选择部门"
+            class="w-full"
+            check-strictly
+            :render-after-expand="false"
+            clearable
+          />
         </el-form-item>
       </re-col>
       <re-col
