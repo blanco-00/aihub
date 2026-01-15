@@ -9,7 +9,8 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleList, getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { getAllRoles, createRole, updateRole, deleteRole, type CreateRoleRequest, type UpdateRoleRequest } from "@/api/role";
+import { getMenuTree } from "@/api/menu";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 
 export function useRole(treeRef: Ref) {
@@ -75,15 +76,15 @@ export function useRole(treeRef: Ref) {
     },
     {
       label: "备注",
-      prop: "remark",
+      prop: "description",
       minWidth: 160
     },
     {
       label: "创建时间",
-      prop: "createTime",
+      prop: "createdAt",
       minWidth: 160,
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      formatter: ({ createdAt }) =>
+        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-"
     },
     {
       label: "操作",
@@ -102,7 +103,7 @@ export function useRole(treeRef: Ref) {
   //   ];
   // });
 
-  function onChange({ row, index }) {
+  async function onChange({ row, index }) {
     ElMessageBox.confirm(
       `确认要<strong>${
         row.status === 0 ? "停用" : "启用"
@@ -118,7 +119,7 @@ export function useRole(treeRef: Ref) {
         draggable: true
       }
     )
-      .then(() => {
+      .then(async () => {
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
@@ -126,7 +127,23 @@ export function useRole(treeRef: Ref) {
             loading: true
           }
         );
-        setTimeout(() => {
+        try {
+          const newStatus = row.status === 0 ? 1 : 0;
+          const request: UpdateRoleRequest = { status: newStatus };
+          const response = await updateRole(row.id, request);
+          if (response.code === 200) {
+            row.status = newStatus;
+            message(`已${row.status === 0 ? "停用" : "启用"}${row.name}`, {
+              type: "success"
+            });
+          } else {
+            message(response.message || "更新角色状态失败", { type: "error" });
+            row.status === 0 ? (row.status = 1) : (row.status = 0);
+          }
+        } catch (error: any) {
+          message(error.message || "更新角色状态失败", { type: "error" });
+          row.status === 0 ? (row.status = 1) : (row.status = 0);
+        } finally {
           switchLoadMap.value[index] = Object.assign(
             {},
             switchLoadMap.value[index],
@@ -134,46 +151,83 @@ export function useRole(treeRef: Ref) {
               loading: false
             }
           );
-          message(`已${row.status === 0 ? "停用" : "启用"}${row.name}`, {
-            type: "success"
-          });
-        }, 300);
+        }
       })
       .catch(() => {
         row.status === 0 ? (row.status = 1) : (row.status = 0);
       });
   }
 
-  function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
-    onSearch();
+  async function handleDelete(row) {
+    try {
+      const response = await deleteRole(row.id);
+      if (response.code === 200) {
+        message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+        onSearch();
+      } else {
+        message(response.message || "删除角色失败", { type: "error" });
+      }
+    } catch (error: any) {
+      message(error.message || "删除角色失败", { type: "error" });
+    }
   }
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    // 调试用，已注释
+    // console.log(`${val} items per page`);
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    // 调试用，已注释
+    // console.log(`current page: ${val}`);
   }
 
   function handleSelectionChange(val) {
-    console.log("handleSelectionChange", val);
+    // 调试用，已注释
+    // console.log("handleSelectionChange", val);
   }
 
   async function onSearch() {
     loading.value = true;
-    const { code, data } = await getRoleList(toRaw(form));
-    if (code === 0) {
-      dataList.value = data.list;
-      pagination.total = data.total;
-      pagination.pageSize = data.pageSize;
-      pagination.currentPage = data.currentPage;
-    }
-
-    setTimeout(() => {
+    try {
+      const searchStartTime = performance.now();
+      
+      const response = await getAllRoles();
+      const searchTime = performance.now() - searchStartTime;
+      
+      // 只记录超过1秒的请求
+      if (searchTime > 1000) {
+        console.warn(`[性能警告] 角色列表查询耗时: ${searchTime.toFixed(2)}ms`);
+      }
+      // 后端返回 code: 200 表示成功
+      if (response.code === 200 && response.data) {
+        let roles = response.data;
+        
+        // 前端筛选
+        if (form.name) {
+          roles = roles.filter((item: any) => item.name.includes(form.name));
+        }
+        if (form.code) {
+          roles = roles.filter((item: any) => item.code.includes(form.code));
+        }
+        if (form.status !== "") {
+          roles = roles.filter((item: any) => item.status === Number(form.status));
+        }
+        
+        dataList.value = roles;
+        pagination.total = roles.length;
+        pagination.pageSize = 10;
+        pagination.currentPage = 1;
+      } else {
+        message(response.message || "获取角色列表失败", { type: "error" });
+        dataList.value = [];
+      }
+    } catch (error: any) {
+      message(error.message || "获取角色列表失败", { type: "error" });
+      dataList.value = [];
+    } finally {
       loading.value = false;
-    }, 500);
+    }
   }
 
   const resetForm = formEl => {
@@ -187,9 +241,10 @@ export function useRole(treeRef: Ref) {
       title: `${title}角色`,
       props: {
         formInline: {
+          id: row?.id,
           name: row?.name ?? "",
           code: row?.code ?? "",
-          remark: row?.remark ?? ""
+          remark: row?.remark ?? row?.description ?? ""
         }
       },
       width: "40%",
@@ -198,26 +253,47 @@ export function useRole(treeRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
-      beforeSure: (done, { options }) => {
+      beforeSure: async (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        function chores() {
-          message(`您${title}了角色名称为${curData.name}的这条数据`, {
-            type: "success"
-          });
-          done(); // 关闭弹框
-          onSearch(); // 刷新表格数据
-        }
-        FormRef.validate(valid => {
+        FormRef.validate(async (valid: boolean) => {
           if (valid) {
-            console.log("curData", curData);
-            // 表单规则校验通过
-            if (title === "新增") {
-              // 实际开发先调用新增接口，再进行下面操作
-              chores();
-            } else {
-              // 实际开发先调用修改接口，再进行下面操作
-              chores();
+            try {
+              if (title === "新增") {
+                const request: CreateRoleRequest = {
+                  code: curData.code,
+                  name: curData.name,
+                  description: curData.remark || undefined,
+                  status: 1
+                };
+                const response = await createRole(request);
+                if (response.code === 200) {
+                  message(`您${title}了角色名称为${curData.name}的这条数据`, {
+                    type: "success"
+                  });
+                  done();
+                  onSearch();
+                } else {
+                  message(response.message || "创建角色失败", { type: "error" });
+                }
+              } else {
+                const request: UpdateRoleRequest = {
+                  name: curData.name || undefined,
+                  description: curData.remark || undefined
+                };
+                const response = await updateRole(curData.id, request);
+                if (response.code === 200) {
+                  message(`您${title}了角色名称为${curData.name}的这条数据`, {
+                    type: "success"
+                  });
+                  done();
+                  onSearch();
+                } else {
+                  message(response.message || "更新角色失败", { type: "error" });
+                }
+              }
+            } catch (error: any) {
+              message(error.message || `${title}角色失败`, { type: "error" });
             }
           }
         });
@@ -231,10 +307,9 @@ export function useRole(treeRef: Ref) {
     if (id) {
       curRow.value = row;
       isShow.value = true;
-      const { code, data } = await getRoleMenuIds({ id });
-      if (code === 0) {
-        treeRef.value.setCheckedKeys(data);
-      }
+      // TODO: 后续实现角色菜单关联接口后，从后端获取已选中的菜单ID
+      // 目前先清空选中状态
+      treeRef.value.setCheckedKeys([]);
     } else {
       curRow.value = null;
       isShow.value = false;
@@ -250,13 +325,27 @@ export function useRole(treeRef: Ref) {
   }
 
   /** 菜单权限-保存 */
-  function handleSave() {
+  async function handleSave() {
     const { id, name } = curRow.value;
-    // 根据用户 id 调用实际项目中菜单权限修改接口
-    console.log(id, treeRef.value.getCheckedKeys());
-    message(`角色名称为${name}的菜单权限修改成功`, {
-      type: "success"
-    });
+    const checkedKeys = treeRef.value.getCheckedKeys();
+    try {
+      // TODO: 后续实现角色菜单关联接口后，调用后端接口保存
+      // 目前先提示功能待实现
+      // 调试用，已注释
+      // console.log("角色ID:", id, "选中的菜单ID:", checkedKeys);
+      message(`角色名称为${name}的菜单权限保存功能待实现`, {
+        type: "warning"
+      });
+      // 实际实现示例：
+      // const response = await saveRoleMenu(id, checkedKeys);
+      // if (response.code === 200) {
+      //   message(`角色名称为${name}的菜单权限修改成功`, { type: "success" });
+      // } else {
+      //   message(response.message || "保存菜单权限失败", { type: "error" });
+      // }
+    } catch (error: any) {
+      message(error.message || "保存菜单权限失败", { type: "error" });
+    }
   }
 
   /** 数据权限 可自行开发 */
@@ -271,11 +360,19 @@ export function useRole(treeRef: Ref) {
   };
 
   onMounted(async () => {
-    onSearch();
-    const { code, data } = await getRoleMenu();
-    if (code === 0) {
-      treeIds.value = getKeyList(data, "id");
-      treeData.value = handleTree(data);
+    // 优化：先等待第一个请求完成，避免同时建立多个连接导致的延迟
+    // 这样可以复用第一个请求建立的连接
+    await onSearch();
+    
+    // 获取菜单树用于权限配置（在第一个请求完成后发起，可以复用连接）
+    try {
+      const response = await getMenuTree();
+      if (response.code === 200 && response.data) {
+        treeIds.value = getKeyList(response.data, "id");
+        treeData.value = handleTree(response.data);
+      }
+    } catch (error: any) {
+      message(error.message || "获取菜单列表失败", { type: "error" });
     }
   });
 

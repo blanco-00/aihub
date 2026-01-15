@@ -1,6 +1,5 @@
 package com.aihub.mapper;
 
-import com.aihub.dto.UserListRequest;
 import com.aihub.dto.UserListResponse;
 import com.aihub.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -29,6 +28,7 @@ public interface UserMapper extends BaseMapper<User> {
      * 查询用户列表（支持搜索和筛选）
      */
     List<UserListResponse> selectUserList(@Param("keyword") String keyword, 
+                                          @Param("phone") String phone,
                                           @Param("role") String role, 
                                           @Param("status") Integer status,
                                           @Param("offset") Long offset,
@@ -38,6 +38,7 @@ public interface UserMapper extends BaseMapper<User> {
      * 统计用户总数（支持搜索和筛选）
      */
     Long countUserList(@Param("keyword") String keyword, 
+                      @Param("phone") String phone,
                       @Param("role") String role, 
                       @Param("status") Integer status);
 }

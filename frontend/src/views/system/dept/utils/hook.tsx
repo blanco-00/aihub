@@ -63,7 +63,8 @@ export function useDept() {
   ];
 
   function handleSelectionChange(val) {
-    console.log("handleSelectionChange", val);
+    // 调试用，已注释
+    // console.log("handleSelectionChange", val);
   }
 
   function resetForm(formEl) {
@@ -139,7 +140,8 @@ export function useDept() {
         }
         FormRef.validate(valid => {
           if (valid) {
-            console.log("curData", curData);
+            // 调试用，已注释
+            // console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作

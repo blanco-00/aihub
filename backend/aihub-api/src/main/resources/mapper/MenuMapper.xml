@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.mapper.MenuMapper">
+
+    <!-- 根据父菜单ID查询子菜单列表 -->
+    <select id="selectByParentId" resultType="com.aihub.entity.Menu">
+        SELECT 
+            id, parent_id, name, path, component, redirect, icon, title, 
+            sort_order, show_link, keep_alive, status, created_at, updated_at, is_deleted
+        FROM menu 
+        WHERE parent_id = #{parentId} 
+        AND is_deleted = 0
+        AND status = 1
+        ORDER BY sort_order ASC
+    </select>
+
+    <!-- 查询所有菜单（树形结构） -->
+    <!-- 注意：菜单数据量通常不大（几十到几百条），且需要完整字段构建树结构，因此查询所有字段 -->
+    <select id="selectAllMenus" resultType="com.aihub.entity.Menu">
+        SELECT 
+            id, parent_id, name, path, component, redirect, icon, title, 
+            sort_order, show_link, keep_alive, status, created_at, updated_at, is_deleted
+        FROM menu 
+        WHERE is_deleted = 0
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <!-- 根据角色ID查询菜单列表 -->
+    <select id="selectByRoleId" resultType="com.aihub.entity.Menu">
+        SELECT 
+            m.id, m.parent_id, m.name, m.path, m.component, m.redirect, m.icon, m.title, 
+            m.sort_order, m.show_link, m.keep_alive, m.status, m.created_at, m.updated_at, m.is_deleted
+        FROM menu m
+        INNER JOIN role_menu rm ON m.id = rm.menu_id
+        WHERE rm.role_id = #{roleId}
+        AND m.is_deleted = 0
+        AND m.status = 1
+        ORDER BY m.sort_order ASC, m.id ASC
+    </select>
+
+    <!-- 根据角色代码查询菜单列表 -->
+    <select id="selectByRoleCode" resultType="com.aihub.entity.Menu">
+        SELECT 
+            m.id, m.parent_id, m.name, m.path, m.component, m.redirect, m.icon, m.title, 
+            m.sort_order, m.show_link, m.keep_alive, m.status, m.created_at, m.updated_at, m.is_deleted
+        FROM menu m
+        INNER JOIN role_menu rm ON m.id = rm.menu_id
+        INNER JOIN role r ON rm.role_id = r.id
+        WHERE r.code = #{roleCode}
+        AND r.is_deleted = 0
+        AND r.status = 1
+        AND m.is_deleted = 0
+        AND m.status = 1
+        ORDER BY m.sort_order ASC, m.id ASC
+    </select>
+
+    <!-- 检查是否存在子菜单 -->
+    <select id="countChildren" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM menu 
+        WHERE parent_id = #{parentId} 
+        AND is_deleted = 0
+    </select>
+
+</mapper>

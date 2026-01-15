@@ -17,14 +17,30 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+      # 性能优化：连接池配置
+      minimum-idle: 5      # 最小空闲连接数（预热连接池，避免首次连接慢）
+      maximum-pool-size: 20  # 最大连接数
+      connection-timeout: 5000  # 连接超时时间（5秒，快速失败）
+      idle-timeout: 600000  # 空闲连接超时（10分钟）
+      max-lifetime: 1800000  # 连接最大生命周期（30分钟）
+      leak-detection-threshold: 60000  # 连接泄漏检测阈值（60秒）
       # 启动时立即初始化连接池（不延迟加载）
       initialization-fail-timeout: 0  # 0 表示立即初始化，失败时立即报错
       connection-test-query: SELECT 1  # 连接测试查询
+  
+  # Redis 配置（默认配置，可在 profile 中覆盖）
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+      timeout: 3000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
   
   # Flyway 配置（可选，仅开发环境启用）
   flyway:
@@ -39,13 +55,28 @@ mybatis-plus:
   type-aliases-package: com.aihub.entity
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 性能优化：关闭 SQL 日志输出到控制台，改为使用 SLF4J 日志（可通过 logging.level 控制）
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 服务器配置
 server:
   port: 8080
   servlet:
     context-path: /
+    # 性能优化：在应用启动时立即初始化 DispatcherServlet，而不是懒加载
+    # 这样可以避免首次请求时的初始化延迟（约1-2秒）
+    eager-init: true
+  tomcat:
+    # 性能优化：Tomcat 连接器配置
+    threads:
+      max: 200  # 最大线程数
+      min-spare: 10  # 最小空闲线程数（预热线程池）
+    accept-count: 100  # 等待队列长度
+    max-connections: 10000  # 最大连接数
+    connection-timeout: 20000  # 连接超时时间（20秒）
+    # 性能优化：启用压缩，减少传输时间
+    compression: on
+    compressible-mime-types: application/json,application/xml,text/html,text/xml,text/plain
 
 # JWT配置
 jwt:

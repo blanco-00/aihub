@@ -1,5 +1,94 @@
 # SQL 脚本管理
 
+> 📚 **相关文档**: [项目主文档](../../README.md) | [数据库设计文档](../backend/database.md) | [系统初始化文档](../backend/initialization.md)
+
+## Flyway 数据库迁移
+
+### 迁移脚本位置
+
+迁移脚本位于：`backend/aihub-api/src/main/resources/db/migration/`
+
+### 迁移脚本列表
+
+#### V1.0.0__init_tables.sql
+- **说明**: 初始化数据库表结构
+- **包含表**: user, model_config
+- **注意**: 此脚本包含最新的表结构（包括 nickname 字段）
+
+#### V1.0.1__add_nickname_to_user.sql
+- **说明**: 为已有数据库添加 nickname 字段
+- **用途**: 用于升级已有数据库（从 V1.0.0 升级到包含 nickname 的版本）
+- **注意**: 新数据库不需要执行此脚本，因为 V1.0.0 已包含 nickname 字段
+
+### 使用方式
+
+#### 1. 启用 Flyway
+
+在 `application.yml` 或 `application-dev.yml` 中启用 Flyway：
+
+```yaml
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 1.0.0
+```
+
+#### 2. 自动迁移
+
+启动应用时，Flyway 会自动：
+- **首次启动时自动创建 `flyway_schema_history` 表**（如果不存在）
+- 检查数据库中的迁移历史表 `flyway_schema_history`
+- 按版本号顺序执行未执行的迁移脚本
+- 记录执行历史，避免重复执行
+
+**注意**：
+- 如果 Flyway 未启用（`enabled: false`），`flyway_schema_history` 表不会存在，这是正常的
+- 只有启用 Flyway 并启动应用后，才会创建此表
+
+#### 3. 新数据库
+
+对于全新的数据库：
+- Flyway 会执行 V1.0.0（包含完整的表结构，包括 nickname）
+- 不会执行 V1.0.1（因为 V1.0.0 已包含 nickname）
+
+#### 4. 已有数据库
+
+对于已有数据库（已执行过 V1.0.0，但没有 nickname 字段）：
+- Flyway 会检测到 V1.0.0 已执行
+- 自动执行 V1.0.1，添加 nickname 字段
+- 将现有用户的 nickname 设置为 username
+
+### 命名规范
+
+迁移脚本命名格式：`V{版本号}__{描述}.sql`
+
+- 版本号：使用点号分隔，如 `1.0.0`, `1.0.1`, `1.1.0`
+- 描述：使用下划线分隔的英文描述
+- 示例：`V1.0.1__add_nickname_to_user.sql`
+
+### 注意事项
+
+1. **Flyway 历史表**：
+   - `flyway_schema_history` 表是 Flyway 自动创建的，用于记录迁移脚本的执行历史
+   - **只有在启用 Flyway 并首次启动应用时才会创建此表**
+   - 如果 Flyway 未启用（`enabled: false`），此表不会存在，这是正常的
+   - 表结构：包含 `installed_rank`、`version`、`description`、`type`、`script`、`checksum`、`installed_on` 等字段
+2. **不要修改已执行的迁移脚本**：已执行的脚本会被记录在 `flyway_schema_history` 表中，修改会导致校验失败
+3. **新字段添加到最新版本**：新字段应该添加到最新的迁移脚本中，并更新 V1.0.0（全量初始化脚本）
+4. **向后兼容**：迁移脚本应该支持重复执行（使用 `IF NOT EXISTS` 等）
+5. **数据迁移**：如果需要迁移数据，应该在迁移脚本中包含数据迁移逻辑
+
+### 当前状态
+
+- ✅ V1.0.0: 初始化表结构（包含 nickname 字段）
+- ✅ V1.0.1: 为已有数据库添加 nickname 字段（支持重复执行）
+
+---
+
+# SQL 脚本管理
+
 > 本文档说明 SQL 脚本的存放方式和管理规范。
 
 ## 📚 相关文档
@@ -190,11 +279,33 @@ docs/sql/
 
 ---
 
-## 🛠️ Flyway 集成（可选，仅开发环境）
+## 🛠️ Flyway 集成（推荐在开发环境启用）
 
-**注意**: Flyway 是可选的数据库迁移工具。如果项目没有引入 Flyway，可以直接使用全量脚本手动初始化数据库。
+**注意**: Flyway 是推荐的数据库迁移工具，可以自动管理数据库版本和增量迁移。
 
 **重要原则**: Flyway 应该只在开发环境启用，测试和生产环境必须禁用，由运维人员手动执行数据库迁移。
+
+### 为什么启用 Flyway？
+
+1. **自动增量迁移**：
+   - 添加新字段时，只需创建新的迁移脚本（如 `V1.0.2__add_new_field.sql`）
+   - Flyway 会自动检测并执行未执行的迁移脚本
+   - 无需手动执行 SQL，提高开发效率
+
+2. **版本管理**：
+   - 所有数据库变更都记录在迁移脚本中
+   - 便于代码审查和版本追踪
+   - 团队协作时，每个人拉取代码后自动同步数据库结构
+
+3. **与 Docker 初始化脚本的配合**：
+   - Docker 初始化脚本（`docker-entrypoint-initdb.d`）只在**首次创建数据库**时执行
+   - 如果数据库已存在，Docker 初始化脚本不会执行
+   - Flyway 的 `baseline-on-migrate: true` 会自动处理已有数据库的情况
+   - 两者不会冲突：Docker 负责首次初始化，Flyway 负责后续增量迁移
+
+4. **幂等性保证**：
+   - Flyway 会记录已执行的脚本，避免重复执行
+   - 即使重启应用，也不会重复执行已执行的脚本
 
 ### 使用 Flyway 的前提条件
 

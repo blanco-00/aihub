@@ -16,7 +16,7 @@ public class LoginRequest {
     private String password;
     
     /**
-     * 记住我（7天有效期）
+     * 记住我（是否勾选免登录，后端固定30天）
      */
     private Boolean rememberMe = false;
 }

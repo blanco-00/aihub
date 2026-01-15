@@ -4,9 +4,19 @@ import { isPhone, isEmail } from "@pureadmin/utils";
 
 /** 自定义表单规则校验 */
 export const formRules = reactive(<FormRules>{
-  nickname: [{ required: true, message: "用户昵称为必填项", trigger: "blur" }],
+  nickname: [{ required: false, message: "用户昵称为必填项", trigger: "blur" }],
   username: [{ required: true, message: "用户名称为必填项", trigger: "blur" }],
-  password: [{ required: true, message: "用户密码为必填项", trigger: "blur" }],
+  password: [
+    {
+      validator: (rule, value, callback) => {
+        // 新增时密码必填，修改时密码可选（通过formInline.title判断）
+        // 这里在hook中动态设置验证规则
+        callback();
+      },
+      trigger: "blur"
+    }
+  ],
+  role: [{ required: true, message: "用户角色为必填项", trigger: "blur" }],
   phone: [
     {
       validator: (rule, value, callback) => {

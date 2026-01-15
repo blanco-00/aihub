@@ -58,6 +58,22 @@ public class JwtUtil {
     }
     
     /**
+     * 生成Token（自定义过期时间）
+     * @param userId 用户ID
+     * @param username 用户名
+     * @param role 角色
+     * @param expirationMillis 过期时间（毫秒）
+     * @return Token字符串
+     */
+    public String generateToken(Long userId, String username, String role, Long expirationMillis) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("username", username);
+        claims.put("role", role);
+        return generateToken(claims, expirationMillis);
+    }
+    
+    /**
      * 生成刷新Token
      * @param userId 用户ID
      * @param username 用户名

@@ -20,10 +20,11 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { initRouter, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { ReImageVerify } from "@/components/ReImageVerify";
-import { ref, toRaw, reactive, watch, computed } from "vue";
+import { ref, toRaw, reactive, watch, computed, onMounted } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+import { getLastUsername } from "@/utils/auth";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
@@ -39,7 +40,6 @@ defineOptions({
 });
 
 const imgCode = ref("");
-const loginDay = ref(7);
 const router = useRouter();
 const loading = ref(false);
 const checked = ref(false);
@@ -57,9 +57,11 @@ dataThemeChange(themeMode.value);
 const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
+// 从缓存中读取上次登录的用户名，如果没有则为空
+const lastUsername = getLastUsername();
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123",
+  username: lastUsername,
+  password: "",
   verifyCode: ""
 });
 
@@ -112,9 +114,6 @@ watch(imgCode, value => {
 });
 watch(checked, bool => {
   useUserStoreHook().SET_ISREMEMBERED(bool);
-});
-watch(loginDay, value => {
-  useUserStoreHook().SET_LOGINDAY(value);
 });
 </script>
 
@@ -237,20 +236,6 @@ watch(loginDay, value => {
                 <div class="w-full h-[20px] flex justify-between items-center">
                   <el-checkbox v-model="checked">
                     <span class="flex">
-                      <select
-                        v-model="loginDay"
-                        :style="{
-                          width: loginDay < 10 ? '10px' : '16px',
-                          outline: 'none',
-                          background: 'none',
-                          appearance: 'none',
-                          border: 'none'
-                        }"
-                      >
-                        <option value="1">1</option>
-                        <option value="7">7</option>
-                        <option value="30">30</option>
-                      </select>
                       {{ t("login.pureRemember") }}
                       <IconifyIconOffline
                         v-tippy="{

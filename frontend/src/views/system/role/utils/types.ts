@@ -1,6 +1,8 @@
 // 虽然字段很少 但是抽离出来 后续有扩展字段需求就很方便了
 
 interface FormItemProps {
+  /** 角色ID（编辑时使用） */
+  id?: number;
   /** 角色名称 */
   name: string;
   /** 角色编号 */

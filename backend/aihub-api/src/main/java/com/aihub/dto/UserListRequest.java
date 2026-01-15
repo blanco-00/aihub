@@ -19,9 +19,14 @@ public class UserListRequest {
     private Integer size = 10;
     
     /**
-     * 搜索关键词（用户名或邮箱）
+     * 搜索关键词（用户名、昵称或邮箱）
      */
     private String keyword;
+
+    /**
+     * 手机号筛选
+     */
+    private String phone;
     
     /**
      * 角色筛选

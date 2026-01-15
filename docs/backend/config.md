@@ -6,6 +6,8 @@
 
 - [后端开发指南](./guide.md) - 返回后端文档总览
 - [快速开始指南](./quick-start.md) - 快速初始化项目
+- [数据库设计文档](./database.md) - 查看数据库设计规范
+- [系统初始化文档](./initialization.md) - 查看系统初始化流程
 - [Docker Compose 部署指南](../deployment/docker-compose.md) - Docker 部署相关配置
 - [项目主文档](../../README.md) - 返回项目文档入口
 

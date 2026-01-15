@@ -30,6 +30,8 @@ export const TokenKey = "authorized-token";
  * 再次打开浏览器需要重新登录系统
  * */
 export const multipleTabsKey = "multiple-tabs";
+/** 上次登录的用户名缓存key */
+export const lastUsernameKey = "last-username";
 
 /** 获取`token` */
 export function getToken(): DataInfo<number> {
@@ -48,25 +50,25 @@ export function getToken(): DataInfo<number> {
 export function setToken(data: DataInfo<Date>) {
   let expires = 0;
   const { accessToken, refreshToken } = data;
-  const { isRemembered, loginDay } = useUserStoreHook();
+  const { isRemembered } = useUserStoreHook();
   expires = new Date(data.expires).getTime(); // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
   const cookieString = JSON.stringify({ accessToken, expires, refreshToken });
 
-  expires > 0
-    ? Cookies.set(TokenKey, cookieString, {
-        expires: (expires - Date.now()) / 86400000
-      })
-    : Cookies.set(TokenKey, cookieString);
-
-  Cookies.set(
-    multipleTabsKey,
-    "true",
-    isRemembered
-      ? {
-          expires: loginDay
-        }
-      : {}
-  );
+  // Cookie 过期时间使用 Token 本身的过期时间（后端已根据 rememberMe 设置）
+  if (expires > 0) {
+    const expiresInDays = (expires - Date.now()) / 86400000; // 转换为天数
+    Cookies.set(TokenKey, cookieString, {
+      expires: expiresInDays
+    });
+    
+    // multipleTabsKey 用于判断是否已登录，过期时间与 Token Cookie 保持一致
+    Cookies.set(multipleTabsKey, "true", {
+      expires: expiresInDays
+    });
+  } else {
+    Cookies.set(TokenKey, cookieString); // 会话 Cookie（浏览器关闭后失效）
+    Cookies.set(multipleTabsKey, "true"); // 会话 Cookie
+  }
 
   function setUserKey({ avatar, username, nickname, roles, permissions }) {
     useUserStoreHook().SET_AVATAR(avatar);
@@ -139,3 +141,15 @@ export const hasPerms = (value: string | Array<string>): boolean => {
     : isIncludeAllChildren(value, permissions);
   return isAuths ? true : false;
 };
+
+/** 保存上次登录的用户名 */
+export function saveLastUsername(username: string): void {
+  if (username) {
+    storageLocal().setItem(lastUsernameKey, username);
+  }
+}
+
+/** 获取上次登录的用户名 */
+export function getLastUsername(): string {
+  return storageLocal().getItem<string>(lastUsernameKey) || "";
+}

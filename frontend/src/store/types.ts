@@ -46,5 +46,4 @@ export type userType = {
   verifyCode?: string;
   currentPage?: number;
   isRemembered?: boolean;
-  loginDay?: number;
 };

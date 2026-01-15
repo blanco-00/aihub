@@ -32,6 +32,7 @@ public class LoginResponse {
     public static class UserInfo {
         private Long id;
         private String username;
+        private String nickname;
         private String email;
         private String role;
         private String roleDescription;

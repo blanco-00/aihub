@@ -20,7 +20,7 @@ import {
   refreshToken as authRefreshToken
 } from "@/api/auth";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { type DataInfo, setToken, removeToken, userKey, saveLastUsername } from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
@@ -39,10 +39,8 @@ export const useUserStore = defineStore("pure-user", {
     verifyCode: "",
     // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：二维码登录、3：注册、4：忘记密码）
     currentPage: 0,
-    // 是否勾选了登录页的免登录
-    isRemembered: false,
-    // 登录页的免登录存储几天，默认7天
-    loginDay: 7
+    // 是否勾选了登录页的免登录（后端固定30天）
+    isRemembered: false
   }),
   actions: {
     /** 存储头像 */
@@ -77,34 +75,37 @@ export const useUserStore = defineStore("pure-user", {
     SET_ISREMEMBERED(bool: boolean) {
       this.isRemembered = bool;
     },
-    /** 设置登录页的免登录存储几天 */
-    SET_LOGINDAY(value: number) {
-      this.loginDay = Number(value);
-    },
     /** 登入 */
     async loginByUsername(data: { username?: string; password?: string }) {
       return new Promise<UserResult>((resolve, reject) => {
         // 使用新的 auth API
         const loginData: LoginRequest = {
           usernameOrEmail: data.username || "",
-          password: data.password || ""
+          password: data.password || "",
+          rememberMe: this.isRemembered
         };
         authLogin(loginData)
           .then(response => {
             if (response.code === 200) {
               // 转换后端数据格式为前端需要的格式
               const loginResponse = response.data;
+              // 计算过期时间：当前时间 + expiresIn（秒）转毫秒
+              const expires = new Date(Date.now() + loginResponse.expiresIn * 1000);
               const tokenData = {
-                accessToken: loginResponse.accessToken,
+                accessToken: loginResponse.token, // 后端返回的是 token
                 refreshToken: loginResponse.refreshToken,
-                expires: new Date(loginResponse.expires),
+                expires: expires, // 根据 expiresIn 计算过期时间
                 username: loginResponse.user.username,
-                avatar: loginResponse.user.avatar || "",
-                nickname: loginResponse.user.nickname || loginResponse.user.username,
+                avatar: "", // 后端暂未返回头像
+                nickname: loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
                 roles: [loginResponse.user.role],
                 permissions: [] // 后端暂未返回权限，后续可扩展
               };
               setToken(tokenData);
+              // 保存上次登录的用户名
+              if (data.username) {
+                saveLastUsername(data.username);
+              }
               // 返回兼容旧格式的数据
               const userResult: UserResult = {
                 code: 0,
@@ -122,6 +123,10 @@ export const useUserStore = defineStore("pure-user", {
               .then(data => {
                 if (data.code === 0) {
                   setToken(data.data);
+                  // 保存上次登录的用户名
+                  if (data.data?.username) {
+                    saveLastUsername(data.data.username);
+                  }
                   resolve(data);
                 } else {
                   reject(data.message);
@@ -152,16 +157,18 @@ export const useUserStore = defineStore("pure-user", {
         };
         authRefreshToken(refreshData)
           .then(response => {
-            if (response.code === 0) {
+            if (response.code === 200) {
               // 转换后端数据格式为前端需要的格式
               const loginResponse = response.data;
+              // 计算过期时间：当前时间 + expiresIn（秒）转毫秒
+              const expires = new Date(Date.now() + loginResponse.expiresIn * 1000);
               const tokenData = {
-                accessToken: loginResponse.accessToken,
+                accessToken: loginResponse.token, // 后端返回的是 token
                 refreshToken: loginResponse.refreshToken,
-                expires: new Date(loginResponse.expires),
+                expires: expires, // 根据 expiresIn 计算过期时间
                 username: loginResponse.user.username,
-                avatar: loginResponse.user.avatar || "",
-                nickname: loginResponse.user.nickname || loginResponse.user.username,
+                avatar: "", // 后端暂未返回头像
+                nickname: loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
                 roles: [loginResponse.user.role],
                 permissions: [] // 后端暂未返回权限，后续可扩展
               };

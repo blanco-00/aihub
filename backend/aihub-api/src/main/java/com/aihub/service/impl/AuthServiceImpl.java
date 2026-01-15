@@ -11,10 +11,12 @@ import com.aihub.enums.UserRole;
 import com.aihub.exception.BusinessException;
 import com.aihub.mapper.UserMapper;
 import com.aihub.service.AuthService;
+import com.aihub.service.TokenCacheService;
 import com.aihub.service.VerificationCodeService;
 import com.aihub.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,15 @@ public class AuthServiceImpl implements AuthService {
     
     @Autowired
     private VerificationCodeService verificationCodeService;
+    
+    @Autowired
+    private TokenCacheService tokenCacheService;
+    
+    @Value("${jwt.expiration:86400000}")
+    private Long tokenExpiration; // Token过期时间（毫秒）
+    
+    @Value("${jwt.refresh-expiration:604800000}")
+    private Long refreshTokenExpiration; // 刷新Token过期时间（毫秒）
     
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -77,20 +88,37 @@ public class AuthServiceImpl implements AuthService {
         
         log.debug("密码验证成功: username={}", user.getUsername());
         
-        // 生成Token
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+        // 根据 rememberMe 计算 Token 过期时间
+        long tokenExpirationMillis;
+        long expiresInSeconds;
+        
+        if (request.getRememberMe() != null && request.getRememberMe()) {
+            // 勾选了免登录，固定使用30天
+            tokenExpirationMillis = 30L * 24 * 60 * 60 * 1000; // 30天转换为毫秒
+            expiresInSeconds = 30L * 24 * 60 * 60; // 30天转换为秒
+            log.info("用户勾选了免登录: username={}, 使用30天过期时间", user.getUsername());
+        } else {
+            // 未勾选免登录，使用默认过期时间（24小时）
+            tokenExpirationMillis = tokenExpiration;
+            expiresInSeconds = tokenExpiration / 1000; // 转换为秒
+            log.info("用户未勾选免登录: username={}, 使用默认过期时间24小时", user.getUsername());
+        }
+        
+        // 生成Token（使用计算出的过期时间）
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole(), tokenExpirationMillis);
         String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername());
         
         // 构建响应
         LoginResponse response = new LoginResponse();
         response.setToken(token);
         response.setRefreshToken(refreshToken);
-        response.setExpiresIn(86400L); // 24小时（秒）
+        response.setExpiresIn(expiresInSeconds);
         
         // 用户信息
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
         userInfo.setId(user.getId());
         userInfo.setUsername(user.getUsername());
+        userInfo.setNickname(user.getNickname() != null ? user.getNickname() : user.getUsername());
         userInfo.setEmail(user.getEmail());
         userInfo.setRole(user.getRole());
         
@@ -99,6 +127,9 @@ public class AuthServiceImpl implements AuthService {
         userInfo.setRoleDescription(role.getDescription());
         
         response.setUser(userInfo);
+        
+        // 将 Token 存入 Redis 缓存（使用计算出的过期时间）
+        tokenCacheService.saveToken(token, user.getId(), expiresInSeconds);
         
         log.info("用户登录成功: username={}, role={}", user.getUsername(), user.getRole());
         
@@ -150,6 +181,7 @@ public class AuthServiceImpl implements AuthService {
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo();
         userInfo.setId(user.getId());
         userInfo.setUsername(user.getUsername());
+        userInfo.setNickname(user.getNickname() != null ? user.getNickname() : user.getUsername());
         userInfo.setEmail(user.getEmail());
         userInfo.setRole(user.getRole());
         
@@ -158,6 +190,14 @@ public class AuthServiceImpl implements AuthService {
         
         response.setUser(userInfo);
         
+        // 将旧的 refreshToken 加入黑名单（使其失效）
+        long refreshExpirationSeconds = refreshTokenExpiration / 1000; // 转换为秒
+        tokenCacheService.invalidateToken(request.getRefreshToken(), refreshExpirationSeconds);
+        
+        // 将新的 Token 存入 Redis 缓存
+        long expirationSeconds = tokenExpiration / 1000; // 转换为秒
+        tokenCacheService.saveToken(newToken, user.getId(), expirationSeconds);
+        
         log.info("Token刷新成功: username={}", user.getUsername());
         
         return response;
@@ -165,9 +205,14 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
     public void logout(String token) {
-        // 这里可以实现Token黑名单机制
-        // 目前JWT是无状态的，登出主要靠前端删除Token
-        log.info("用户登出: token={}", token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null");
+        if (token != null && !token.isEmpty()) {
+            // 将 Token 加入黑名单，使其立即失效
+            long expirationSeconds = tokenExpiration / 1000; // 转换为秒
+            tokenCacheService.invalidateToken(token, expirationSeconds);
+            log.info("用户登出: Token已加入黑名单, token={}", token.substring(0, Math.min(20, token.length())) + "...");
+        } else {
+            log.warn("用户登出: Token为空");
+        }
     }
     
     @Override

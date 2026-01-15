@@ -17,9 +17,21 @@ public class InitializationInterceptor implements HandlerInterceptor {
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        long startTime = System.currentTimeMillis();
         String requestPath = request.getRequestURI();
         
-        log.debug("初始化拦截器处理请求: {}", requestPath);
+        // 获取请求到达服务器的时间（从Filter中设置）
+        Long requestArrivalTime = (Long) request.getAttribute("__requestArrivalTime");
+        String requestId = (String) request.getAttribute("__requestId");
+        
+        // 只记录性能警告（超过100ms的请求）
+        if (requestArrivalTime != null) {
+            long timeFromArrival = startTime - requestArrivalTime;
+            if (timeFromArrival > 100) {
+                log.warn("[性能警告] {} 请求在到达拦截器前耗时过长: {}ms, {}", 
+                        requestId, timeFromArrival, requestPath);
+            }
+        }
         
         // 排除初始化相关的API和页面，允许访问
         if (requestPath.startsWith("/api/init/") || 
@@ -28,14 +40,17 @@ public class InitializationInterceptor implements HandlerInterceptor {
             requestPath.equals("/init") ||
             requestPath.equals("/login") ||
             requestPath.equals("/error")) {
-            log.debug("请求路径在排除列表中，直接放行: {}", requestPath);
             return true;
         }
         
         // 对于其他请求，检查系统是否已初始化
-        // 如果已初始化，直接放行，不再拦截
+        long checkStart = System.currentTimeMillis();
         boolean initialized = initializationService.isInitialized();
-        log.debug("系统初始化状态: {}", initialized);
+        long checkTime = System.currentTimeMillis() - checkStart;
+        
+        if (checkTime > 100) {
+            log.warn("[性能警告] 初始化状态检查耗时过长: {}ms", checkTime);
+        }
         
         if (initialized) {
             return true;

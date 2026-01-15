@@ -31,17 +31,25 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public PageResult<UserListResponse> getUserList(UserListRequest request) {
+        long startTime = System.currentTimeMillis();
+        
         // 计算偏移量
         Long offset = (long) (request.getCurrent() - 1) * request.getSize();
         
         // 查询用户列表
+        long queryStart = System.currentTimeMillis();
         List<UserListResponse> users = userMapper.selectUserList(
             request.getKeyword(),
+            request.getPhone(),
             request.getRole(),
             request.getStatus(),
             offset,
             request.getSize()
         );
+        long queryTime = System.currentTimeMillis() - queryStart;
+        if (queryTime > 500) {
+            log.warn("[性能警告] 查询用户列表耗时: {}ms, 结果数量: {}", queryTime, users.size());
+        }
         
         // 设置角色描述
         users.forEach(user -> {
@@ -54,11 +62,17 @@ public class UserServiceImpl implements UserService {
         });
         
         // 统计总数
+        long countStart = System.currentTimeMillis();
         Long total = userMapper.countUserList(
             request.getKeyword(),
+            request.getPhone(),
             request.getRole(),
             request.getStatus()
         );
+        long countTime = System.currentTimeMillis() - countStart;
+        if (countTime > 500) {
+            log.warn("[性能警告] 统计用户总数耗时: {}ms, 总数: {}", countTime, total);
+        }
         
         // 计算总页数
         Long pages = (total + request.getSize() - 1) / request.getSize();
@@ -70,6 +84,12 @@ public class UserServiceImpl implements UserService {
         result.setCurrent(request.getCurrent());
         result.setSize(request.getSize());
         result.setPages(pages);
+        
+        long totalTime = System.currentTimeMillis() - startTime;
+        if (totalTime > 1000) {
+            log.warn("[性能警告] 用户列表查询总耗时: {}ms, 查询耗时: {}ms, 统计耗时: {}ms", 
+                    totalTime, queryTime, countTime);
+        }
         
         return result;
     }
@@ -84,7 +104,9 @@ public class UserServiceImpl implements UserService {
         UserListResponse response = new UserListResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
+        response.setNickname(user.getNickname() != null ? user.getNickname() : user.getUsername());
         response.setEmail(user.getEmail());
+        response.setPhone(user.getPhone());
         response.setRole(user.getRole());
         response.setStatus(user.getStatus());
         response.setCreatedAt(user.getCreatedAt());
@@ -126,7 +148,9 @@ public class UserServiceImpl implements UserService {
         // 创建用户
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
         user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
         user.setStatus(request.getStatus() != null ? request.getStatus() : 1);
@@ -179,7 +203,11 @@ public class UserServiceImpl implements UserService {
         
         // 更新用户信息
         user.setUsername(request.getUsername());
+        user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
         user.setEmail(request.getEmail());
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
         user.setRole(request.getRole());
         if (request.getStatus() != null) {
             user.setStatus(request.getStatus());

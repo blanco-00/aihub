@@ -15,24 +15,23 @@ type Result<T = any> = {
 export type LoginRequest = {
   usernameOrEmail: string;
   password: string;
+  rememberMe?: boolean; // 是否记住我（后端固定30天）
 };
 
 /**
- * 登录响应数据
+ * 登录响应数据（后端实际返回的格式）
  */
 export type LoginResponse = {
-  accessToken: string;
+  token: string; // 后端返回的是 token，不是 accessToken
   refreshToken: string;
-  expires: string;
+  expiresIn: number; // 后端返回的是 expiresIn（秒数），不是 expires（日期）
   user: {
     id: number;
     username: string;
+    nickname?: string;
     email: string;
     role: string;
     roleDescription: string;
-    status: number;
-    avatar?: string;
-    nickname?: string;
   };
 };
 

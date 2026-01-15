@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import tree from "./tree.vue";
 import { useUser } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -18,7 +17,6 @@ defineOptions({
   name: "SystemUser"
 });
 
-const treeRef = ref();
 const formRef = ref();
 const tableRef = ref();
 
@@ -27,8 +25,6 @@ const {
   loading,
   columns,
   dataList,
-  treeData,
-  treeLoading,
   selectedNum,
   pagination,
   buttonClass,
@@ -37,7 +33,6 @@ const {
   resetForm,
   onbatchDel,
   openDialog,
-  onTreeSelect,
   handleUpdate,
   handleDelete,
   handleUpload,
@@ -47,21 +42,11 @@ const {
   onSelectionCancel,
   handleCurrentChange,
   handleSelectionChange
-} = useUser(tableRef, treeRef);
+} = useUser(tableRef);
 </script>
 
 <template>
-  <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
-    <tree
-      ref="treeRef"
-      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
-      :treeData="treeData"
-      :treeLoading="treeLoading"
-      @tree-select="onTreeSelect"
-    />
-    <div
-      :class="[deviceDetection() ? ['w-full', 'mt-2'] : 'w-[calc(100%-200px)]']"
-    >
+  <div class="w-full">
       <el-form
         ref="formRef"
         :inline="true"
@@ -111,7 +96,7 @@ const {
       </el-form>
 
       <PureTableBar
-        title="用户管理（仅演示，操作后不生效）"
+        title="用户管理"
         :columns="columns"
         @refresh="onSearch"
       >
@@ -250,7 +235,6 @@ const {
           </pure-table>
         </template>
       </PureTableBar>
-    </div>
   </div>
 </template>
 

@@ -8,7 +8,10 @@ import com.aihub.dto.ForgotPasswordRequest;
 import com.aihub.dto.ForgotPasswordResponse;
 import com.aihub.dto.ResetPasswordRequest;
 import com.aihub.dto.Result;
+import com.aihub.exception.BusinessException;
 import com.aihub.service.AuthService;
+import com.aihub.service.LoginLogService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +28,75 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     
+    @Autowired
+    private com.aihub.service.UserService userService;
+    
+    @Autowired
+    private LoginLogService loginLogService;
+    
+    /**
+     * 获取当前登录用户信息
+     */
+    @GetMapping("/me")
+    public Result<com.aihub.dto.UserListResponse> getCurrentUser(
+            jakarta.servlet.http.HttpServletRequest request) {
+        try {
+            // 从拦截器设置的属性中获取用户ID
+            Long userId = (Long) request.getAttribute("userId");
+            if (userId == null) {
+                return Result.error(401, "未登录或Token无效");
+            }
+            
+            com.aihub.dto.UserListResponse user = userService.getUserById(userId);
+            return Result.success(user);
+        } catch (Exception e) {
+            log.error("获取当前用户信息失败", e);
+            throw e;
+        }
+    }
+    
     /**
      * 用户登录
      */
     @PostMapping("/login")
-    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        String usernameOrEmail = request.getUsernameOrEmail();
         try {
-            log.info("用户登录请求: usernameOrEmail={}", request.getUsernameOrEmail());
+            log.info("用户登录请求: usernameOrEmail={}", usernameOrEmail);
             LoginResponse response = authService.login(request);
+            
+            // 记录登录成功日志
+            if (response.getUser() != null) {
+                loginLogService.recordLogin(
+                    response.getUser().getId(),
+                    response.getUser().getUsername(),
+                    1,
+                    "登录成功",
+                    httpRequest
+                );
+            }
+            
             return Result.success(response);
+        } catch (BusinessException e) {
+            // 记录登录失败日志
+            loginLogService.recordLogin(
+                null,
+                usernameOrEmail,
+                0,
+                "登录失败: " + e.getMessage(),
+                httpRequest
+            );
+            log.error("登录失败", e);
+            throw e;
         } catch (Exception e) {
+            // 记录登录失败日志
+            loginLogService.recordLogin(
+                null,
+                usernameOrEmail,
+                0,
+                "登录失败: " + e.getMessage(),
+                httpRequest
+            );
             log.error("登录失败", e);
             throw e;
         }

@@ -1,4 +1,6 @@
 interface FormItemProps {
+  /** 菜单ID（编辑时使用） */
+  id?: number;
   /** 菜单类型（0代表菜单、1代表iframe、2代表外链、3代表按钮）*/
   menuType: number;
   higherMenuOptions: Record<string, unknown>[];
@@ -22,6 +24,8 @@ interface FormItemProps {
   fixedTag: boolean;
   showLink: boolean;
   showParent: boolean;
+  /** 状态（0-禁用，1-启用） */
+  status?: number;
 }
 interface FormProps {
   formInline: FormItemProps;

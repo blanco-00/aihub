@@ -2,20 +2,17 @@ interface FormItemProps {
   id?: number;
   /** 用于判断是`新增`还是`修改` */
   title: string;
-  higherDeptOptions: Record<string, unknown>[];
-  parentId: number;
   nickname: string;
   username: string;
-  password: string;
+  password?: string;
   phone: string | number;
   email: string;
   sex: string | number;
+  role?: string;
   status: number;
-  dept?: {
-    id?: number;
-    name?: string;
-  };
   remark: string;
+  /** 是否是最后一个超级管理员 */
+  isLastSuperAdmin?: boolean;
 }
 interface FormProps {
   formInline: FormItemProps;

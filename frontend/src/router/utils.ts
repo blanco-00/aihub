@@ -22,6 +22,7 @@ import { userKey, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+const Layout = () => import("@/layout/index.vue");
 const IFrame = () => import("@/layout/frame.vue");
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
@@ -41,13 +42,20 @@ function handRank(routeInfo: any) {
 
 /** 按照路由中meta下的rank等级升序来排序路由 */
 function ascending(arr: any[]) {
-  arr.forEach((v, index) => {
+  // 过滤掉空对象和无效路由
+  const validRoutes = arr.filter(v => v && (v.path || v.name || v.component));
+  
+  validRoutes.forEach((v, index) => {
+    // 确保 meta 对象存在
+    if (!v.meta) {
+      v.meta = {};
+    }
     // 当rank不存在时，根据顺序自动创建，首页路由永远在第一位
     if (handRank(v)) v.meta.rank = index + 2;
   });
-  return arr.sort(
+  return validRoutes.sort(
     (a: { meta: { rank: number } }, b: { meta: { rank: number } }) => {
-      return a?.meta.rank - b?.meta.rank;
+      return (a?.meta?.rank || 0) - (b?.meta?.rank || 0);
     }
   );
 }
@@ -211,7 +219,7 @@ function initRouter() {
       return new Promise(resolve => {
         getAsyncRoutes()
           .then(({ code, data }) => {
-            if (code === 0) {
+            if (code === 0 || code === 200) {
               handleAsyncRoutes(cloneDeep(data));
               storageLocal().setItem(key, data);
             }
@@ -227,7 +235,7 @@ function initRouter() {
     return new Promise(resolve => {
       getAsyncRoutes()
         .then(({ code, data }) => {
-          if (code === 0) {
+          if (code === 0 || code === 200) {
             handleAsyncRoutes(cloneDeep(data));
           }
           resolve(router);
@@ -332,7 +340,13 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
     // 父级的name属性取值：如果子级存在且父级的name属性不存在，默认取第一个子级的name；如果子级存在且父级的name属性存在，取存在的name属性，会覆盖默认值（注意：测试中发现父级的name不能和子级name重复，如果重复会造成重定向无效（跳转404），所以这里给父级的name起名的时候后面会自动加上`Parent`，避免重复）
     if (v?.children && v.children.length && !v.name)
       v.name = (v.children[0].name as string) + "Parent";
-    if (v.meta?.frameSrc) {
+    // 处理父级路由的 component：优先检查是否为 "Layout" 字符串，或者没有 component 但有 children 的情况
+    const componentStr = v.component as any;
+    if (typeof componentStr === "string" && componentStr === "Layout") {
+      v.component = Layout;
+    } else if (!v.component && v?.children && v.children.length) {
+      v.component = Layout;
+    } else if (v.meta?.frameSrc) {
       v.component = IFrame;
     } else {
       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）

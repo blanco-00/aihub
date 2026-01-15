@@ -1,6 +1,6 @@
 // 模拟后端动态生成路由
 import { defineFakeRoute } from "vite-plugin-fake-server/client";
-import { system, monitor, permission, frame, tabs } from "@/router/enums";
+import { system, monitor, frame, tabs } from "@/router/enums";
 
 /**
  * roles：页面级别权限，这里模拟二种 "admin"、"common"
@@ -10,6 +10,7 @@ import { system, monitor, permission, frame, tabs } from "@/router/enums";
 
 const systemManagementRouter = {
   path: "/system",
+  component: "Layout",
   meta: {
     icon: "ri:settings-3-line",
     title: "menus.pureSysManagement",
@@ -17,39 +18,43 @@ const systemManagementRouter = {
   },
   children: [
     {
-      path: "/system/user/index",
+      path: "/system/user",
       name: "SystemUser",
+      component: "system/user/index",
       meta: {
         icon: "ri:admin-line",
         title: "menus.pureUser",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
       path: "/system/role/index",
       name: "SystemRole",
+      component: "system/role/index",
       meta: {
         icon: "ri:admin-fill",
         title: "menus.pureRole",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
       path: "/system/menu/index",
       name: "SystemMenu",
+      component: "system/menu/index",
       meta: {
         icon: "ep:menu",
         title: "menus.pureSystemMenu",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
       path: "/system/dept/index",
       name: "SystemDept",
+      component: "system/dept/index",
       meta: {
         icon: "ri:git-branch-line",
         title: "menus.pureDept",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     }
   ]
@@ -57,6 +62,7 @@ const systemManagementRouter = {
 
 const systemMonitorRouter = {
   path: "/monitor",
+  component: "Layout",
   meta: {
     icon: "ep:monitor",
     title: "menus.pureSysMonitor",
@@ -70,7 +76,7 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:user-voice-line",
         title: "menus.pureOnlineUser",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
@@ -80,7 +86,7 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:window-line",
         title: "menus.pureLoginLog",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
@@ -90,7 +96,7 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:history-fill",
         title: "menus.pureOperationLog",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     },
     {
@@ -100,60 +106,12 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:file-search-line",
         title: "menus.pureSystemLog",
-        roles: ["admin"]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
       }
     }
   ]
 };
 
-const permissionRouter = {
-  path: "/permission",
-  meta: {
-    title: "menus.purePermission",
-    icon: "ep:lollipop",
-    rank: permission
-  },
-  children: [
-    {
-      path: "/permission/page/index",
-      name: "PermissionPage",
-      meta: {
-        title: "menus.purePermissionPage",
-        roles: ["admin", "common"]
-      }
-    },
-    {
-      path: "/permission/button",
-      meta: {
-        title: "menus.purePermissionButton",
-        roles: ["admin", "common"]
-      },
-      children: [
-        {
-          path: "/permission/button/router",
-          component: "permission/button/index",
-          name: "PermissionButtonRouter",
-          meta: {
-            title: "menus.purePermissionButtonRouter",
-            auths: [
-              "permission:btn:add",
-              "permission:btn:edit",
-              "permission:btn:delete"
-            ]
-          }
-        },
-        {
-          path: "/permission/button/login",
-          component: "permission/button/perms",
-          name: "PermissionButtonLogin",
-          meta: {
-            title: "menus.purePermissionButtonLogin"
-          }
-        }
-      ]
-    }
-  ]
-};
 
 const frameRouter = {
   path: "/iframe",
@@ -322,7 +280,7 @@ const tabsRouter = {
 
 export default defineFakeRoute([
   {
-    url: "/get-async-routes",
+    url: "/api/routes/async",
     method: "get",
     response: () => {
       return {
@@ -331,7 +289,6 @@ export default defineFakeRoute([
         data: [
           systemManagementRouter,
           systemMonitorRouter,
-          permissionRouter,
           frameRouter,
           tabsRouter
         ]

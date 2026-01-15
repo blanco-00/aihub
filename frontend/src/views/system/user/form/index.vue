@@ -8,14 +8,13 @@ import { usePublicHooks } from "../../hooks";
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     title: "新增",
-    higherDeptOptions: [],
-    parentId: 0,
     nickname: "",
     username: "",
     password: "",
     phone: "",
     email: "",
     sex: "",
+    role: "USER",
     status: 1,
     remark: ""
   })
@@ -29,6 +28,21 @@ const sexOptions = [
   {
     value: 1,
     label: "女"
+  }
+];
+
+const roleOptions = [
+  {
+    value: "SUPER_ADMIN",
+    label: "超级管理员"
+  },
+  {
+    value: "ADMIN",
+    label: "管理员"
+  },
+  {
+    value: "USER",
+    label: "普通用户"
   }
 ];
 const ruleFormRef = ref();
@@ -119,28 +133,25 @@ defineExpose({ getRef });
           </el-select>
         </el-form-item>
       </re-col>
-
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="归属部门">
-          <el-cascader
-            v-model="newFormInline.parentId"
+        <el-form-item label="用户角色" prop="role">
+          <el-select
+            v-model="newFormInline.role"
+            placeholder="请选择用户角色"
             class="w-full"
-            :options="newFormInline.higherDeptOptions"
-            :props="{
-              value: 'id',
-              label: 'name',
-              emitPath: false,
-              checkStrictly: true
-            }"
-            clearable
-            filterable
-            placeholder="请选择归属部门"
+            :disabled="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'"
           >
-            <template #default="{ node, data }">
-              <span>{{ data.name }}</span>
-              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-            </template>
-          </el-cascader>
+            <el-option
+              v-for="(item, index) in roleOptions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="newFormInline.isLastSuperAdmin && newFormInline.title === '修改' && item.value !== 'SUPER_ADMIN'"
+            />
+          </el-select>
+          <div v-if="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'" class="text-xs text-yellow-600 mt-1">
+            不能修改最后一个超级管理员的角色
+          </div>
         </el-form-item>
       </re-col>
       <re-col

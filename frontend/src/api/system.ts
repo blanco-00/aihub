@@ -1,5 +1,14 @@
 import { http } from "@/utils/http";
-import { getUserList as getUserListNew, type UserListParams } from "./user";
+import {
+  getUserList as getUserListNew,
+  createUser as createUserNew,
+  updateUser as updateUserNew,
+  deleteUser as deleteUserNew,
+  toggleUserStatus as toggleUserStatusNew,
+  type UserListParams,
+  type CreateUserRequest,
+  type UpdateUserRequest
+} from "./user";
 
 type Result = {
   code: number;
@@ -24,6 +33,8 @@ type ResultTable = {
 
 /** 获取系统管理-用户管理列表 */
 export const getUserList = (data?: any) => {
+  const transformStartTime = performance.now();
+  
   // 转换参数格式：从 { username, phone, status, currentPage, pageSize } 转换为 { keyword, role, status, current, size }
   const params: UserListParams = {};
   if (data) {
@@ -32,34 +43,134 @@ export const getUserList = (data?: any) => {
     if (data.username) {
       params.keyword = data.username;
     }
+    if (data.phone) {
+      params.phone = data.phone;
+    }
     if (data.role) {
       params.role = data.role;
     }
     if (data.status !== undefined && data.status !== "") {
-      params.status = data.status;
+      params.status = Number(data.status);
     }
   }
+  
+  const transformTime = performance.now() - transformStartTime;
+  if (transformTime > 10) {
+    console.warn(`[getUserList] 参数转换耗时: ${transformTime.toFixed(2)}ms`);
+  }
+  
+  const requestStartTime = performance.now();
   return getUserListNew(params).then((response: any) => {
+    const requestTime = performance.now() - requestStartTime;
+    const responseProcessStart = performance.now();
+    
+    console.log("[getUserList] API响应接收", {
+      code: response.code,
+      requestTime: `${requestTime.toFixed(2)}ms`,
+      timestamp: new Date().toISOString()
+    });
+    
     // 转换响应格式：从 { records, total, current, size, pages } 转换为 { list, total, pageSize, currentPage }
-    if (response.code === 200 && response.data) {
+    // 后端返回 code: 200 表示成功
+    if ((response.code === 200 || response.code === 0) && response.data) {
+      // 适配前端需要的数据格式
+      const list = (response.data.records || []).map((item: any) => ({
+        id: item.id,
+        username: item.username,
+        nickname: item.nickname || item.username, // 使用后端返回的nickname，如果没有则使用username
+        phone: item.phone || "",
+        email: item.email,
+        sex: 0, // 后端没有sex字段，默认0（男）
+        avatar: "", // 后端没有avatar字段
+        status: item.status,
+        role: item.role,
+        roleDescription: item.roleDescription,
+        createTime: item.createdAt,
+        updatedAt: item.updatedAt
+      }));
+      
+      const responseProcessTime = performance.now() - responseProcessStart;
+      const totalTime = performance.now() - transformStartTime;
+      
+      if (responseProcessTime > 10) {
+        console.warn(`[getUserList] 响应处理耗时: ${responseProcessTime.toFixed(2)}ms`);
+      }
+      
+      if (totalTime > 1000) {
+        console.warn(`[getUserList] 总耗时过长: ${totalTime.toFixed(2)}ms (请求: ${requestTime.toFixed(2)}ms, 处理: ${responseProcessTime.toFixed(2)}ms)`);
+      }
+      
       return {
         code: 0,
         message: response.message || "success",
         data: {
-          list: response.data.records || [],
+          list,
           total: response.data.total || 0,
           pageSize: response.data.size || 10,
           currentPage: response.data.current || 1
         }
       };
     }
-    return response;
+    // 如果响应格式不符合预期，返回错误格式
+    return {
+      code: response.code || -1,
+      message: response.message || "获取用户列表失败",
+      data: {
+        list: [],
+        total: 0,
+        pageSize: 10,
+        currentPage: 1
+      }
+    };
   });
+};
+
+/** 创建用户 */
+export const createUser = (data: any) => {
+  const request: CreateUserRequest = {
+    username: data.username,
+    nickname: data.nickname,
+    email: data.email,
+    phone: data.phone,
+    password: data.password,
+    role: data.role || "USER", // 默认角色
+    status: data.status !== undefined ? data.status : 1
+  };
+  return createUserNew(request);
+};
+
+/** 更新用户 */
+export const updateUser = (id: number, data: any) => {
+  const request: UpdateUserRequest = {
+    username: data.username,
+    nickname: data.nickname,
+    email: data.email,
+    phone: data.phone,
+    role: data.role || "USER",
+    status: data.status,
+    password: data.password || undefined // 只有提供密码时才更新
+  };
+  return updateUserNew(id, request);
+};
+
+/** 删除用户 */
+export const deleteUser = (id: number) => {
+  return deleteUserNew(id);
+};
+
+/** 切换用户状态 */
+export const toggleUserStatus = (id: number, status: number) => {
+  return toggleUserStatusNew(id, status);
 };
 
 /** 系统管理-用户管理-获取所有角色列表 */
 export const getAllRoleList = () => {
-  return http.request<Result>("get", "/list-all-role");
+  return http.request<Result>("get", "/api/roles/options");
+};
+
+/** 系统管理-角色管理-获取所有角色列表（从数据库） */
+export const getAllRolesFromDB = () => {
+  return http.request<Result>("get", "/api/roles");
 };
 
 /** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */

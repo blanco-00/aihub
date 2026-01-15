@@ -26,7 +26,9 @@ export type PageResult<T> = {
 export type UserInfo = {
   id: number;
   username: string;
+  nickname?: string;
   email: string;
+  phone?: string;
   role: string;
   roleDescription: string;
   status: number;
@@ -41,6 +43,7 @@ export type UserListParams = {
   current?: number;
   size?: number;
   keyword?: string;
+  phone?: string;
   role?: string;
   status?: number;
 };
@@ -50,7 +53,9 @@ export type UserListParams = {
  */
 export type CreateUserRequest = {
   username: string;
+  nickname?: string;
   email: string;
+  phone?: string;
   password: string;
   role: string;
   status?: number;
@@ -61,7 +66,9 @@ export type CreateUserRequest = {
  */
 export type UpdateUserRequest = {
   username: string;
+  nickname?: string;
   email: string;
+  phone?: string;
   role: string;
   status?: number;
   password?: string;
@@ -173,7 +180,29 @@ export const refreshTokenApi = (data?: object) => {
 
 /** 账户设置-个人信息 */
 export const getMine = (data?: object) => {
-  return http.request<Result<UserInfo>>("get", "/mine", { data });
+  return http.request<Result<UserInfo>>("get", "/api/auth/me", { data }).then((response: any) => {
+    // 转换后端数据格式为前端需要的格式
+    if (response.code === 200 && response.data) {
+      const userData = response.data;
+      return {
+        code: 0,
+        message: response.message || "success",
+        data: {
+          id: userData.id,
+          username: userData.username,
+          nickname: userData.nickname || userData.username, // 使用后端返回的nickname，如果没有则使用username
+          email: userData.email,
+          phone: userData.phone || "",
+          avatar: "", // 后端没有avatar字段
+          description: "", // 后端没有description字段
+          role: userData.role,
+          roleDescription: userData.roleDescription,
+          status: userData.status
+        }
+      };
+    }
+    return response;
+  });
 };
 
 /** 账户设置-个人安全日志 */
