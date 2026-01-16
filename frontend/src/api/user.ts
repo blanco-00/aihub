@@ -201,8 +201,8 @@ export const getMine = (data?: object) => {
           nickname: userData.nickname || userData.username, // 使用后端返回的nickname，如果没有则使用username
           email: userData.email,
           phone: userData.phone || "",
-          avatar: "", // 后端没有avatar字段
-          description: "", // 后端没有description字段
+          avatar: userData.avatar || "",
+          description: userData.description || "",
           role: userData.role,
           roleDescription: userData.roleDescription,
           status: userData.status
@@ -214,6 +214,47 @@ export const getMine = (data?: object) => {
 };
 
 /** 账户设置-个人安全日志 */
-export const getMineLogs = (data?: object) => {
-  return http.request<ResultTable>("get", "/mine-logs", { data });
+export const getMineLogs = (params?: { current?: number; size?: number }) => {
+  return http.request<Result<PageResult<SecurityLogInfo>>>("get", "/api/auth/security-logs", { params });
+};
+
+/**
+ * 安全日志信息
+ */
+export type SecurityLogInfo = {
+  id: number;
+  type: string;
+  summary: string;
+  ip: string;
+  address: string;
+  system: string;
+  browser: string;
+  operatingTime: string;
+};
+
+/**
+ * 更新个人信息
+ */
+export type UpdateProfileRequest = {
+  nickname?: string;
+  email?: string;
+  phone?: string;
+  description?: string;
+  avatar?: string;
+};
+
+export const updateProfile = (data: UpdateProfileRequest) => {
+  return http.request<Result<void>>("put", "/api/auth/profile", { data });
+};
+
+/**
+ * 修改密码
+ */
+export type UpdatePasswordRequest = {
+  oldPassword: string;
+  newPassword: string;
+};
+
+export const updatePassword = (data: UpdatePasswordRequest) => {
+  return http.request<Result<void>>("put", "/api/auth/password", { data });
 };

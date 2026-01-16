@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -188,11 +190,21 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<MenuResponse> getMenuTreeByRoleCode(String roleCode) {
         List<Menu> menus = menuMapper.selectByRoleCode(roleCode);
-        return buildMenuTree(menus, 0L);
+        
+        // 应用层去重：使用 LinkedHashSet 保持顺序并去重（基于菜单ID）
+        // 性能优化：在应用层去重，避免 SQL DISTINCT 的开销
+        Set<Long> seenIds = new LinkedHashSet<>();
+        List<Menu> distinctMenus = menus.stream()
+            .filter(menu -> seenIds.add(menu.getId()))
+            .collect(Collectors.toList());
+        
+        List<MenuResponse> result = buildMenuTree(distinctMenus, 0L);
+        return result;
     }
     
     /**
      * 构建菜单树
+     * 注意：如果子菜单的父菜单不在查询结果中，需要自动包含父菜单
      */
     private List<MenuResponse> buildMenuTree(List<Menu> menus, Long parentId) {
         List<MenuResponse> result = new ArrayList<>();
@@ -201,8 +213,52 @@ public class MenuServiceImpl implements MenuService {
         Map<Long, List<Menu>> menuMap = menus.stream()
             .collect(Collectors.groupingBy(Menu::getParentId));
         
-        // 获取当前层级的菜单
+        // 获取所有菜单的ID集合，用于检查父菜单是否存在
+        Set<Long> menuIds = menus.stream()
+            .map(Menu::getId)
+            .collect(Collectors.toSet());
+        
+        // 处理缺失父菜单的情况：如果子菜单的父菜单不在结果中，需要查询并包含父菜单
+        // 这种情况可能发生在：只关联了子菜单，但没有关联父菜单
+        if (parentId == 0) {
+            // 顶级菜单：检查是否有子菜单的父菜单不在结果中
+            Set<Long> missingParentIds = menus.stream()
+                .filter(menu -> menu.getParentId() != null && menu.getParentId() != 0)
+                .map(Menu::getParentId)
+                .filter(pid -> !menuIds.contains(pid))
+                .collect(Collectors.toSet());
+            
+            // 查询缺失的父菜单
+            if (!missingParentIds.isEmpty()) {
+                for (Long missingParentId : missingParentIds) {
+                    Menu parentMenu = menuMapper.selectById(missingParentId);
+                    if (parentMenu != null && parentMenu.getIsDeleted() == 0 && parentMenu.getStatus() == 1) {
+                        menus.add(parentMenu);
+                        menuIds.add(parentMenu.getId());
+                    }
+                }
+                // 重新分组
+                menuMap = menus.stream()
+                    .collect(Collectors.groupingBy(Menu::getParentId));
+            }
+        }
+        
+        // 获取当前层级的菜单，并按 sortOrder 排序
         List<Menu> currentLevelMenus = menuMap.getOrDefault(parentId, new ArrayList<>());
+        // 按 sortOrder 升序排序，如果 sortOrder 相同则按 id 升序排序
+        currentLevelMenus.sort((a, b) -> {
+            int sortCompare = Integer.compare(
+                a.getSortOrder() != null ? a.getSortOrder() : 0,
+                b.getSortOrder() != null ? b.getSortOrder() : 0
+            );
+            if (sortCompare != 0) {
+                return sortCompare;
+            }
+            return Long.compare(
+                a.getId() != null ? a.getId() : 0L,
+                b.getId() != null ? b.getId() : 0L
+            );
+        });
         
         // 递归构建子菜单
         for (Menu menu : currentLevelMenus) {

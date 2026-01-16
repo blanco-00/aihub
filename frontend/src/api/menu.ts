@@ -21,7 +21,7 @@ export type MenuInfo = {
   redirect?: string;
   icon?: string;
   title: string;
-  rank: number;
+  sortOrder: number;
   showLink: number;
   keepAlive: number;
   status: number;
@@ -41,7 +41,7 @@ export type CreateMenuRequest = {
   redirect?: string;
   icon?: string;
   title: string;
-  rank?: number;
+  sortOrder?: number;
   showLink?: number;
   keepAlive?: number;
   status?: number;
@@ -58,17 +58,24 @@ export type UpdateMenuRequest = {
   redirect?: string;
   icon?: string;
   title?: string;
-  rank?: number;
+  sortOrder?: number;
   showLink?: number;
   keepAlive?: number;
   status?: number;
 };
 
 /**
- * 获取菜单树
+ * 获取所有菜单树（用于菜单管理页面，不根据角色过滤）
  */
 export const getMenuTree = () => {
-  return http.request<Result<MenuInfo[]>>("get", "/api/menus/tree");
+  return http.request<Result<MenuInfo[]>>("get", "/api/menus/tree/all");
+};
+
+/**
+ * 获取菜单树（根据用户角色，用于动态路由）
+ */
+export const getMenuTreeByRole = () => {
+  return http.request<Result<any[]>>("get", "/api/menus/tree");
 };
 
 /**

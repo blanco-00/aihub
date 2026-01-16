@@ -18,6 +18,18 @@ const pagination = reactive<PaginationProps>({
   background: true,
   layout: "prev, pager, next"
 });
+
+// 监听分页变化
+const handlePageChange = (page: number) => {
+  pagination.currentPage = page;
+  onSearch();
+};
+
+const handleSizeChange = (size: number) => {
+  pagination.pageSize = size;
+  pagination.currentPage = 1;
+  onSearch();
+};
 const columns: TableColumnList = [
   {
     label: "详情",
@@ -55,17 +67,24 @@ const columns: TableColumnList = [
 
 async function onSearch() {
   loading.value = true;
-  const { code, data } = await getMineLogs();
-  if (code === 0) {
-    dataList.value = data.list;
-    pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+  try {
+    const { code, data } = await getMineLogs({
+      current: pagination.currentPage,
+      size: pagination.pageSize
+    });
+    if (code === 0 && data) {
+      dataList.value = data.records || [];
+      pagination.total = data.total || 0;
+      pagination.pageSize = data.size || 10;
+      pagination.currentPage = data.current || 1;
+    }
+  } catch (error) {
+    console.error("获取安全日志失败", error);
+  } finally {
+    setTimeout(() => {
+      loading.value = false;
+    }, 200);
   }
-
-  setTimeout(() => {
-    loading.value = false;
-  }, 200);
 }
 
 onMounted(() => {
@@ -88,6 +107,8 @@ onMounted(() => {
       :data="dataList"
       :columns="columns"
       :pagination="pagination"
+      @page-change="handlePageChange"
+      @page-size-change="handleSizeChange"
     />
   </div>
 </template>

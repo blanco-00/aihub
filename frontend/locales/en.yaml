@@ -72,6 +72,7 @@ menus:
   pureRole: Role Manage
   pureSystemMenu: Menu Manage
   pureDept: Dept Manage
+  pureDict: Dict Manage
   pureSysMonitor: System Monitor
   pureSystemMonitor: System Status
   pureOnlineUser: Online User

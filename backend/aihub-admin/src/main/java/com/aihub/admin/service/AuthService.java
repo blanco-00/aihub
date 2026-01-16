@@ -57,4 +57,32 @@ public interface AuthService {
      * @return 是否有效
      */
     boolean validateToken(String token);
+    
+    /**
+     * 更新个人信息
+     * @param userId 用户ID
+     * @param nickname 昵称
+     * @param email 邮箱
+     * @param phone 手机号
+     * @param description 简介
+     * @param avatar 头像URL
+     */
+    void updateProfile(Long userId, String nickname, String email, String phone, String description, String avatar);
+    
+    /**
+     * 修改密码
+     * @param userId 用户ID
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     */
+    void updatePassword(Long userId, String oldPassword, String newPassword);
+    
+    /**
+     * 获取当前用户的安全日志（合并登录日志和操作日志）
+     * @param userId 用户ID
+     * @param current 当前页
+     * @param size 每页大小
+     * @return 安全日志分页结果
+     */
+    com.aihub.common.web.dto.PageResult<com.aihub.admin.dto.response.SecurityLogResponse> getSecurityLogs(Long userId, Integer current, Integer size);
 }

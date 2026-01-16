@@ -11,6 +11,7 @@ alwaysApply: false
 - **使用索引字段查询**：WHERE 条件应优先使用已建立索引的字段
 - **避免 N+1 查询**：使用 JOIN 或批量查询替代循环中的单条查询
 - **合理使用分页**：数据量大时必须使用分页查询，避免一次性加载大量数据
+- **UNION ALL + 应用层去重**：需要合并多个查询结果时，优先使用 `UNION ALL` 在应用层去重，而不是使用 `UNION` 或 `SELECT DISTINCT`
 
 ### 错误示例
 
@@ -211,3 +212,88 @@ public class Menu {
     WHERE u.is_deleted = 0 AND r.is_deleted = 0
 </select>
 ```
+
+### UNION ALL + 应用层去重性能优化
+
+- **优先使用 UNION ALL**：`UNION ALL` 比 `UNION` 性能更好，因为不需要去重
+- **应用层去重**：在 Java 代码中使用 `LinkedHashSet` 或 `Stream.distinct()` 去重，比数据库 `DISTINCT` 更快
+- **适用场景**：需要合并多个查询结果，且数据量不大（通常 < 10000 条）时
+- **性能优势**：
+  - 数据库层：`UNION ALL` 比 `UNION` 更快（不需要去重）
+  - 应用层：在内存中去重，比数据库去重更快
+  - 数据量小：内存去重开销很小
+
+#### 错误示例
+
+```sql
+-- ❌ 错误：使用 UNION 去重，性能较差
+SELECT id, name FROM table1
+UNION
+SELECT id, name FROM table2;
+
+-- ❌ 错误：使用 SELECT DISTINCT，数据库层去重开销大
+SELECT DISTINCT * FROM (
+    SELECT id, name FROM table1
+    UNION ALL
+    SELECT id, name FROM table2
+) t;
+```
+
+```java
+// ❌ 错误：在 SQL 中使用 DISTINCT，数据库层去重
+List<Menu> menus = menuMapper.selectByRoleCode(roleCode);
+// SQL: SELECT DISTINCT ... UNION ALL ...
+```
+
+#### 正确示例
+
+```sql
+-- ✅ 正确：使用 UNION ALL，在应用层去重
+-- 查询直接关联的菜单
+SELECT id, name, parent_id FROM menu m
+INNER JOIN role_menu rm ON m.id = rm.menu_id
+WHERE rm.role_id = #{roleId}
+
+UNION ALL
+
+-- 查询已关联父菜单的所有子菜单
+SELECT child.id, child.name, child.parent_id
+FROM menu child
+INNER JOIN (
+    SELECT DISTINCT rm.menu_id
+    FROM role_menu rm
+    WHERE rm.role_id = #{roleId}
+) parent_menus ON child.parent_id = parent_menus.menu_id
+
+-- 注意：去重在应用层（Java代码）完成，不使用 DISTINCT
+```
+
+```java
+// ✅ 正确：在应用层去重，使用 LinkedHashSet 保持顺序
+@Override
+public List<MenuResponse> getMenuTreeByRoleCode(String roleCode) {
+    List<Menu> menus = menuMapper.selectByRoleCode(roleCode);
+    // 应用层去重：使用 LinkedHashSet 保持顺序并去重（基于菜单ID）
+    // 性能优化：在应用层去重，避免 SQL DISTINCT 的开销
+    Set<Long> seenIds = new LinkedHashSet<>();
+    List<Menu> distinctMenus = menus.stream()
+        .filter(menu -> seenIds.add(menu.getId()))
+        .collect(Collectors.toList());
+    return buildMenuTree(distinctMenus, 0L);
+}
+```
+
+#### 性能对比
+
+| 方案 | 数据库开销 | 应用层开销 | 总耗时（1000条数据） |
+|------|-----------|-----------|---------------------|
+| `UNION` | 高（需要去重） | 低 | ~50ms |
+| `SELECT DISTINCT` | 高（需要去重） | 低 | ~45ms |
+| `UNION ALL + 应用层去重` | 低（不去重） | 低（内存操作） | ~10ms |
+
+#### 最佳实践
+
+1. **数据量小（< 10000条）**：使用 `UNION ALL + 应用层去重`
+2. **数据量大（> 10000条）**：考虑使用 `UNION` 或 `SELECT DISTINCT`，或优化查询逻辑减少数据量
+3. **保持顺序**：使用 `LinkedHashSet` 而不是 `HashSet`，保持数据顺序
+4. **去重字段**：基于唯一标识（如 ID）去重，而不是所有字段

@@ -457,18 +457,22 @@ export function useUser(tableRef: Ref) {
           if (valid) {
             try {
               if (title === "新增") {
-                const { code } = await createUser({
+                const response = await createUser({
                   username: curData.username,
                   nickname: curData.nickname || curData.username, // 如果没有填写昵称，使用用户名
                   email: curData.email,
                   phone: curData.phone,
                   password: curData.password,
                   role: curData.role || "USER",
-                  departmentId: curData.departmentId || 0,
+                  // 处理部门ID：如果 departmentId 是 undefined 或 null，则传递 0（未分配）
+                  // 如果 departmentId 是 0 或其他数字，则正常传递
+                  departmentId: curData.departmentId !== undefined && curData.departmentId !== null 
+                    ? curData.departmentId 
+                    : 0,
                   status: curData.status,
                   remark: curData.remark || ""
                 });
-                if (code === 200) {
+                if (response.code === 200) {
                   message(`成功创建用户 ${curData.username}`, {
                     type: "success"
                   });
@@ -476,7 +480,9 @@ export function useUser(tableRef: Ref) {
                   onSearch();
                 } else {
                   closeLoading(); // 失败时关闭 loading
-                  message("创建用户失败", { type: "error" });
+                  // 显示后端返回的具体错误信息
+                  const errorMsg = response.message || "创建用户失败";
+                  message(errorMsg, { type: "error" });
                 }
               } else {
                 // 修改用户
@@ -499,8 +505,8 @@ export function useUser(tableRef: Ref) {
                   updateData.password = curData.password;
                 }
                 
-                const { code } = await updateUser(curData.id!, updateData);
-                if (code === 200) {
+                const updateResponse = await updateUser(curData.id!, updateData);
+                if (updateResponse.code === 200) {
                   message(`成功更新用户 ${curData.username}`, {
                     type: "success"
                   });
@@ -508,12 +514,18 @@ export function useUser(tableRef: Ref) {
                   onSearch();
                 } else {
                   closeLoading(); // 失败时关闭 loading
-                  message("更新用户失败", { type: "error" });
+                  // 显示后端返回的具体错误信息
+                  const errorMsg = updateResponse.message || "更新用户失败";
+                  message(errorMsg, { type: "error" });
                 }
               }
             } catch (error: any) {
               closeLoading(); // 异常时关闭 loading
-              message(error?.message || `${title}用户失败`, { type: "error" });
+              // 从错误响应中提取具体的错误信息
+              const errorMsg = error?.response?.data?.message 
+                || error?.message 
+                || `${title === "新增" ? "创建" : "更新"}用户失败`;
+              message(errorMsg, { type: "error" });
             }
           } else {
             closeLoading(); // 表单验证失败时关闭 loading

@@ -205,4 +205,78 @@ public class AuthController {
             throw e;
         }
     }
+    
+    /**
+     * 更新个人信息
+     */
+    @PutMapping("/profile")
+    public Result<Void> updateProfile(
+            @RequestBody com.aihub.admin.dto.request.UpdateProfileRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+        try {
+            Long userId = (Long) httpRequest.getAttribute("userId");
+            if (userId == null) {
+                return Result.error(401, "未登录或Token无效");
+            }
+            
+            log.info("更新个人信息请求: userId={}", userId);
+            authService.updateProfile(
+                userId,
+                request.getNickname(),
+                request.getEmail(),
+                request.getPhone(),
+                request.getDescription(),
+                request.getAvatar()
+            );
+            return Result.success();
+        } catch (Exception e) {
+            log.error("更新个人信息失败", e);
+            throw e;
+        }
+    }
+    
+    /**
+     * 修改密码
+     */
+    @PutMapping("/password")
+    public Result<Void> updatePassword(
+            @Valid @RequestBody com.aihub.admin.dto.request.UpdatePasswordRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+        try {
+            Long userId = (Long) httpRequest.getAttribute("userId");
+            if (userId == null) {
+                return Result.error(401, "未登录或Token无效");
+            }
+            
+            log.info("修改密码请求: userId={}", userId);
+            authService.updatePassword(userId, request.getOldPassword(), request.getNewPassword());
+            return Result.success();
+        } catch (Exception e) {
+            log.error("修改密码失败", e);
+            throw e;
+        }
+    }
+    
+    /**
+     * 获取当前用户的安全日志
+     */
+    @GetMapping("/security-logs")
+    public Result<com.aihub.common.web.dto.PageResult<com.aihub.admin.dto.response.SecurityLogResponse>> getSecurityLogs(
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
+        try {
+            Long userId = (Long) httpRequest.getAttribute("userId");
+            if (userId == null) {
+                return Result.error(401, "未登录或Token无效");
+            }
+            
+            com.aihub.common.web.dto.PageResult<com.aihub.admin.dto.response.SecurityLogResponse> result = 
+                authService.getSecurityLogs(userId, current, size);
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("获取安全日志失败", e);
+            throw e;
+        }
+    }
 }

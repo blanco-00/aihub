@@ -72,6 +72,7 @@ menus:
   pureRole: 角色管理
   pureSystemMenu: 菜单管理
   pureDept: 部门管理
+  pureDict: 字典管理
   pureSysMonitor: 系统监控
   pureSystemMonitor: 运行状况
   pureOnlineUser: 在线用户

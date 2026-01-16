@@ -14,6 +14,8 @@ public class UserListResponse {
     private String nickname;
     private String email;
     private String phone;
+    private String avatar;
+    private String description;
     private String role;
     private String roleDescription;
     private Long departmentId;

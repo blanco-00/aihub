@@ -140,7 +140,9 @@ export const createUser = (data: any) => {
     phone: data.phone,
     password: data.password,
     role: data.role || "USER", // 默认角色
-    status: data.status !== undefined ? data.status : 1
+    departmentId: data.departmentId !== undefined && data.departmentId !== null ? data.departmentId : 0, // 部门ID
+    status: data.status !== undefined ? data.status : 1,
+    remark: data.remark || "" // 备注
   };
   return createUserNew(request);
 };

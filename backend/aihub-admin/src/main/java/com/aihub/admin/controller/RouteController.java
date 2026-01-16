@@ -17,98 +17,167 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 动态路由（菜单）接口
+ * 动态路由接口
+ * 只返回静态路由配置（时效性不高的数据），如 iframe、tabs 等
+ * 菜单数据应从 /api/menus/tree 接口获取
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/routes")
 public class RouteController {
     
-    @Autowired
-    private MenuService menuService;
-    
-    @Autowired
-    private JwtUtil jwtUtil;
-    
     /**
-     * 获取动态路由菜单
-     * 从数据库读取菜单，根据用户角色过滤
+     * 获取静态路由配置
+     * 只返回时效性不高的静态路由，如 iframe、tabs 等
+     * 菜单数据应从 /api/menus/tree 接口获取
      */
     @GetMapping("/async")
-    public Result<List<RouteResponse>> getAsyncRoutes(HttpServletRequest request) {
+    public Result<List<RouteResponse>> getAsyncRoutes() {
         try {
-            // 从请求头获取Token
-            String token = request.getHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-            
-            // 从Token中获取用户角色
-            String roleCode = null;
-            if (token != null) {
-                try {
-                    roleCode = jwtUtil.getRoleFromToken(token);
-                } catch (Exception e) {
-                    log.debug("无法从Token获取角色，使用默认角色: {}", e.getMessage());
-                }
-            }
-            
-            // 如果无法获取角色，使用默认角色（SUPER_ADMIN）
-            if (roleCode == null) {
-                roleCode = "SUPER_ADMIN";
-            }
-            
-            // 从数据库获取菜单树
-            List<MenuResponse> menuTree = menuService.getMenuTreeByRoleCode(roleCode);
-            
-            // 转换为路由格式
-            List<RouteResponse> routes = convertToRoutes(menuTree);
-            
-            return Result.success(routes);
+            log.debug("获取静态路由配置");
+            // 返回静态路由配置（iframe、tabs 等）
+            // 这些路由不需要从数据库查询，是固定的配置
+            List<RouteResponse> staticRoutes = getStaticRoutes();
+            return Result.success(staticRoutes);
         } catch (Exception e) {
-            log.error("获取动态路由失败", e);
-            // 如果出错，返回空列表，前端会使用静态路由
+            log.error("获取静态路由配置失败", e);
             return Result.success(new ArrayList<>());
         }
     }
     
     /**
-     * 将菜单树转换为路由格式
+     * 获取静态路由配置
+     * 这些路由是固定的，不需要从数据库查询
      */
-    private List<RouteResponse> convertToRoutes(List<MenuResponse> menuTree) {
+    private List<RouteResponse> getStaticRoutes() {
         List<RouteResponse> routes = new ArrayList<>();
         
-        for (MenuResponse menu : menuTree) {
-            RouteResponse route = new RouteResponse();
-            route.setPath(menu.getPath());
-            route.setName(menu.getName());
-            
-            // 如果有子菜单，设置为Layout；否则使用组件路径
-            if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
-                route.setComponent("Layout");
-                route.setChildren(convertToRoutes(menu.getChildren()));
-            } else {
-                route.setComponent(menu.getComponent());
-            }
-            
-            // 设置重定向
-            if (menu.getRedirect() != null) {
-                route.setRedirect(menu.getRedirect());
-            }
-            
-            // 设置Meta信息
-            RouteMeta meta = new RouteMeta();
-            meta.setIcon(menu.getIcon());
-            meta.setTitle(menu.getTitle());
-            meta.setSortOrder(menu.getSortOrder());
-            meta.setShowLink(menu.getShowLink() == 1);
-            meta.setKeepAlive(menu.getKeepAlive() == 1);
-            // 所有菜单对所有角色可见（已在数据库层面过滤）
-            meta.setRoles(null);
-            route.setMeta(meta);
-            
-            routes.add(route);
+        // iframe 路由
+        RouteResponse iframeRoute = new RouteResponse();
+        iframeRoute.setPath("/iframe");
+        RouteMeta iframeMeta = new RouteMeta();
+        iframeMeta.setIcon("ri:links-fill");
+        iframeMeta.setTitle("menus.pureExternalPage");
+        iframeMeta.setSortOrder(12);
+        iframeRoute.setMeta(iframeMeta);
+        
+        // iframe 子路由
+        List<RouteResponse> iframeChildren = new ArrayList<>();
+        
+        // embedded 子路由
+        RouteResponse embeddedRoute = new RouteResponse();
+        embeddedRoute.setPath("/iframe/embedded");
+        RouteMeta embeddedMeta = new RouteMeta();
+        embeddedMeta.setTitle("menus.pureEmbeddedDoc");
+        embeddedRoute.setMeta(embeddedMeta);
+        
+        List<RouteResponse> embeddedChildren = new ArrayList<>();
+        // 添加各种 iframe 子路由（colorhunt, uigradients, ep, tailwindcss, vue3, vite, pinia, vue-router）
+        String[] iframeNames = {"FrameColorHunt", "FrameUiGradients", "FrameEp", "FrameTailwindcss", "FrameVue", "FrameVite", "FramePinia", "FrameRouter"};
+        String[] iframePaths = {"/iframe/colorhunt", "/iframe/uigradients", "/iframe/ep", "/iframe/tailwindcss", "/iframe/vue3", "/iframe/vite", "/iframe/pinia", "/iframe/vue-router"};
+        String[] iframeTitles = {"menus.pureColorHuntDoc", "menus.pureUiGradients", "menus.pureEpDoc", "menus.pureTailwindcssDoc", "menus.pureVueDoc", "menus.pureViteDoc", "menus.purePiniaDoc", "menus.pureRouterDoc"};
+        String[] iframeSrcs = {
+            "https://colorhunt.co/",
+            "https://uigradients.com/",
+            "https://element-plus.org/zh-CN/",
+            "https://tailwindcss.com/docs/installation",
+            "https://cn.vuejs.org/",
+            "https://cn.vitejs.dev/",
+            "https://pinia.vuejs.org/zh/index.html",
+            "https://router.vuejs.org/zh/"
+        };
+        
+        for (int i = 0; i < iframeNames.length; i++) {
+            RouteResponse iframeChild = new RouteResponse();
+            iframeChild.setPath(iframePaths[i]);
+            iframeChild.setName(iframeNames[i]);
+            RouteMeta iframeChildMeta = new RouteMeta();
+            iframeChildMeta.setTitle(iframeTitles[i]);
+            iframeChildMeta.setFrameSrc(iframeSrcs[i]);
+            iframeChildMeta.setKeepAlive(true);
+            iframeChildMeta.setRoles(List.of("admin", "common"));
+            iframeChild.setMeta(iframeChildMeta);
+            embeddedChildren.add(iframeChild);
         }
+        
+        embeddedRoute.setChildren(embeddedChildren);
+        iframeChildren.add(embeddedRoute);
+        
+        // external 子路由
+        RouteResponse externalRoute = new RouteResponse();
+        externalRoute.setPath("/iframe/external");
+        RouteMeta externalMeta = new RouteMeta();
+        externalMeta.setTitle("menus.pureExternalDoc");
+        externalRoute.setMeta(externalMeta);
+        
+        List<RouteResponse> externalChildren = new ArrayList<>();
+        RouteResponse externalLink1 = new RouteResponse();
+        externalLink1.setPath("/external");
+        externalLink1.setName("https://pure-admin.cn/");
+        RouteMeta externalLink1Meta = new RouteMeta();
+        externalLink1Meta.setTitle("menus.pureExternalLink");
+        externalLink1Meta.setRoles(List.of("admin", "common"));
+        externalLink1.setMeta(externalLink1Meta);
+        externalChildren.add(externalLink1);
+        
+        RouteResponse externalLink2 = new RouteResponse();
+        externalLink2.setPath("/pureUtilsLink");
+        externalLink2.setName("https://pure-admin-utils.netlify.app/");
+        RouteMeta externalLink2Meta = new RouteMeta();
+        externalLink2Meta.setTitle("menus.pureUtilsLink");
+        externalLink2Meta.setRoles(List.of("admin", "common"));
+        externalLink2.setMeta(externalLink2Meta);
+        externalChildren.add(externalLink2);
+        
+        externalRoute.setChildren(externalChildren);
+        iframeChildren.add(externalRoute);
+        
+        iframeRoute.setChildren(iframeChildren);
+        routes.add(iframeRoute);
+        
+        // tabs 路由
+        RouteResponse tabsRoute = new RouteResponse();
+        tabsRoute.setPath("/tabs");
+        RouteMeta tabsMeta = new RouteMeta();
+        tabsMeta.setIcon("ri:bookmark-2-line");
+        tabsMeta.setTitle("menus.pureTabs");
+        tabsMeta.setSortOrder(16);
+        tabsRoute.setMeta(tabsMeta);
+        
+        List<RouteResponse> tabsChildren = new ArrayList<>();
+        
+        RouteResponse tabsIndex = new RouteResponse();
+        tabsIndex.setPath("/tabs/index");
+        tabsIndex.setName("Tabs");
+        RouteMeta tabsIndexMeta = new RouteMeta();
+        tabsIndexMeta.setTitle("menus.pureTabs");
+        tabsIndexMeta.setRoles(List.of("admin", "common"));
+        tabsIndex.setMeta(tabsIndexMeta);
+        tabsChildren.add(tabsIndex);
+        
+        RouteResponse tabsQueryDetail = new RouteResponse();
+        tabsQueryDetail.setPath("/tabs/query-detail");
+        tabsQueryDetail.setName("TabQueryDetail");
+        RouteMeta tabsQueryDetailMeta = new RouteMeta();
+        tabsQueryDetailMeta.setShowLink(false);
+        tabsQueryDetailMeta.setActivePath("/tabs/index");
+        tabsQueryDetailMeta.setRoles(List.of("admin", "common"));
+        tabsQueryDetail.setMeta(tabsQueryDetailMeta);
+        tabsChildren.add(tabsQueryDetail);
+        
+        RouteResponse tabsParamsDetail = new RouteResponse();
+        tabsParamsDetail.setPath("/tabs/params-detail/:id");
+        tabsParamsDetail.setComponent("params-detail");
+        tabsParamsDetail.setName("TabParamsDetail");
+        RouteMeta tabsParamsDetailMeta = new RouteMeta();
+        tabsParamsDetailMeta.setShowLink(false);
+        tabsParamsDetailMeta.setActivePath("/tabs/index");
+        tabsParamsDetailMeta.setRoles(List.of("admin", "common"));
+        tabsParamsDetail.setMeta(tabsParamsDetailMeta);
+        tabsChildren.add(tabsParamsDetail);
+        
+        tabsRoute.setChildren(tabsChildren);
+        routes.add(tabsRoute);
         
         return routes;
     }

@@ -107,11 +107,18 @@ logging:
     # 项目代码：info（生产环境），如需调试可改为 debug
     com.aihub: info
     
+    # 菜单服务：debug（用于调试菜单查询问题）
+    com.aihub.admin.service.impl.MenuServiceImpl: debug
+    com.aihub.admin.controller.RouteController: debug
+    
     # 初始化服务：debug（用于调试初始化状态，可改为 info 减少日志）
     com.aihub.admin.service.impl.InitializationServiceImpl: debug
     
     # Spring 框架：info（减少框架日志）
     org.springframework: info
+    
+    # MyBatis SQL 日志：debug（查看 SQL 执行情况）
+    com.aihub.admin.mapper.MenuMapper: debug
     
     # MyBatis SQL 日志：warn（减少 SQL 输出，如需查看 SQL 可改为 debug）
     org.apache.ibatis: warn

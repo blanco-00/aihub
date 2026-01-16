@@ -23,6 +23,10 @@ public class User {
     
     private String phone;
     
+    private String avatar;
+    
+    private String description;
+    
     private String password;
     
     private String role;

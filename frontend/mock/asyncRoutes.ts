@@ -293,12 +293,12 @@ export default defineFakeRoute([
     url: "/api/routes/async",
     method: "get",
     response: () => {
+      // 静态路由只返回 iframe 和 tabs，不包含 /system 和 /monitor
+      // /system 和 /monitor 应该从 /api/menus/tree 接口获取（根据用户角色动态查询）
       return {
         code: 0,
         message: "操作成功",
         data: [
-          systemManagementRouter,
-          systemMonitorRouter,
           frameRouter,
           tabsRouter
         ]

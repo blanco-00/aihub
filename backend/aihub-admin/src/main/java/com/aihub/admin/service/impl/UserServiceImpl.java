@@ -116,6 +116,8 @@ public class UserServiceImpl implements UserService {
         response.setNickname(user.getNickname() != null ? user.getNickname() : user.getUsername());
         response.setEmail(user.getEmail());
         response.setPhone(user.getPhone());
+        response.setAvatar(user.getAvatar());
+        response.setDescription(user.getDescription());
         response.setRole(user.getRole());
         response.setDepartmentId(user.getDepartmentId() != null ? user.getDepartmentId() : 0L);
         response.setStatus(user.getStatus());

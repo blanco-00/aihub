@@ -6,10 +6,19 @@ import com.aihub.admin.dto.request.RefreshTokenRequest;
 import com.aihub.admin.dto.request.RegisterRequest;
 import com.aihub.admin.dto.request.ForgotPasswordRequest;
 import com.aihub.admin.dto.request.ResetPasswordRequest;
+import com.aihub.admin.dto.request.LoginLogListRequest;
+import com.aihub.admin.dto.request.OperationLogListRequest;
+import com.aihub.admin.dto.response.LoginLogResponse;
+import com.aihub.admin.dto.response.OperationLogResponse;
+import com.aihub.admin.dto.response.SecurityLogResponse;
 import com.aihub.admin.entity.User;
 import com.aihub.admin.enums.UserRole;
+import com.aihub.admin.utils.UserAgentUtils;
+import com.aihub.common.web.dto.PageResult;
 import com.aihub.common.web.exception.BusinessException;
 import com.aihub.admin.mapper.UserMapper;
+import com.aihub.admin.mapper.LoginLogMapper;
+import com.aihub.admin.mapper.OperationLogMapper;
 import com.aihub.admin.service.AuthService;
 import com.aihub.admin.service.TokenCacheService;
 import com.aihub.admin.service.VerificationCodeService;
@@ -21,6 +30,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 认证服务实现
@@ -43,6 +55,12 @@ public class AuthServiceImpl implements AuthService {
     
     @Autowired
     private TokenCacheService tokenCacheService;
+    
+    @Autowired
+    private LoginLogMapper loginLogMapper;
+    
+    @Autowired
+    private OperationLogMapper operationLogMapper;
     
     @Value("${jwt.expiration:86400000}")
     private Long tokenExpiration; // Token过期时间（毫秒）
@@ -297,5 +315,156 @@ public class AuthServiceImpl implements AuthService {
         userMapper.updateById(user);
         
         log.info("密码重置成功: email={}", request.getEmail());
+    }
+    
+    @Override
+    public void updateProfile(Long userId, String nickname, String email, String phone, String description, String avatar) {
+        // 查询用户
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getIsDeleted() == 1) {
+            throw new BusinessException("用户不存在");
+        }
+        
+        // 如果邮箱有变化，检查新邮箱是否已被其他用户使用
+        if (email != null && !email.equals(user.getEmail())) {
+            User existingUser = userMapper.findByEmail(email);
+            if (existingUser != null && existingUser.getIsDeleted() == 0 && !existingUser.getId().equals(userId)) {
+                throw new BusinessException("邮箱已被其他用户使用");
+            }
+        }
+        
+        // 更新用户信息
+        if (nickname != null) {
+            user.setNickname(nickname);
+        }
+        if (email != null) {
+            user.setEmail(email);
+        }
+        if (phone != null) {
+            user.setPhone(phone);
+        }
+        if (description != null) {
+            user.setDescription(description);
+        }
+        if (avatar != null) {
+            user.setAvatar(avatar);
+        }
+        user.setUpdatedAt(LocalDateTime.now());
+        
+        userMapper.updateById(user);
+        log.info("个人信息更新成功: userId={}, nickname={}", userId, nickname);
+    }
+    
+    @Override
+    public void updatePassword(Long userId, String oldPassword, String newPassword) {
+        // 查询用户
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getIsDeleted() == 1) {
+            throw new BusinessException("用户不存在");
+        }
+        
+        // 验证旧密码
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BusinessException("当前密码错误");
+        }
+        
+        // 更新密码
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
+        userMapper.updateById(user);
+        
+        log.info("密码修改成功: userId={}", userId);
+    }
+    
+    @Override
+    public PageResult<SecurityLogResponse> getSecurityLogs(Long userId, Integer current, Integer size) {
+        // 获取用户信息
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getIsDeleted() == 1) {
+            throw new BusinessException("用户不存在");
+        }
+        
+        String username = user.getUsername();
+        
+        // 查询登录日志（扩大查询范围，后续再筛选）
+        LoginLogListRequest loginLogRequest = new LoginLogListRequest();
+        loginLogRequest.setUsername(username);
+        List<LoginLogResponse> allLoginLogs = loginLogMapper.selectLoginLogList(
+            loginLogRequest, 0L, 1000); // 查询最多1000条
+        
+        // 查询操作日志（扩大查询范围，后续再筛选）
+        OperationLogListRequest operationLogRequest = new OperationLogListRequest();
+        operationLogRequest.setUsername(username);
+        List<OperationLogResponse> allOperationLogs = operationLogMapper.selectOperationLogList(
+            operationLogRequest, 0L, 1000); // 查询最多1000条
+        
+        // 转换为安全日志响应
+        List<SecurityLogResponse> securityLogs = new ArrayList<>();
+        
+        // 转换登录日志
+        for (LoginLogResponse loginLog : allLoginLogs) {
+            if (loginLog.getUserId() != null && loginLog.getUserId().equals(userId)) {
+                SecurityLogResponse securityLog = new SecurityLogResponse();
+                securityLog.setId(loginLog.getId());
+                securityLog.setType("LOGIN");
+                securityLog.setSummary(loginLog.getMessage() != null ? loginLog.getMessage() : 
+                    (loginLog.getStatus() != null && loginLog.getStatus() == 1 ? "登录成功" : "登录失败"));
+                securityLog.setIp(loginLog.getIp());
+                securityLog.setAddress(loginLog.getAddress());
+                securityLog.setSystem(UserAgentUtils.parseOS(loginLog.getUserAgent()));
+                securityLog.setBrowser(UserAgentUtils.parseBrowser(loginLog.getUserAgent()));
+                securityLog.setOperatingTime(loginLog.getLoginTime());
+                securityLogs.add(securityLog);
+            }
+        }
+        
+        // 转换操作日志
+        for (OperationLogResponse operationLog : allOperationLogs) {
+            if (operationLog.getUserId() != null && operationLog.getUserId().equals(userId)) {
+                SecurityLogResponse securityLog = new SecurityLogResponse();
+                securityLog.setId(operationLog.getId());
+                securityLog.setType("OPERATION");
+                String summary = (operationLog.getModule() != null ? operationLog.getModule() : "") + 
+                    " - " + (operationLog.getOperation() != null ? operationLog.getOperation() : "");
+                securityLog.setSummary(summary);
+                securityLog.setIp(operationLog.getIp());
+                securityLog.setAddress(null); // 操作日志可能没有地址信息
+                securityLog.setSystem("未知"); // 操作日志可能没有User-Agent
+                securityLog.setBrowser("未知");
+                securityLog.setOperatingTime(operationLog.getOperationTime());
+                securityLogs.add(securityLog);
+            }
+        }
+        
+        // 按时间倒序排序
+        securityLogs.sort((a, b) -> {
+            if (a.getOperatingTime() == null && b.getOperatingTime() == null) {
+                return 0;
+            }
+            if (a.getOperatingTime() == null) {
+                return 1;
+            }
+            if (b.getOperatingTime() == null) {
+                return -1;
+            }
+            return b.getOperatingTime().compareTo(a.getOperatingTime());
+        });
+        
+        // 分页处理
+        int total = securityLogs.size();
+        int fromIndex = (current - 1) * size;
+        int toIndex = Math.min(fromIndex + size, total);
+        List<SecurityLogResponse> pagedLogs = fromIndex < total ? 
+            securityLogs.subList(fromIndex, toIndex) : new ArrayList<>();
+        
+        // 构建分页结果
+        PageResult<SecurityLogResponse> result = new PageResult<>();
+        result.setRecords(pagedLogs);
+        result.setTotal((long) total);
+        result.setCurrent(current);
+        result.setSize(size);
+        result.setPages((long) ((total + size - 1) / size));
+        
+        return result;
     }
 }

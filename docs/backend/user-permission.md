@@ -19,63 +19,44 @@
 
 ## 数据库表设计
 
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本：
+> - `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql` - 基础表结构
+> - `backend/aihub-api/src/main/resources/db/migration/V1.0.5__add_department_table.sql` - 部门表
+> - `backend/aihub-api/src/main/resources/db/migration/V1.0.8__add_department_id_to_user.sql` - 用户表添加部门关联字段
+
 ### 用户表扩展
 
-在现有 `user` 表基础上添加部门关联：
-
-```sql
--- 添加部门关联字段
-ALTER TABLE user ADD COLUMN department_id BIGINT COMMENT '部门ID';
-ALTER TABLE user ADD INDEX idx_department_id (department_id);
-```
+在现有 `user` 表基础上添加部门关联字段 `department_id`，用于关联部门表。
 
 ### 角色表 (role)
 
-```sql
-CREATE TABLE role (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '角色ID',
-    code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色代码 SUPER_ADMIN/ADMIN/USER',
-    name VARCHAR(50) NOT NULL COMMENT '角色名称',
-    description VARCHAR(255) COMMENT '角色描述',
-    status TINYINT(1) DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) DEFAULT 0,
-    INDEX idx_role_code (code),
-    INDEX idx_role_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
-```
+**主要字段**：
+- `id`: 角色ID（主键）
+- `code`: 角色代码（SUPER_ADMIN/ADMIN/USER），唯一
+- `name`: 角色名称
+- `description`: 角色描述
+- `status`: 状态（0-禁用，1-启用）
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ### 用户角色关联表 (user_role)
 
-```sql
-CREATE TABLE user_role (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '关联ID',
-    user_id BIGINT NOT NULL COMMENT '用户ID',
-    role_id BIGINT NOT NULL COMMENT '角色ID',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_user_role (user_id, role_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_role_id (role_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联表';
-```
+**主要字段**：
+- `id`: 关联ID（主键）
+- `user_id`: 用户ID
+- `role_id`: 角色ID
+- `created_at`: 创建时间
+
+**唯一约束**：`(user_id, role_id)` 唯一，防止重复关联
 
 ### 部门表 (department)
 
-```sql
-CREATE TABLE department (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '部门ID',
-    name VARCHAR(100) NOT NULL COMMENT '部门名称',
-    parent_id BIGINT DEFAULT 0 COMMENT '父部门ID，0表示顶级',
-    sort_order INT DEFAULT 0 COMMENT '排序',
-    status TINYINT(1) DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) DEFAULT 0,
-    INDEX idx_parent_id (parent_id),
-    INDEX idx_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='部门表';
-```
+**主要字段**：
+- `id`: 部门ID（主键）
+- `name`: 部门名称
+- `parent_id`: 父部门ID，0表示顶级部门
+- `sort_order`: 排序（注意：使用 `sort_order` 而非 `rank`，避免保留关键字）
+- `status`: 状态（0-禁用，1-启用）
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ## 功能设计
 

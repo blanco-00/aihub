@@ -168,24 +168,23 @@ CREATE UNIQUE INDEX uk_user_username ON user(username);
 > - [系统监控模块设计](./monitor.md) - 登录日志表、操作日志表、系统日志表
 
 ### 用户表 (user)
-```sql
-CREATE TABLE user (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
-    username VARCHAR(50) NOT NULL COMMENT '用户名',
-    email VARCHAR(100) NOT NULL COMMENT '邮箱',
-    password VARCHAR(255) NOT NULL COMMENT '密码（BCrypt加密）',
-    role VARCHAR(20) NOT NULL DEFAULT 'USER' COMMENT '角色 SUPER_ADMIN-超级管理员 ADMIN-管理员 USER-普通用户',
-    status TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否删除 0-未删除 1-已删除',
-    UNIQUE KEY uk_user_username (username),
-    UNIQUE KEY uk_user_email (email),
-    INDEX idx_user_role (role),
-    INDEX idx_user_status (status),
-    INDEX idx_user_is_deleted (is_deleted)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
-```
+
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本 `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
+
+**主要字段**：
+- `id`: 用户ID（主键）
+- `username`: 用户名（唯一）
+- `nickname`: 用户昵称
+- `email`: 邮箱（唯一）
+- `phone`: 手机号
+- `avatar`: 头像URL
+- `description`: 个人简介
+- `password`: 密码（BCrypt加密）
+- `role`: 角色（SUPER_ADMIN-超级管理员，ADMIN-管理员，USER-普通用户）
+- `department_id`: 部门ID
+- `status`: 状态（0-禁用，1-启用）
+- `remark`: 备注
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 **角色说明**:
 - `SUPER_ADMIN`: 超级管理员，拥有所有权限，至少保留一个
@@ -193,72 +192,65 @@ CREATE TABLE user (
 - `USER`: 普通用户，基础使用权限
 
 ### 模型配置表 (model_config)
-```sql
-CREATE TABLE model_config (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '模型ID',
-    name VARCHAR(100) NOT NULL COMMENT '模型名称',
-    vendor VARCHAR(50) NOT NULL COMMENT '厂商 OpenAI/Claude/DeepSeek等',
-    model_id VARCHAR(100) NOT NULL COMMENT '模型ID',
-    api_key VARCHAR(255) NOT NULL COMMENT 'API Key（加密存储）',
-    base_url VARCHAR(255) COMMENT 'Base URL',
-    status TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    config JSON COMMENT '模型配置参数',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-    INDEX idx_model_vendor (vendor),
-    INDEX idx_model_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='模型配置表';
-```
+
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本 `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
+
+**主要字段**：
+- `id`: 模型ID（主键）
+- `name`: 模型名称
+- `vendor`: 厂商（OpenAI/Claude/DeepSeek等）
+- `model_id`: 模型ID
+- `api_key`: API Key（加密存储）
+- `base_url`: Base URL
+- `status`: 状态（0-禁用，1-启用）
+- `config`: 模型配置参数（JSON格式）
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ### Agent表 (agent)
-```sql
-CREATE TABLE agent (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'Agent ID',
-    name VARCHAR(100) NOT NULL COMMENT 'Agent名称',
-    description TEXT COMMENT '描述',
-    workflow JSON NOT NULL COMMENT '工作流配置',
-    prompt_id BIGINT COMMENT '关联的Prompt ID',
-    status TINYINT(1) NOT NULL DEFAULT 1 COMMENT '状态',
-    created_by BIGINT NOT NULL COMMENT '创建人',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-    INDEX idx_agent_created_by (created_by),
-    INDEX idx_agent_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Agent表';
-```
+
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本 `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
+
+**主要字段**：
+- `id`: Agent ID（主键）
+- `name`: Agent名称
+- `description`: 描述
+- `workflow`: 工作流配置（JSON格式）
+- `prompt_id`: 关联的Prompt ID
+- `status`: 状态
+- `created_by`: 创建人
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ### Prompt表 (prompt)
-```sql
-CREATE TABLE prompt (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'Prompt ID',
-    title VARCHAR(200) NOT NULL COMMENT '标题',
-    content TEXT NOT NULL COMMENT 'Prompt内容',
-    description TEXT COMMENT '描述',
-    tags JSON COMMENT '标签',
-    category VARCHAR(50) COMMENT '分类',
-    version INT NOT NULL DEFAULT 1 COMMENT '版本号',
-    parent_id BIGINT COMMENT '父版本ID',
-    rating DECIMAL(3,2) COMMENT '评分',
-    use_count INT NOT NULL DEFAULT 0 COMMENT '使用次数',
-    created_by BIGINT NOT NULL COMMENT '创建人',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-    INDEX idx_prompt_category (category),
-    INDEX idx_prompt_created_by (created_by),
-    INDEX idx_prompt_parent_id (parent_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Prompt表';
-```
+
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本 `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
+
+**主要字段**：
+- `id`: Prompt ID（主键）
+- `title`: 标题
+- `content`: Prompt内容
+- `description`: 描述
+- `tags`: 标签（JSON格式）
+- `category`: 分类
+- `version`: 版本号
+- `parent_id`: 父版本ID
+- `rating`: 评分
+- `use_count`: 使用次数
+- `created_by`: 创建人
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ## 功能模块表设计
+
+> 📝 **说明**：所有数据库表的完整SQL定义都在后端迁移脚本中，文档中只保留字段说明和设计思路。
 
 功能模块相关的表设计已移至对应的功能模块文档：
 
 - **[用户与权限模块设计](./user-permission.md)** - 角色表、用户角色关联表、部门表
 - **[菜单管理模块设计](./menu.md)** - 菜单表、角色菜单关联表
 - **[系统监控模块设计](./monitor.md)** - 登录日志表、操作日志表、系统日志表
+
+**迁移脚本位置**：
+- `backend/aihub-api/src/main/resources/db/migration/` - 所有数据库迁移脚本
+- 表结构变更时，只需更新迁移脚本，文档会自动引用最新版本
 
 > 更多核心业务表结构设计待完善...
 

@@ -11,44 +11,33 @@
 
 ## 数据库表设计
 
+> 📝 **说明**：完整的SQL表结构定义请参考后端迁移脚本 `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
+
 ### 菜单表 (menu)
 
-```sql
-CREATE TABLE menu (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '菜单ID',
-    parent_id BIGINT DEFAULT 0 COMMENT '父菜单ID，0表示顶级',
-    name VARCHAR(50) NOT NULL COMMENT '菜单名称（路由name）',
-    path VARCHAR(200) NOT NULL COMMENT '路由路径',
-    component VARCHAR(200) COMMENT '组件路径，父级为Layout',
-    redirect VARCHAR(200) COMMENT '重定向路径',
-    icon VARCHAR(50) COMMENT '图标',
-    title VARCHAR(100) NOT NULL COMMENT '菜单标题（i18n key）',
-    rank INT DEFAULT 0 COMMENT '排序',
-    show_link TINYINT(1) DEFAULT 1 COMMENT '是否显示 0-隐藏 1-显示',
-    keep_alive TINYINT(1) DEFAULT 0 COMMENT '是否缓存',
-    status TINYINT(1) DEFAULT 1 COMMENT '状态 0-禁用 1-启用',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_deleted TINYINT(1) DEFAULT 0,
-    INDEX idx_parent_id (parent_id),
-    INDEX idx_rank (rank),
-    INDEX idx_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜单表';
-```
+**主要字段**：
+- `id`: 菜单ID（主键）
+- `parent_id`: 父菜单ID，0表示顶级菜单
+- `name`: 菜单名称（路由name）
+- `path`: 路由路径
+- `component`: 组件路径，父级为Layout
+- `icon`: 图标
+- `title`: 菜单标题（i18n key）
+- `sort_order`: 排序（注意：数据库字段为 `sort_order`，避免使用保留关键字 `rank`）
+- `show_link`: 是否显示（0-隐藏，1-显示）
+- `keep_alive`: 是否缓存（0-不缓存，1-缓存）
+- `status`: 状态（0-禁用，1-启用）
+- `is_deleted`: 是否删除（0-未删除，1-已删除）
 
 ### 角色菜单关联表 (role_menu)
 
-```sql
-CREATE TABLE role_menu (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '关联ID',
-    role_id BIGINT NOT NULL COMMENT '角色ID',
-    menu_id BIGINT NOT NULL COMMENT '菜单ID',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_role_menu (role_id, menu_id),
-    INDEX idx_role_id (role_id),
-    INDEX idx_menu_id (menu_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色菜单关联表';
-```
+**主要字段**：
+- `id`: 关联ID（主键）
+- `role_id`: 角色ID
+- `menu_id`: 菜单ID
+- `created_at`: 创建时间
+
+**唯一约束**：`(role_id, menu_id)` 唯一，防止重复关联
 
 ## 关系设计
 
@@ -63,7 +52,7 @@ CREATE TABLE role_menu (
 - **菜单创建**：支持创建父级菜单和子菜单
 - **菜单编辑**：修改菜单信息（路径、组件、图标等）
 - **菜单删除**：逻辑删除，删除父菜单时检查子菜单
-- **菜单排序**：通过 `rank` 字段控制显示顺序，支持拖拽排序
+- **菜单排序**：通过 `sort_order` 字段控制显示顺序，支持拖拽排序
 
 ### 菜单权限
 

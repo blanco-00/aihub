@@ -25,9 +25,12 @@ export const usePermissionStore = defineStore("pure-permission", {
   actions: {
     /** 组装整体路由生成的菜单 */
     handleWholeMenus(routes: any[]) {
-      this.wholeMenus = filterNoPermissionTree(
-        filterTree(ascending(this.constantMenus.concat(routes)))
-      );
+      const mergedRoutes = this.constantMenus.concat(routes);
+      const sortedRoutes = ascending(mergedRoutes);
+      const filteredByShowLink = filterTree(sortedRoutes);
+      const filteredByPermission = filterNoPermissionTree(filteredByShowLink);
+      
+      this.wholeMenus = filteredByPermission;
       this.flatteningRoutes = formatFlatteningRoutes(
         this.constantMenus.concat(routes) as any
       );

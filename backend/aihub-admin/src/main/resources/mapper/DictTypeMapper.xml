@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.DictTypeMapper">
+    
+    <!-- 查询字典类型列表（分页、搜索、筛选） -->
+    <select id="selectDictTypeList" resultType="com.aihub.admin.dto.response.DictTypeResponse">
+        SELECT 
+            id, dict_name, dict_type, status, remark,
+            created_at as createdAt, updated_at as updatedAt
+        FROM dict_type
+        WHERE is_deleted = 0
+        <if test="dictName != null and dictName != ''">
+            AND dict_name LIKE CONCAT('%', #{dictName}, '%')
+        </if>
+        <if test="dictType != null and dictType != ''">
+            AND dict_type LIKE CONCAT('%', #{dictType}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND created_at &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND created_at &lt;= #{endTime}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <!-- 统计字典类型总数 -->
+    <select id="countDictTypeList" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM dict_type
+        WHERE is_deleted = 0
+        <if test="dictName != null and dictName != ''">
+            AND dict_name LIKE CONCAT('%', #{dictName}, '%')
+        </if>
+        <if test="dictType != null and dictType != ''">
+            AND dict_type LIKE CONCAT('%', #{dictType}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND created_at &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND created_at &lt;= #{endTime}
+        </if>
+    </select>
+    
+</mapper>

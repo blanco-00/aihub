@@ -29,12 +29,16 @@ const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 // 动态路由
 import { getAsyncRoutes } from "@/api/routes";
+// 菜单数据（根据用户角色）
+import { getMenuTreeByRole } from "@/api/menu";
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
+  // 支持 sortOrder（后端字段）和 rank（前端路由字段）
+  const rank = meta?.rank ?? meta?.sortOrder;
   return isAllEmpty(parentId)
-    ? isAllEmpty(meta?.rank) ||
-      (meta?.rank === 0 && name !== "Home" && path !== "/")
+    ? isAllEmpty(rank) ||
+      (rank === 0 && name !== "Home" && path !== "/")
       ? true
       : false
     : false;
@@ -50,12 +54,19 @@ function ascending(arr: any[]) {
     if (!v.meta) {
       v.meta = {};
     }
+    // 如果存在 sortOrder（后端字段），映射到 rank（前端路由字段）
+    if (v.meta.sortOrder !== undefined && v.meta.rank === undefined) {
+      v.meta.rank = v.meta.sortOrder;
+    }
     // 当rank不存在时，根据顺序自动创建，首页路由永远在第一位
     if (handRank(v)) v.meta.rank = index + 2;
   });
   return validRoutes.sort(
-    (a: { meta: { rank: number } }, b: { meta: { rank: number } }) => {
-      return (a?.meta?.rank || 0) - (b?.meta?.rank || 0);
+    (a: { meta: { rank?: number; sortOrder?: number } }, b: { meta: { rank?: number; sortOrder?: number } }) => {
+      // 优先使用 rank，如果没有则使用 sortOrder
+      const rankA = a?.meta?.rank ?? a?.meta?.sortOrder ?? 0;
+      const rankB = b?.meta?.rank ?? b?.meta?.sortOrder ?? 0;
+      return rankA - rankB;
     }
   );
 }
@@ -63,7 +74,13 @@ function ascending(arr: any[]) {
 /** 过滤meta中showLink为false的菜单 */
 function filterTree(data: RouteComponent[]) {
   const newTree = cloneDeep(data).filter(
-    (v: { meta: { showLink: boolean } }) => v.meta?.showLink !== false
+    (v: { meta: { showLink: boolean } }) => {
+      // 如果 meta 不存在或 showLink 未定义，默认显示
+      if (!v.meta || v.meta.showLink === undefined) {
+        return true;
+      }
+      return v.meta.showLink !== false;
+    }
   );
   newTree.forEach(
     (v: { children }) => v.children && (v.children = filterTree(v.children))
@@ -73,7 +90,24 @@ function filterTree(data: RouteComponent[]) {
 
 /** 过滤children长度为0的的目录，当目录下没有菜单时，会过滤此目录，目录没有赋予roles权限，当目录下只要有一个菜单有显示权限，那么此目录就会显示 */
 function filterChildrenTree(data: RouteComponent[]) {
-  const newTree = cloneDeep(data).filter((v: any) => v?.children?.length !== 0);
+  const newTree = cloneDeep(data).filter((v: any) => {
+    // 检查是否是目录（Layout）还是叶子节点（实际页面）
+    // 在 filterChildrenTree 执行时，component 可能是字符串（如 "Layout" 或 "system/dict/index"）
+    const componentStr = v.component as any;
+    const isLayout = typeof componentStr === 'string' && componentStr === 'Layout' ||
+                     componentStr === Layout ||
+                     (v.component === undefined && v?.children && v.children.length > 0);
+    
+    // 如果是 Layout 目录，需要检查是否有子菜单
+    // 如果是叶子节点（有 component 且不是 Layout），即使 children 为空也应该保留
+    const hasChildren = v?.children?.length !== 0;
+    const isLeafNode = !isLayout && (v.component !== undefined && v.component !== null);
+    
+    // 如果是叶子节点，或者有子菜单，则保留
+    const shouldKeep = isLeafNode || hasChildren;
+    
+    return shouldKeep;
+  });
   newTree.forEach(
     (v: { children }) => v.children && (v.children = filterTree(v.children))
   );
@@ -81,25 +115,57 @@ function filterChildrenTree(data: RouteComponent[]) {
 }
 
 /** 判断两个数组彼此是否存在相同值 */
-function isOneOfArray(a: Array<string>, b: Array<string>) {
-  return Array.isArray(a) && Array.isArray(b)
-    ? intersection(a, b).length > 0
-      ? true
-      : false
-    : true;
+function isOneOfArray(a: Array<string> | null | undefined, b: Array<string>) {
+  // 如果 roles 为 null 或 undefined，表示所有角色都可以访问（包括没有角色的用户）
+  if (a === null || a === undefined) {
+    return true;
+  }
+  // 如果 roles 是空数组，表示没有角色可以访问
+  if (!Array.isArray(a) || a.length === 0) {
+    return false;
+  }
+  // 如果用户没有角色（b 为空数组），但菜单要求特定角色，则不允许访问
+  // 但如果用户有角色，检查是否有交集
+  if (!Array.isArray(b) || b.length === 0) {
+    // 用户没有角色，但菜单要求特定角色，不允许访问
+    return false;
+  }
+  // 检查是否有交集
+  return intersection(a, b).length > 0;
 }
 
 /** 从localStorage里取出当前登录用户的角色roles，过滤无权限的菜单 */
 function filterNoPermissionTree(data: RouteComponent[]) {
+  if (!data || data.length === 0) {
+    return [];
+  }
+  
   const currentRoles =
     storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
-  const newTree = cloneDeep(data).filter((v: any) =>
-    isOneOfArray(v.meta?.roles, currentRoles)
-  );
+  
+  const newTree = cloneDeep(data).filter((v: any) => {
+    // 确保 meta 存在
+    if (!v.meta) {
+      v.meta = {};
+    }
+    
+    const routeRoles = v.meta.roles;
+    const hasPermission = isOneOfArray(routeRoles, currentRoles);
+    return hasPermission;
+  });
+  
+  // 递归处理子菜单
   newTree.forEach(
-    (v: any) => v.children && (v.children = filterNoPermissionTree(v.children))
+    (v: any) => {
+      if (v.children && Array.isArray(v.children) && v.children.length > 0) {
+        v.children = filterNoPermissionTree(v.children);
+      }
+    }
   );
-  return filterChildrenTree(newTree);
+  
+  const finalTree = filterChildrenTree(newTree);
+  
+  return finalTree;
 }
 
 /** 通过指定 `key` 获取父级路径集合，默认 `key` 为 `path` */
@@ -162,36 +228,102 @@ function addPathMatch() {
   }
 }
 
+
+/** 数据格式转换：将 MenuResponse 格式转换为 RouteResponse 格式 */
+function normalizeRouteData(route: any): any {
+  if (!route) return route;
+  
+  // 如果顶层有 showLink，说明是 MenuResponse 格式，需要转换为 RouteResponse 格式
+  if (route.showLink !== undefined && !route.meta) {
+    const normalizedRoute: any = {
+      path: route.path,
+      name: route.name,
+      component: route.component,
+      redirect: route.redirect,
+      meta: {
+        icon: route.icon,
+        title: route.title,
+        sortOrder: route.sortOrder,
+        // 将后端的 sortOrder 映射到前端的 rank（路由系统使用 rank 排序）
+        rank: route.sortOrder,
+        showLink: route.showLink === 1 || route.showLink === true,
+        keepAlive: route.keepAlive === 1 || route.keepAlive === true,
+        roles: null // 所有菜单对所有角色可见（已在数据库层面过滤）
+      }
+    };
+    // 递归处理子菜单（处理 children 为 null 或空数组的情况）
+    // 注意：children 应该始终是数组，不能是 null，避免前端组件访问时出错
+    if (route.children && Array.isArray(route.children) && route.children.length > 0) {
+      normalizedRoute.children = route.children.map((child: any) => normalizeRouteData(child));
+    } else {
+      normalizedRoute.children = [];
+    }
+    return normalizedRoute;
+  }
+  
+  // 如果已经是 RouteResponse 格式，确保 meta 对象存在
+  if (!route.meta) {
+    route.meta = {};
+  }
+  
+  // 确保 roles 字段：如果后端返回的是 null，保持为 null（表示所有角色可见）
+  // 如果后端没有返回 roles 字段，也设置为 null
+  if (route.meta.roles === undefined) {
+    route.meta.roles = null;
+  }
+  
+  // 确保 children 始终是数组，不能是 null
+  if (route.children === null || route.children === undefined) {
+    route.children = [];
+  } else if (Array.isArray(route.children) && route.children.length > 0) {
+    route.children = route.children.map((child: any) => normalizeRouteData(child));
+  } else {
+    route.children = [];
+  }
+  
+  return route;
+}
+
 /** 处理动态路由（后端返回的路由） */
 function handleAsyncRoutes(routeList) {
-  if (routeList.length === 0) {
-    usePermissionStoreHook().handleWholeMenus(routeList);
+  if (!routeList || routeList.length === 0) {
+    usePermissionStoreHook().handleWholeMenus([]);
   } else {
-    formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
-      (v: RouteRecordRaw) => {
-        // 防止重复添加路由
-        if (
-          router.options.routes[0].children.findIndex(
-            value => value.path === v.path
-          ) !== -1
-        ) {
-          return;
-        } else {
-          // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
-          router.options.routes[0].children.push(v);
-          // 最终路由进行升序
-          ascending(router.options.routes[0].children);
-          if (!router.hasRoute(v?.name)) router.addRoute(v);
-          const flattenRouters: any = router
-            .getRoutes()
-            .find(n => n.path === "/");
-          // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
-          flattenRouters.children = router.options.routes[0].children;
-          router.addRoute(flattenRouters);
+    // 数据格式转换：如果后端返回的是 MenuResponse 格式（有 showLink 在顶层），需要转换为 RouteResponse 格式
+    const normalizedRoutes = routeList.map((route: any) => normalizeRouteData(route));
+    
+    try {
+      formatFlatteningRoutes(addAsyncRoutes(cloneDeep(normalizedRoutes))).map(
+        (v: RouteRecordRaw) => {
+          // 防止重复添加路由
+          if (
+            router.options.routes[0].children.findIndex(
+              value => value.path === v.path
+            ) !== -1
+          ) {
+            return;
+          } else {
+            // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+            router.options.routes[0].children.push(v);
+            // 最终路由进行升序
+            ascending(router.options.routes[0].children);
+            if (!router.hasRoute(v?.name)) router.addRoute(v);
+            const flattenRouters: any = router
+              .getRoutes()
+              .find(n => n.path === "/");
+            // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
+            if (flattenRouters) {
+              flattenRouters.children = router.options.routes[0].children;
+              router.addRoute(flattenRouters);
+            }
+          }
         }
-      }
-    );
-    usePermissionStoreHook().handleWholeMenus(routeList);
+      );
+    } catch (error) {
+      console.error("添加路由时出错:", error);
+    }
+    
+    usePermissionStoreHook().handleWholeMenus(normalizedRoutes);
   }
   if (!useMultiTagsStoreHook().getMultiTagsCache) {
     useMultiTagsStoreHook().handleTags("equal", [
@@ -206,44 +338,87 @@ function handleAsyncRoutes(routeList) {
 
 /** 初始化路由（`new Promise` 写法防止在异步请求中造成无限循环）*/
 function initRouter() {
+  // 清除旧的缓存数据，避免使用包含 /system 和 /monitor 的旧缓存
+  const key = "async-routes";
+  storageLocal().removeItem(key);
+  
   if (getConfig()?.CachingAsyncRoutes) {
     // 开启动态路由缓存本地localStorage
-    const key = "async-routes";
-    const asyncRouteList = storageLocal().getItem(key) as any;
+    // 注意：缓存已在上面清除，这里强制从接口获取最新数据
+    const asyncRouteList = null; // 强制不使用缓存，从接口获取最新数据
+    
     if (asyncRouteList && asyncRouteList?.length > 0) {
       return new Promise(resolve => {
-        handleAsyncRoutes(asyncRouteList);
+        // 对缓存的数据也进行格式转换处理
+        const normalizedCachedRoutes = asyncRouteList.map((route: any) => normalizeRouteData(route));
+        handleAsyncRoutes(normalizedCachedRoutes);
         resolve(router);
       });
     } else {
       return new Promise(resolve => {
-        getAsyncRoutes()
-          .then(({ code, data }) => {
-            if (code === 0 || code === 200) {
-              handleAsyncRoutes(cloneDeep(data));
-              storageLocal().setItem(key, data);
-            }
-            resolve(router);
-          })
-          .catch(() => {
-            // 接口失败时也 resolve，避免阻塞路由
-            resolve(router);
-          });
+        // 并行获取菜单数据和静态路由配置
+        Promise.all([
+          getMenuTreeByRole().catch(() => ({ code: 0, data: [] })),
+          getAsyncRoutes().catch(() => ({ code: 0, data: [] }))
+        ]).then(([menuResult, staticRouteResult]) => {
+          const menuData = menuResult.code === 0 || menuResult.code === 200 ? menuResult.data : [];
+          const staticRoutes = staticRouteResult.code === 0 || staticRouteResult.code === 200 ? staticRouteResult.data : [];
+        
+          // 合并菜单数据和静态路由配置
+          // 注意：静态路由不应该包含 /system 和 /monitor，这些应该只从菜单接口获取
+          const staticRoutesFiltered = staticRoutes.filter((route: any) => 
+            route.path !== "/system" && route.path !== "/monitor"
+          );
+          const allRoutes = [...(menuData || []), ...(staticRoutesFiltered || [])];
+        
+          if (allRoutes.length > 0) {
+            // 数据格式转换：将 MenuResponse 格式转换为 RouteResponse 格式
+            const normalizedRoutes = allRoutes.map((route: any) => normalizeRouteData(route));
+            handleAsyncRoutes(cloneDeep(normalizedRoutes));
+            // 保存转换后的数据到缓存
+            storageLocal().setItem(key, normalizedRoutes);
+          } else {
+            // 即使没有数据，也要调用 handleAsyncRoutes 来设置 wholeMenus，避免菜单一直转圈
+            handleAsyncRoutes([]);
+          }
+          resolve(router);
+        }).catch((error) => {
+          console.error("获取路由数据失败:", error);
+          // 接口失败时也 resolve，避免阻塞路由
+          resolve(router);
+        });
       });
     }
   } else {
     return new Promise(resolve => {
-      getAsyncRoutes()
-        .then(({ code, data }) => {
-          if (code === 0 || code === 200) {
-            handleAsyncRoutes(cloneDeep(data));
-          }
-          resolve(router);
-        })
-        .catch(() => {
-          // 接口失败时也 resolve，避免阻塞路由
-          resolve(router);
-        });
+      // 并行获取菜单数据和静态路由配置
+      Promise.all([
+        getMenuTreeByRole().catch(() => ({ code: 0, data: [] })),
+        getAsyncRoutes().catch(() => ({ code: 0, data: [] }))
+      ]).then(([menuResult, staticRouteResult]) => {
+        const menuData = menuResult.code === 0 || menuResult.code === 200 ? menuResult.data : [];
+        const staticRoutes = staticRouteResult.code === 0 || staticRouteResult.code === 200 ? staticRouteResult.data : [];
+        
+        // 合并菜单数据和静态路由配置
+        // 注意：静态路由不应该包含 /system 和 /monitor，这些应该只从菜单接口获取
+        const staticRoutesFiltered = staticRoutes.filter((route: any) => 
+          route.path !== "/system" && route.path !== "/monitor"
+        );
+        const allRoutes = [...(menuData || []), ...(staticRoutesFiltered || [])];
+        
+        if (allRoutes.length > 0) {
+          // 数据格式转换：将 MenuResponse 格式转换为 RouteResponse 格式
+          const normalizedRoutes = allRoutes.map((route: any) => normalizeRouteData(route));
+          handleAsyncRoutes(cloneDeep(normalizedRoutes));
+        } else {
+          // 即使没有数据，也要调用 handleAsyncRoutes 来设置 wholeMenus，避免菜单一直转圈
+          handleAsyncRoutes([]);
+        }
+        resolve(router);
+      }).catch(() => {
+        // 接口失败时也 resolve，避免阻塞路由
+        resolve(router);
+      });
     });
   }
 }
@@ -332,14 +507,38 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
   arrRoutes.forEach((v: RouteRecordRaw) => {
+    // 确保 meta 对象存在
+    if (!v.meta) {
+      v.meta = { title: v.meta?.title || "" };
+    }
+    // 确保 title 存在
+    if (!v.meta.title) {
+      v.meta.title = "";
+    }
     // 将backstage属性加入meta，标识此路由为后端返回路由
     v.meta.backstage = true;
+    // 数据转换：确保 showLink 是 boolean 类型（后端可能返回数字 0/1）
+    if (v.meta.showLink !== undefined && typeof v.meta.showLink !== "boolean") {
+      v.meta.showLink = v.meta.showLink === 1 || v.meta.showLink === true;
+    }
+    // 数据转换：确保 keepAlive 是 boolean 类型
+    if (v.meta.keepAlive !== undefined && typeof v.meta.keepAlive !== "boolean") {
+      v.meta.keepAlive = v.meta.keepAlive === 1 || v.meta.keepAlive === true;
+    }
     // 父级的redirect属性取值：如果子级存在且父级的redirect属性不存在，默认取第一个子级的path；如果子级存在且父级的redirect属性存在，取存在的redirect属性，会覆盖默认值
     if (v?.children && v.children.length && !v.redirect)
       v.redirect = v.children[0].path;
     // 父级的name属性取值：如果子级存在且父级的name属性不存在，默认取第一个子级的name；如果子级存在且父级的name属性存在，取存在的name属性，会覆盖默认值（注意：测试中发现父级的name不能和子级name重复，如果重复会造成重定向无效（跳转404），所以这里给父级的name起名的时候后面会自动加上`Parent`，避免重复）
     if (v?.children && v.children.length && !v.name)
       v.name = (v.children[0].name as string) + "Parent";
+    // 检查并修复父级和子级 name 重复的问题（避免路由名称冲突）
+    if (v?.children && v.children.length && v.name) {
+      const hasDuplicateName = v.children.some((child: any) => child.name === v.name);
+      if (hasDuplicateName) {
+        // 如果父级和子级 name 重复，给父级 name 加上 "Parent" 后缀
+        v.name = (v.name as string) + "Parent";
+      }
+    }
     // 处理父级路由的 component：优先检查是否为 "Layout" 字符串，或者没有 component 但有 children 的情况
     const componentStr = v.component as any;
     if (typeof componentStr === "string" && componentStr === "Layout") {
@@ -355,8 +554,14 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
         : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
       v.component = modulesRoutes[modulesRoutesKeys[index]];
     }
-    if (v?.children && v.children.length) {
+    // 确保 children 始终是数组，不能是 null，避免前端组件访问时出错
+    if (v.children === null || v.children === undefined) {
+      v.children = [];
+    } else if (Array.isArray(v.children) && v.children.length > 0) {
+      // 递归处理子菜单
       addAsyncRoutes(v.children);
+    } else {
+      v.children = [];
     }
   });
   return arrRoutes;

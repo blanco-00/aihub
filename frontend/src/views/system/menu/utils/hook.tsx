@@ -71,8 +71,9 @@ export function useMenu() {
     },
     {
       label: "排序",
-      prop: "rank",
-      width: 100
+      prop: "sortOrder",
+      width: 100,
+      sortable: true
     },
     {
       label: "显示",
@@ -173,7 +174,7 @@ export function useMenu() {
           name: row?.name ?? "",
           path: row?.path ?? "",
           component: row?.component ?? "",
-          rank: row?.rank ?? 0,
+          sortOrder: row?.sortOrder ?? 0,
           redirect: row?.redirect ?? "",
           icon: row?.icon ?? "",
           extraIcon: row?.extraIcon ?? "",
@@ -212,7 +213,7 @@ export function useMenu() {
                   redirect: curData.redirect || undefined,
                   icon: curData.icon || undefined,
                   title: curData.title,
-                  rank: curData.rank || 0,
+                  sortOrder: curData.sortOrder || 0,
                   showLink: curData.showLink ? 1 : 0,
                   keepAlive: curData.keepAlive ? 1 : 0,
                   status: 1
@@ -236,7 +237,7 @@ export function useMenu() {
                   redirect: curData.redirect || undefined,
                   icon: curData.icon || undefined,
                   title: curData.title || undefined,
-                  rank: curData.rank !== undefined ? curData.rank : undefined,
+                  sortOrder: curData.sortOrder !== undefined ? curData.sortOrder : undefined,
                   showLink: curData.showLink !== undefined ? (curData.showLink ? 1 : 0) : undefined,
                   keepAlive: curData.keepAlive !== undefined ? (curData.keepAlive ? 1 : 0) : undefined,
                   status: curData.status !== undefined ? curData.status : undefined

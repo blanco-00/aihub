@@ -39,8 +39,10 @@
         ORDER BY m.sort_order ASC, m.id ASC
     </select>
 
-    <!-- 根据角色代码查询菜单列表 -->
+    <!-- 根据角色代码查询菜单列表（包含已关联父菜单的所有子菜单） -->
+    <!-- 性能优化：使用 UNION ALL 减少去重开销，在应用层去重；使用子查询优化自连接 -->
     <select id="selectByRoleCode" resultType="com.aihub.admin.entity.Menu">
+        -- 查询直接关联的菜单
         SELECT 
             m.id, m.parent_id, m.name, m.path, m.component, m.redirect, m.icon, m.title, 
             m.sort_order, m.show_link, m.keep_alive, m.status, m.created_at, m.updated_at, m.is_deleted
@@ -52,7 +54,29 @@
         AND r.status = 1
         AND m.is_deleted = 0
         AND m.status = 1
-        ORDER BY m.sort_order ASC, m.id ASC
+        
+        UNION ALL
+        
+        -- 查询已关联父菜单的所有子菜单
+        -- 优化：先获取已关联的父菜单ID，再查询子菜单，避免自连接
+        SELECT 
+            child.id, child.parent_id, child.name, child.path, child.component, child.redirect, 
+            child.icon, child.title, child.sort_order, child.show_link, child.keep_alive, 
+            child.status, child.created_at, child.updated_at, child.is_deleted
+        FROM menu child
+        INNER JOIN (
+            -- 子查询：获取已关联的父菜单ID
+            SELECT DISTINCT rm.menu_id
+            FROM role_menu rm
+            INNER JOIN role r ON rm.role_id = r.id
+            WHERE r.code = #{roleCode}
+            AND r.is_deleted = 0
+            AND r.status = 1
+        ) parent_menus ON child.parent_id = parent_menus.menu_id
+        WHERE child.is_deleted = 0
+        AND child.status = 1
+        
+        -- 注意：去重在应用层（Java代码）完成，不使用 DISTINCT 以提高性能
     </select>
 
     <!-- 检查是否存在子菜单 -->
