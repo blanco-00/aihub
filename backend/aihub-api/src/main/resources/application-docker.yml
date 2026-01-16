@@ -58,7 +58,7 @@ verification:
 logging:
   level:
     com.aihub: info
-    com.aihub.service.impl.InitializationServiceImpl: info
+    com.aihub.admin.service.impl.InitializationServiceImpl: info
     org.springframework: info
     org.apache.ibatis: warn
     org.springframework.jdbc: warn

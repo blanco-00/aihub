@@ -11,11 +11,11 @@ type Result<T = any> = {
 
 /**
  * 数据库状态
+ * 注意：表结构初始化由 Flyway 自动处理，无需手动检查
  */
 export type DatabaseStatus = {
   connected: boolean;
   databaseExists: boolean;
-  tablesInitialized: boolean;
   errorMessage?: string;
 };
 
@@ -41,13 +41,6 @@ export const getInitStatus = () => {
  */
 export const getDatabaseStatus = () => {
   return http.request<Result<DatabaseStatus>>("get", "/api/init/database/status");
-};
-
-/**
- * 初始化数据库表结构
- */
-export const initializeDatabase = () => {
-  return http.request<Result<void>>("post", "/api/init/database/init");
 };
 
 /**

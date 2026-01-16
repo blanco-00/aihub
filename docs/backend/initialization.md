@@ -23,26 +23,9 @@
 
 ### 1. 数据库表结构初始化
 
-#### 方式一：通过页面初始化（推荐）
+**重要**: 数据库表结构初始化由 **Flyway 自动处理**，无需手动操作。
 
-1. 启动后端服务（系统会自动连接数据库）
-2. 访问 `http://localhost:3000`，系统会自动跳转到 `/init` 页面
-3. 如果数据库连接正常但表未初始化，会显示"初始化数据库表结构"按钮
-4. 点击按钮，系统会自动执行 SQL 脚本创建所有表结构
-
-**脚本位置**: `backend/aihub-api/src/main/resources/db/migration/V1.0.0__init_tables.sql`
-
-#### 方式二：手动执行 SQL 脚本
-
-如果需要手动执行，可以使用全量脚本：
-
-```bash
-mysql -u root -p < docs/sql/init/init_v1.0.0.sql
-```
-
-**全量脚本位置**: `docs/sql/init/init_v1.0.0.sql`（包含 CREATE DATABASE）
-
-#### 方式三：使用 Flyway（推荐，开发环境已启用）
+#### Flyway 自动初始化（推荐，开发环境已启用）
 
 **开发环境已默认启用 Flyway**，应用启动时会自动执行迁移脚本。
 
@@ -54,6 +37,18 @@ mysql -u root -p < docs/sql/init/init_v1.0.0.sql
 **配置说明**: 详细配置请参考 [SQL 脚本管理文档 - Flyway 集成](../sql/guide.md#-flyway-集成推荐在开发环境启用)
 
 **重要原则**: Flyway 只在开发环境启用，测试和生产环境必须禁用，由运维人员手动执行数据库迁移。
+
+#### 手动执行 SQL 脚本（可选）
+
+如果需要手动执行，可以使用全量脚本：
+
+```bash
+mysql -u root -p < docs/sql/init/init_v1.0.0.sql
+```
+
+**全量脚本位置**: `docs/sql/init/init_v1.0.0.sql`（包含 CREATE DATABASE）
+
+**注意**: 通常不需要手动执行，Flyway 会自动处理。
 
 ### 2. 超级管理员初始化
 
@@ -103,9 +98,10 @@ mysql -u root -p < docs/sql/init/init_v1.0.0.sql
 
 **API 接口**:
 - `GET /api/init/status`: 检查系统是否已初始化
-- `GET /api/init/database/status`: 检查数据库状态（连接状态、表结构初始化状态）
-- `POST /api/init/database/init`: 初始化数据库表结构
+- `GET /api/init/database/status`: 检查数据库状态（连接状态）
 - `POST /api/init/super-admin`: 创建超级管理员
+
+**注意**: 数据库表结构初始化由 Flyway 自动处理，无需手动调用 API。
 
 **请求/响应**:
 - 创建超级管理员请求: `{ username, email, password }`
@@ -197,16 +193,11 @@ mysql -u root -p < docs/sql/init/init_v1.0.0.sql
 
 1. **数据库状态检查**
    - 页面加载时，调用 `GET /api/init/database/status` 检查数据库状态
-   - 显示数据库连接状态、数据库是否存在、表结构是否已初始化
+   - 显示数据库连接状态、数据库是否存在
    - 如果数据库未连接或不存在，显示错误提示
+   - **注意**: 表结构初始化由 Flyway 自动处理，无需手动操作
 
-2. **数据库表结构初始化**
-   - 如果数据库连接正常但表未初始化，显示"初始化数据库表结构"按钮
-   - 点击按钮，调用 `POST /api/init/database/init` 初始化表结构
-   - 显示加载状态和初始化进度
-   - 初始化完成后，自动刷新数据库状态
-
-3. **初始化状态检查**
+2. **初始化状态检查**
    - 数据库表结构初始化完成后，调用 `GET /api/init/status` 检查系统是否已初始化
    - 如果已初始化，自动跳转到首页
    - 如果未初始化，显示创建超级管理员表单
@@ -263,14 +254,15 @@ mysql -u root -p < docs/sql/init/init_v1.0.0.sql
 - ✅ **易于维护**：统一的流程，减少代码复杂度
 
 **流程**：
-1. 启动前后端服务（后端自动连接数据库）
+1. 启动前后端服务（后端自动连接数据库，Flyway 自动初始化表结构）
 2. 访问前端 → 自动跳转到 `/init` 页面
-3. 点击"初始化数据库表结构"按钮（如果表未初始化）
+3. 检查数据库连接状态（如果连接失败，显示错误提示）
 4. 填写超级管理员信息并创建
 
 **注意**：
 - Docker 环境中的 MySQL 容器启动时会自动创建数据库
-- 表结构和超级管理员需要通过页面初始化，确保所有环境的一致性
+- 表结构由 Flyway 自动初始化（开发环境），超级管理员需要通过页面创建
+- 确保所有环境的一致性
 
 ## 常见问题
 
@@ -299,19 +291,21 @@ A: 检查以下几点：
    - 如果直接访问后端 API，确认路径是否正确
    - 前端路由是否正确配置
 
-### Q: 初始化数据库表结构失败怎么办？
+### Q: Flyway 自动初始化失败怎么办？
 
 A: 检查以下几点：
 1. **数据库连接是否正常**（参考 [数据库配置说明 - 常见问题](./config.md#常见问题)）
-2. **数据库用户权限**：
+2. **Flyway 是否启用**：
+   - 检查 `application-dev.yml` 中 `flyway.enabled` 是否为 `true`
+   - 开发环境默认启用，测试和生产环境应禁用
+3. **数据库用户权限**：
    - 确保数据库用户有 `CREATE TABLE`、`ALTER TABLE` 等权限
    - 可以执行：`GRANT ALL PRIVILEGES ON aihub.* TO 'your_user'@'localhost';`
-3. **表是否已存在**：
-   - 如果表已存在，初始化会跳过（使用 `CREATE TABLE IF NOT EXISTS`）
-   - 如果表结构有问题，可能需要先删除表
 4. **查看应用日志**：
-   - 查看后端日志中的具体错误信息
-   - 检查 SQL 执行是否有错误
+   - 查看后端启动日志中的 Flyway 执行信息
+   - 检查是否有迁移脚本执行错误
+5. **手动执行 SQL 脚本**（如果 Flyway 失败）：
+   - 可以使用全量脚本手动初始化：`mysql -u root -p < docs/sql/init/init_v1.0.0.sql`
 
 ### Q: 如何创建新的超级管理员？
 

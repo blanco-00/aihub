@@ -17,7 +17,7 @@
           </Motion>
 
           <el-steps :active="currentStep" finish-status="success" align-center style="margin: 32px 0">
-            <el-step title="数据库初始化" />
+            <el-step title="检查数据库" />
             <el-step title="创建管理员" />
           </el-steps>
 
@@ -37,7 +37,7 @@
           </Motion>
 
           <div class="step-content">
-            <!-- 步骤1: 数据库初始化 -->
+            <!-- 步骤1: 检查数据库 -->
             <Motion v-if="currentStep === 0" :delay="150">
               <div class="step-panel">
                 <!-- 加载状态 -->
@@ -59,45 +59,25 @@
                   :closable="false"
                 />
                 
-                <!-- 数据库连接成功但表未初始化 -->
+                <!-- 数据库连接成功 -->
                 <el-alert
-                  v-if="dbStatus && dbStatus.connected && !dbStatus.tablesInitialized"
-                  type="warning"
-                  title="数据库表未初始化"
-                  description="请点击下方按钮初始化数据库表结构"
-                  style="margin-bottom: 24px"
-                  :closable="false"
-                />
-                
-                <!-- 数据库表已初始化 -->
-                <el-alert
-                  v-if="dbStatus && dbStatus.tablesInitialized"
+                  v-if="dbStatus && dbStatus.connected"
                   type="success"
-                  title="数据库表已初始化"
-                  :closable="false"
+                  title="数据库连接正常"
+                  description="数据库连接成功，Flyway 会在应用启动时自动初始化表结构"
                   style="margin-bottom: 24px"
+                  :closable="false"
                 />
                 
                 <div class="flex justify-center">
-                  <!-- 数据库连接成功且表未初始化，显示初始化按钮 -->
+                  <!-- 数据库连接成功，显示下一步按钮 -->
                   <el-button
-                    v-if="dbStatus && dbStatus.connected && !dbStatus.tablesInitialized"
+                    v-if="dbStatus && dbStatus.connected"
                     type="primary"
                     size="large"
-                    @click="initDatabase"
-                    :loading="initDbLoading"
+                    @click="currentStep = 1"
                   >
-                    初始化数据库表结构
-                  </el-button>
-                  
-                  <!-- 数据库表已初始化，显示已初始化状态 -->
-                  <el-button 
-                    v-if="dbStatus && dbStatus.tablesInitialized" 
-                    type="success" 
-                    size="large" 
-                    disabled
-                  >
-                    数据库已初始化
+                    下一步：创建管理员
                   </el-button>
                   
                   <!-- 数据库连接失败，显示重试按钮 -->
@@ -215,7 +195,6 @@ import { REGEXP_PWD } from "@/views/login/utils/rule";
 import { $t, transformI18n } from "@/plugins/i18n";
 import {
   getDatabaseStatus,
-  initializeDatabase,
   createSuperAdmin,
   type DatabaseStatus,
   type InitSuperAdminRequest
@@ -297,8 +276,9 @@ const checkDatabaseStatus = async () => {
     const response = await getDatabaseStatus();
     if (response.code === 200) {
       dbStatus.value = response.data;
-      if (response.data.tablesInitialized) {
-        // 表已初始化，进入下一步
+      if (response.data.connected) {
+        // 数据库连接成功，进入下一步
+        // 注意：表结构初始化由 Flyway 自动处理，无需手动操作
         currentStep.value = 1;
       }
     } else {
@@ -307,34 +287,6 @@ const checkDatabaseStatus = async () => {
   } catch (error: any) {
     console.error("检查数据库状态失败", error);
     ElMessage.error(error?.message || "检查数据库状态失败，请检查后端服务是否正常");
-  } finally {
-    initDbLoading.value = false;
-  }
-};
-
-// 注意：初始化状态检查已在路由守卫中完成，这里不再需要检查
-
-// 初始化数据库
-const initDatabase = async () => {
-  try {
-    await ElMessageBox.confirm("确定要初始化数据库表结构吗？", "确认", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning"
-    });
-    initDbLoading.value = true;
-    const response = await initializeDatabase();
-    if (response.code === 200) {
-      ElMessage.success("数据库表结构初始化成功");
-      // 重新检查数据库状态
-      await checkDatabaseStatus();
-    } else {
-      ElMessage.error(response.message || "初始化失败");
-    }
-  } catch (error: any) {
-    if (error !== "cancel") {
-      ElMessage.error(error?.message || "初始化失败");
-    }
   } finally {
     initDbLoading.value = false;
   }
@@ -368,9 +320,10 @@ const createAdmin = async () => {
 };
 
 onMounted(async () => {
+  // 页面加载时自动检查数据库状态
   // 注意：初始化状态检查已在路由守卫中完成
   // 如果页面能显示，说明系统未初始化，直接显示初始化页面
-  // 不需要再次检查初始化状态
+  await checkDatabaseStatus();
 });
 </script>
 

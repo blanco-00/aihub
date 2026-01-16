@@ -1,6 +1,6 @@
 package com.aihub.config;
 
-import com.aihub.service.InitializationService;
+import com.aihub.admin.service.InitializationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

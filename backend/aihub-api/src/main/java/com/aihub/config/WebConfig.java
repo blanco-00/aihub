@@ -1,6 +1,6 @@
 package com.aihub.config;
 
-import com.aihub.interceptor.AuthInterceptor;
+import com.aihub.admin.interceptor.AuthInterceptor;
 import com.aihub.interceptor.InitializationInterceptor;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.DepartmentMapper">
+    
+    <!-- 查询所有部门（未删除的） -->
+    <select id="selectAllDepartments" resultType="com.aihub.admin.entity.Department">
+        SELECT 
+            id, name, parent_id, sort_order, status, remark, 
+            created_at, updated_at, is_deleted
+        FROM department 
+        WHERE is_deleted = 0
+        ORDER BY sort_order ASC, id ASC
+    </select>
+    
+    <!-- 根据父部门ID查询子部门列表 -->
+    <select id="selectByParentId" resultType="com.aihub.admin.entity.Department">
+        SELECT 
+            id, name, parent_id, sort_order, status, remark, 
+            created_at, updated_at, is_deleted
+        FROM department 
+        WHERE parent_id = #{parentId} 
+        AND is_deleted = 0
+        ORDER BY sort_order ASC, id ASC
+    </select>
+    
+    <!-- 检查是否存在子部门 -->
+    <select id="countChildren" resultType="java.lang.Long">
+        SELECT COUNT(*) 
+        FROM department 
+        WHERE parent_id = #{parentId} 
+        AND is_deleted = 0
+    </select>
+    
+</mapper>

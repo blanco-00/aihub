@@ -108,7 +108,7 @@ logging:
     com.aihub: info
     
     # 初始化服务：debug（用于调试初始化状态，可改为 info 减少日志）
-    com.aihub.service.impl.InitializationServiceImpl: debug
+    com.aihub.admin.service.impl.InitializationServiceImpl: debug
     
     # Spring 框架：info（减少框架日志）
     org.springframework: info

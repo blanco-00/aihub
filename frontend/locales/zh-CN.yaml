@@ -73,7 +73,7 @@ menus:
   pureSystemMenu: 菜单管理
   pureDept: 部门管理
   pureSysMonitor: 系统监控
-  pureSystemMonitor: 系统运行状况
+  pureSystemMonitor: 运行状况
   pureOnlineUser: 在线用户
   pureLoginLog: 登录日志
   pureOperationLog: 操作日志

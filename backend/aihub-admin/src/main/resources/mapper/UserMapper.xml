@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.UserMapper">
+
+    <!-- 根据用户名查询用户（单条记录，需要完整实体对象） -->
+    <select id="findByUsername" resultType="com.aihub.admin.entity.User">
+        SELECT 
+            id, username, nickname, email, phone, password, role, department_id, status, remark,
+            created_at, updated_at, is_deleted
+        FROM user 
+        WHERE username = #{username} 
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据邮箱查询用户（单条记录，需要完整实体对象） -->
+    <select id="findByEmail" resultType="com.aihub.admin.entity.User">
+        SELECT 
+            id, username, nickname, email, phone, password, role, department_id, status, remark,
+            created_at, updated_at, is_deleted
+        FROM user 
+        WHERE email = #{email} 
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="countByRoleAndNotDeleted" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user 
+        WHERE role = #{role} 
+        AND is_deleted = 0
+    </select>
+
+    <!-- 用户列表查询（支持搜索和筛选） -->
+    <!-- 优化：使用索引字段 is_deleted 和 created_at 进行查询和排序 -->
+    <select id="selectUserList" resultType="com.aihub.admin.dto.response.UserListResponse">
+        SELECT 
+            u.id,
+            u.username,
+            u.nickname,
+            u.email,
+            u.phone,
+            u.role,
+            u.department_id as departmentId,
+            COALESCE(d.name, '未分配') as departmentName,
+            u.status,
+            u.remark,
+            u.created_at as createdAt,
+            u.updated_at as updatedAt
+        FROM user u
+        LEFT JOIN department d ON u.department_id = d.id AND d.is_deleted = 0
+        WHERE u.is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (u.username LIKE CONCAT('%', #{keyword}, '%') 
+                 OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.email LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="phone != null and phone != ''">
+            AND u.phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="role != null and role != ''">
+            AND u.role = #{role}
+        </if>
+        <if test="status != null">
+            AND u.status = #{status}
+        </if>
+        <if test="departmentId != null">
+            AND u.department_id = #{departmentId}
+        </if>
+        ORDER BY u.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计用户总数（支持搜索和筛选） -->
+    <select id="countUserList" resultType="java.lang.Long">
+        SELECT COUNT(*) 
+        FROM user u
+        WHERE u.is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (u.username LIKE CONCAT('%', #{keyword}, '%') 
+                 OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.email LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="phone != null and phone != ''">
+            AND u.phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="role != null and role != ''">
+            AND u.role = #{role}
+        </if>
+        <if test="status != null">
+            AND u.status = #{status}
+        </if>
+        <if test="departmentId != null">
+            AND u.department_id = #{departmentId}
+        </if>
+    </select>
+
+</mapper>

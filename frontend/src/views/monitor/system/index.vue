@@ -42,7 +42,7 @@ const getStatusColor = (status: string) => {
 <template>
   <div class="main">
     <div class="mb-4 flex justify-between items-center">
-      <h2 class="text-lg font-semibold">系统运行状况</h2>
+      <h2 class="text-lg font-semibold">运行状况</h2>
       <div class="flex items-center gap-4">
         <el-switch
           v-model="autoRefresh"
