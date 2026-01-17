@@ -7,7 +7,6 @@ import { getDepartmentTree } from "@/api/department";
 import type { DepartmentInfo } from "@/api/department";
 
 import Upload from "~icons/ri/upload-line";
-import Role from "~icons/ri/admin-line";
 import Password from "~icons/ri/lock-password-line";
 import More from "~icons/ep/more-filled";
 import Delete from "~icons/ep/delete";
@@ -23,6 +22,7 @@ const formRef = ref();
 const tableRef = ref();
 const departmentTree = ref<DepartmentInfo[]>([]);
 const selectedDepartmentId = ref<number | undefined>(undefined);
+const sidebarCollapsed = ref(false); // 控制左侧组织机构树的折叠状态
 
 const {
   form,
@@ -41,7 +41,6 @@ const {
   handleDelete,
   handleUpload,
   handleReset,
-  handleRole,
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
@@ -112,28 +111,43 @@ function getDepartmentName(deptId: number | undefined): string {
   <div class="user-management-container">
     <el-container class="h-full">
       <!-- 左侧：组织机构树 -->
-      <el-aside width="280px" class="dept-sidebar">
+      <el-aside 
+        :width="sidebarCollapsed ? '60px' : '280px'" 
+        class="dept-sidebar"
+        :class="{ 'collapsed': sidebarCollapsed }"
+      >
         <div class="p-4">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold dept-title">组织机构</h3>
-            <el-button
-              v-if="selectedDepartmentId"
-              text
-              type="primary"
-              size="small"
-              @click="clearDepartmentFilter"
-            >
-              清除筛选
-            </el-button>
+            <h3 v-if="!sidebarCollapsed" class="text-lg font-semibold dept-title">组织机构</h3>
+            <div class="flex items-center gap-2">
+              <el-button
+                v-if="!sidebarCollapsed && selectedDepartmentId"
+                text
+                type="primary"
+                size="small"
+                @click="clearDepartmentFilter"
+              >
+                清除筛选
+              </el-button>
+              <el-button
+                text
+                type="primary"
+                size="small"
+                :icon="useRenderIcon(sidebarCollapsed ? 'ri:menu-unfold-line' : 'ri:menu-fold-line')"
+                @click="sidebarCollapsed = !sidebarCollapsed"
+                :title="sidebarCollapsed ? '展开' : '折叠'"
+              />
+            </div>
           </div>
           <!-- 显示当前筛选的部门（如果有） -->
-          <div v-if="selectedDepartmentId" class="mb-3 p-2 rounded bg-[var(--el-fill-color-light)]">
+          <div v-if="!sidebarCollapsed && selectedDepartmentId" class="mb-3 p-2 rounded bg-[var(--el-fill-color-light)]">
             <div class="text-xs text-[var(--el-text-color-secondary)] mb-1">当前筛选：</div>
             <div class="text-sm font-medium text-[var(--el-color-primary)]">
               {{ getDepartmentName(selectedDepartmentId) }}
             </div>
           </div>
           <el-tree
+            v-if="!sidebarCollapsed"
             :data="departmentTree"
             :props="{ children: 'children', label: 'name' }"
             :highlight-current="true"
@@ -156,6 +170,28 @@ function getDepartmentName(deptId: number | undefined): string {
               </span>
             </template>
           </el-tree>
+          <!-- 折叠状态下只显示图标 -->
+          <div v-else class="flex flex-col items-center gap-2 pt-4">
+            <el-tooltip
+              v-for="dept in departmentTree"
+              :key="dept.id"
+              :content="dept.name"
+              placement="right"
+            >
+              <div
+                class="cursor-pointer p-2 rounded hover:bg-[var(--el-fill-color-light)] transition-colors"
+                :class="{ 'bg-[var(--el-color-primary-light-9)]': selectedDepartmentId === dept.id }"
+                @click="handleDepartmentNodeClick(dept)"
+              >
+                <el-icon 
+                  class="text-lg block"
+                  :class="{ 'text-[var(--el-color-primary)]': selectedDepartmentId === dept.id }"
+                >
+                  <component :is="useRenderIcon('ri:folder-line')" />
+                </el-icon>
+              </div>
+            </el-tooltip>
+          </div>
         </div>
       </el-aside>
 
@@ -331,18 +367,6 @@ function getDepartmentName(deptId: number | undefined): string {
                             重置密码
                           </el-button>
                         </el-dropdown-item>
-                        <el-dropdown-item>
-                          <el-button
-                            :class="buttonClass"
-                            link
-                            type="primary"
-                            :size="size"
-                            :icon="useRenderIcon(Role)"
-                            @click="handleRole(row)"
-                          >
-                            分配角色
-                          </el-button>
-                        </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -385,6 +409,11 @@ function getDepartmentName(deptId: number | undefined): string {
   background-color: var(--el-bg-color);
   border-right: 1px solid var(--el-border-color);
   overflow-y: auto;
+  transition: width 0.3s ease;
+  
+  &.collapsed {
+    overflow: visible;
+  }
   
   .dept-title {
     color: var(--el-text-color-primary);

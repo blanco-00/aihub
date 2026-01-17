@@ -105,23 +105,27 @@ const handleClose = () => {
 
 const onCropper = ({ blob }) => (cropperBlob.value = blob);
 
-const handleSubmitImage = () => {
-  const formData = createFormData({
-    files: new File([cropperBlob.value], "avatar")
-  });
-  formUpload(formData)
-    .then(({ code }) => {
-      if (code === 0) {
-        message("更新头像成功", { type: "success" });
-        handleClose();
-        loadUserInfo();
-      } else {
-        message("更新头像失败", { type: "error" });
-      }
-    })
-    .catch(error => {
-      message(`提交异常 ${error}`, { type: "error" });
+const handleSubmitImage = async () => {
+  try {
+    const formData = createFormData({
+      file: new File([cropperBlob.value], "avatar.jpg", { type: "image/jpeg" })
     });
+    const { code, data } = await formUpload(formData, "avatar");
+    if (code === 200 && data) {
+      // 更新用户头像
+      await updateProfile({
+        avatar: data.url
+      });
+      message("更新头像成功", { type: "success" });
+      handleClose();
+      loadUserInfo();
+    } else {
+      message("更新头像失败", { type: "error" });
+    }
+  } catch (error) {
+    console.error("头像上传失败", error);
+    message(`提交异常 ${error}`, { type: "error" });
+  }
 };
 
 // 更新个人信息

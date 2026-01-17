@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.SystemLogMapper">
+    
+    <!-- 查询系统日志列表（分页、搜索、筛选） -->
+    <select id="selectSystemLogList" resultType="com.aihub.admin.dto.response.SystemLogResponse">
+        SELECT 
+            id, level, module, message, stack_trace, ip, user_id, request_id, log_time
+        FROM system_log
+        <where>
+            <if test="request.level != null and request.level != ''">
+                AND level = #{request.level}
+            </if>
+            <if test="request.module != null and request.module != ''">
+                AND module LIKE CONCAT('%', #{request.module}, '%')
+            </if>
+            <if test="request.startTime != null and request.startTime != ''">
+                AND log_time &gt;= #{request.startTime}
+            </if>
+            <if test="request.endTime != null and request.endTime != ''">
+                AND log_time &lt;= #{request.endTime}
+            </if>
+        </where>
+        ORDER BY log_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+    
+    <!-- 统计系统日志总数 -->
+    <select id="countSystemLogList" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM system_log
+        <where>
+            <if test="request.level != null and request.level != ''">
+                AND level = #{request.level}
+            </if>
+            <if test="request.module != null and request.module != ''">
+                AND module LIKE CONCAT('%', #{request.module}, '%')
+            </if>
+            <if test="request.startTime != null and request.startTime != ''">
+                AND log_time &gt;= #{request.startTime}
+            </if>
+            <if test="request.endTime != null and request.endTime != ''">
+                AND log_time &lt;= #{request.endTime}
+            </if>
+        </where>
+    </select>
+    
+</mapper>

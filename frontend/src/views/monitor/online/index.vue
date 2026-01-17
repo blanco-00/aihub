@@ -59,7 +59,7 @@ const {
     </el-form>
 
     <PureTableBar
-      title="在线用户（仅演示，操作后不生效）"
+      title="在线用户"
       :columns="columns"
       @refresh="onSearch"
     >

@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.admin.dto.request.CreateRoleRequest;
 import com.aihub.admin.dto.request.UpdateRoleRequest;
@@ -64,6 +65,7 @@ public class RoleController {
     /**
      * 创建角色
      */
+    @OperationLog(module = "角色管理", operation = "创建角色", recordParams = true)
     @PostMapping
     public Result<Void> createRole(@RequestBody CreateRoleRequest request) {
         roleService.createRole(request);
@@ -73,6 +75,7 @@ public class RoleController {
     /**
      * 更新角色
      */
+    @OperationLog(module = "角色管理", operation = "修改角色", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateRole(@PathVariable Long id, @RequestBody UpdateRoleRequest request) {
         roleService.updateRole(id, request);
@@ -82,6 +85,7 @@ public class RoleController {
     /**
      * 删除角色
      */
+    @OperationLog(module = "角色管理", operation = "删除角色")
     @DeleteMapping("/{id}")
     public Result<Void> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
@@ -100,6 +104,7 @@ public class RoleController {
     /**
      * 保存角色菜单关联
      */
+    @OperationLog(module = "角色管理", operation = "配置角色权限", recordParams = true)
     @PostMapping("/{id}/menus")
     public Result<Void> saveRoleMenus(@PathVariable Long id, @RequestBody List<Long> menuIds) {
         roleService.saveRoleMenus(id, menuIds);

@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.admin.dto.request.CreateDepartmentRequest;
 import com.aihub.admin.dto.request.UpdateDepartmentRequest;
@@ -56,6 +57,7 @@ public class DepartmentController {
     /**
      * 创建部门
      */
+    @OperationLog(module = "部门管理", operation = "创建部门", recordParams = true)
     @PostMapping
     public Result<Void> createDepartment(@RequestBody CreateDepartmentRequest request) {
         departmentService.createDepartment(request);
@@ -65,6 +67,7 @@ public class DepartmentController {
     /**
      * 更新部门
      */
+    @OperationLog(module = "部门管理", operation = "修改部门", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateDepartment(@PathVariable Long id, @RequestBody UpdateDepartmentRequest request) {
         departmentService.updateDepartment(id, request);
@@ -74,6 +77,7 @@ public class DepartmentController {
     /**
      * 删除部门
      */
+    @OperationLog(module = "部门管理", operation = "删除部门")
     @DeleteMapping("/{id}")
     public Result<Void> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);

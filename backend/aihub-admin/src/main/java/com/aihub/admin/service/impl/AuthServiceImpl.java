@@ -22,6 +22,7 @@ import com.aihub.admin.mapper.OperationLogMapper;
 import com.aihub.admin.service.AuthService;
 import com.aihub.admin.service.TokenCacheService;
 import com.aihub.admin.service.VerificationCodeService;
+import com.aihub.common.redis.RedisUtil;
 import com.aihub.common.security.jwt.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class AuthServiceImpl implements AuthService {
     
     @Autowired
     private TokenCacheService tokenCacheService;
+    
+    @Autowired
+    private RedisUtil redisUtil;
     
     @Autowired
     private LoginLogMapper loginLogMapper;
@@ -183,6 +187,13 @@ public class AuthServiceImpl implements AuthService {
         // 验证用户状态
         if (user.getStatus() != null && user.getStatus() == 0) {
             throw new BusinessException("账户已被禁用");
+        }
+        
+        // 检查用户是否被强制下线
+        String forceOfflineKey = "force:offline:user:" + userId;
+        if (redisUtil.hasKey(forceOfflineKey)) {
+            log.warn("用户尝试刷新Token，但已被强制下线: userId={}, username={}", userId, username);
+            throw new BusinessException("账户已被强制下线，请重新登录");
         }
         
         // 生成新的Token

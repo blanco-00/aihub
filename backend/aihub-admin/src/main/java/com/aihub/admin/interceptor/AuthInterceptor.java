@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -99,18 +100,21 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
         
-        // 性能优化：Redis 验证改为可选，如果 Redis 慢则跳过（JWT 验证已通过，足够安全）
+        // Redis 验证 Token 是否在黑名单中或是否有效
         long redisStart = System.currentTimeMillis();
         try {
             boolean isValid = tokenCacheService.isTokenValid(token);
             if (!isValid) {
+                log.info("Token验证失败（可能已被强制下线）: token={}", token.substring(0, Math.min(20, token.length())) + "...");
                 sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token无效或已过期");
                 return false;
             }
         } catch (Exception e) {
-            // Redis 异常时，只记录警告，不阻塞请求（JWT 验证已通过）
+            // Redis 异常时，记录错误并拒绝请求（安全优先）
             long redisTime = System.currentTimeMillis() - redisStart;
-            log.warn("Redis Token 验证异常，继续使用 JWT 验证: {}, 耗时: {}ms", e.getMessage(), redisTime);
+            log.error("Redis Token 验证异常，拒绝请求以确保安全: {}, 耗时: {}ms", e.getMessage(), redisTime, e);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token验证失败，请重新登录");
+            return false;
         }
         long redisTime = System.currentTimeMillis() - redisStart;
         if (redisTime > 100) {
@@ -131,6 +135,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         request.setAttribute("userId", userId);
         request.setAttribute("username", username);
         request.setAttribute("role", role);
+        
+        // 设置用户ID到 MDC，供日志系统使用
+        MDC.put("userId", String.valueOf(userId));
         
         long totalTime = System.currentTimeMillis() - startTime;
         if (totalTime > 100) {

@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.admin.dto.request.CreateMenuRequest;
 import com.aihub.admin.dto.request.UpdateMenuRequest;
@@ -133,6 +134,7 @@ public class MenuController {
     /**
      * 创建菜单
      */
+    @OperationLog(module = "菜单管理", operation = "创建菜单", recordParams = true)
     @PostMapping
     public Result<Void> createMenu(@RequestBody CreateMenuRequest request) {
         menuService.createMenu(request);
@@ -142,6 +144,7 @@ public class MenuController {
     /**
      * 更新菜单
      */
+    @OperationLog(module = "菜单管理", operation = "修改菜单", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateMenu(@PathVariable Long id, @RequestBody UpdateMenuRequest request) {
         menuService.updateMenu(id, request);
@@ -151,6 +154,7 @@ public class MenuController {
     /**
      * 删除菜单
      */
+    @OperationLog(module = "菜单管理", operation = "删除菜单")
     @DeleteMapping("/{id}")
     public Result<Void> deleteMenu(@PathVariable Long id) {
         menuService.deleteMenu(id);

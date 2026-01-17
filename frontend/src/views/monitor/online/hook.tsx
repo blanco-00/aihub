@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { message } from "@/utils/message";
-import { getOnlineLogsList } from "@/api/system";
+import { getOnlineLogsList, forceOfflineUser } from "@/api/system";
 import { reactive, ref, onMounted, toRaw } from "vue";
 import type { PaginationProps } from "@pureadmin/table";
 
@@ -17,11 +17,6 @@ export function useRole() {
     background: true
   });
   const columns: TableColumnList = [
-    {
-      label: "序号",
-      prop: "id",
-      minWidth: 60
-    },
     {
       label: "用户名",
       prop: "username",
@@ -62,35 +57,56 @@ export function useRole() {
   ];
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    pagination.pageSize = val;
+    pagination.currentPage = 1;
+    onSearch();
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    pagination.currentPage = val;
+    onSearch();
   }
 
   function handleSelectionChange(val) {
-    console.log("handleSelectionChange", val);
+    // 选择变化处理
   }
 
-  function handleOffline(row) {
-    message(`${row.username}已被强制下线`, { type: "success" });
-    onSearch();
+  async function handleOffline(row) {
+    try {
+      const { code } = await forceOfflineUser(row.userId);
+      if (code === 200) {
+        message(`${row.username}已被强制下线`, { type: "success" });
+        onSearch();
+      } else {
+        message("强制下线失败", { type: "error" });
+      }
+    } catch (error: any) {
+      console.error("强制下线失败", error);
+      message("强制下线失败", { type: "error" });
+    }
   }
 
   async function onSearch() {
     loading.value = true;
-    const { code, data } = await getOnlineLogsList(toRaw(form));
-    if (code === 0) {
-      dataList.value = data.list;
-      pagination.total = data.total;
-      pagination.pageSize = data.pageSize;
-      pagination.currentPage = data.currentPage;
-    }
-
-    setTimeout(() => {
+    try {
+      const { code, data } = await getOnlineLogsList(toRaw(form));
+      if (code === 200 && data) {
+        dataList.value = data.records || [];
+        pagination.total = data.total || 0;
+        pagination.pageSize = data.size || 10;
+        pagination.currentPage = data.current || 1;
+      } else {
+        dataList.value = [];
+        pagination.total = 0;
+      }
+    } catch (error: any) {
+      console.error("获取在线用户列表失败", error);
+      message("获取在线用户列表失败", { type: "error" });
+      dataList.value = [];
+      pagination.total = 0;
+    } finally {
       loading.value = false;
-    }, 500);
+    }
   }
 
   const resetForm = formEl => {

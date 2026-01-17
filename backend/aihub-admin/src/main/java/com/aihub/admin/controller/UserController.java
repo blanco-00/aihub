@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.common.web.dto.PageResult;
 import com.aihub.admin.dto.request.UserListRequest;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 用户管理控制器
@@ -83,6 +86,7 @@ public class UserController {
     /**
      * 创建用户
      */
+    @OperationLog(module = "用户管理", operation = "创建用户", recordParams = true)
     @PostMapping
     public Result<Void> createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
@@ -92,6 +96,7 @@ public class UserController {
     /**
      * 更新用户
      */
+    @OperationLog(module = "用户管理", operation = "修改用户", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         userService.updateUser(id, request);
@@ -101,6 +106,7 @@ public class UserController {
     /**
      * 删除用户（逻辑删除）
      */
+    @OperationLog(module = "用户管理", operation = "删除用户")
     @DeleteMapping("/{id}")
     public Result<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -110,9 +116,29 @@ public class UserController {
     /**
      * 启用/禁用用户
      */
+    @OperationLog(module = "用户管理", operation = "启用/禁用用户", recordParams = true)
     @PutMapping("/{id}/status")
     public Result<Void> toggleUserStatus(@PathVariable Long id, @RequestParam Integer status) {
         userService.toggleUserStatus(id, status);
+        return Result.success();
+    }
+    
+    /**
+     * 获取用户的角色ID列表
+     */
+    @GetMapping("/{id}/roles")
+    public Result<java.util.List<Long>> getUserRoles(@PathVariable Long id) {
+        java.util.List<Long> roleIds = userService.getRoleIdsByUserId(id);
+        return Result.success(roleIds);
+    }
+    
+    /**
+     * 分配用户角色（支持多角色）
+     */
+    @OperationLog(module = "用户管理", operation = "分配角色", recordParams = true)
+    @PostMapping("/{id}/roles")
+    public Result<Void> assignUserRoles(@PathVariable Long id, @RequestBody java.util.List<Long> roleIds) {
+        userService.assignUserRoles(id, roleIds);
         return Result.success();
     }
 }

@@ -11,10 +11,18 @@ import {
 } from "./user";
 import { getDeptList as getDeptListNew } from "./department";
 
-type Result = {
+type Result<T = any> = {
   code: number;
   message: string;
-  data?: Array<any>;
+  data?: T;
+};
+
+type PageResult<T = any> = {
+  records: T[];
+  total: number;
+  current: number;
+  size: number;
+  pages: number;
 };
 
 type ResultTable = {
@@ -89,6 +97,8 @@ export const getUserList = (data?: any) => {
         status: item.status,
         role: item.role,
         roleDescription: item.roleDescription,
+        roleIds: item.roleIds || [], // 用户的所有角色ID列表
+        roleNames: item.roleNames || [], // 用户的所有角色名称列表
         departmentId: item.departmentId || 0,
         departmentName: item.departmentName || "未分配",
         createTime: item.createdAt,
@@ -183,9 +193,14 @@ export const getAllRolesFromDB = () => {
   return http.request<Result>("get", "/api/roles");
 };
 
-/** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
-export const getRoleIds = (data?: object) => {
-  return http.request<Result>("post", "/list-role-ids", { data });
+/** 系统管理-用户管理-根据userId，获取对应角色id列表 */
+export const getRoleIds = (userId: number) => {
+  return http.request<Result<number[]>>("get", `/api/users/${userId}/roles`);
+};
+
+/** 系统管理-用户管理-分配用户角色（支持多角色） */
+export const assignUserRoles = (userId: number, roleIds: number[]) => {
+  return http.request<Result<void>>("post", `/api/users/${userId}/roles`, { data: roleIds });
 };
 
 /** 获取系统管理-角色管理列表 */
@@ -205,27 +220,32 @@ export const getDeptList = (data?: object) => {
 
 /** 获取系统监控-在线用户列表 */
 export const getOnlineLogsList = (data?: object) => {
-  return http.request<ResultTable>("post", "/online-logs", { data });
+  return http.request<ResultTable>("get", "/api/online-users", { params: data });
+};
+
+/** 强制用户下线 */
+export const forceOfflineUser = (userId: number) => {
+  return http.request<Result<void>>("delete", `/api/online-users/${userId}`);
 };
 
 /** 获取系统监控-登录日志列表 */
-export const getLoginLogsList = (data?: object) => {
-  return http.request<ResultTable>("post", "/login-logs", { data });
+export const getLoginLogsList = (params?: object) => {
+  return http.request<Result<PageResult<any>>>("get", "/api/login-logs", { params });
 };
 
 /** 获取系统监控-操作日志列表 */
-export const getOperationLogsList = (data?: object) => {
-  return http.request<ResultTable>("post", "/operation-logs", { data });
+export const getOperationLogsList = (params?: object) => {
+  return http.request<Result<PageResult<any>>>("get", "/api/operation-logs", { params });
 };
 
 /** 获取系统监控-系统日志列表 */
-export const getSystemLogsList = (data?: object) => {
-  return http.request<ResultTable>("post", "/system-logs", { data });
+export const getSystemLogsList = (params?: object) => {
+  return http.request<Result<PageResult<any>>>("get", "/api/system-logs", { params });
 };
 
 /** 获取系统监控-系统日志-根据 id 查日志详情 */
-export const getSystemLogsDetail = (data?: object) => {
-  return http.request<Result>("post", "/system-logs-detail", { data });
+export const getSystemLogsDetail = (id: number) => {
+  return http.request<Result<any>>("get", `/api/system-logs/${id}`);
 };
 
 /** 获取角色管理-权限-菜单权限 */
@@ -236,4 +256,77 @@ export const getRoleMenu = (data?: object) => {
 /** 获取角色管理-权限-菜单权限-根据角色 id 查对应菜单 */
 export const getRoleMenuIds = (data?: object) => {
   return http.request<Result>("post", "/role-menu-ids", { data });
+};
+
+/** 欢迎页面统计数据类型 */
+export type WelcomeStatisticsResponse = {
+  cards: Array<{
+    name: string;
+    value: number;
+    percent: number;
+    data: number[];
+  }>;
+  chartData: {
+    lastWeek: {
+      requireData: number[];
+      questionData: number[];
+    };
+    thisWeek: {
+      requireData: number[];
+      questionData: number[];
+    };
+  };
+  tableData: Array<{
+    date: string;
+    requiredNumber: number;
+    questionNumber: number;
+    resolveNumber: number;
+    satisfaction: number;
+  }>;
+  latestNews: Array<{
+    date: string;
+    requiredNumber: number;
+    resolveNumber: number;
+  }>;
+};
+
+/** 获取欢迎页面统计数据 */
+export const getWelcomeStatistics = () => {
+  return http.request<Result<WelcomeStatisticsResponse>>("get", "/api/welcome/statistics");
+};
+
+/** 文件管理相关类型 */
+export type FileInfo = {
+  url: string;
+  filename: string;
+  size: number;
+  contentType: string;
+  category: string;
+  uploadTime: string;
+  path: string;
+};
+
+export type FileListParams = {
+  category?: string;
+  keyword?: string;
+  current?: number;
+  size?: number;
+};
+
+/** 获取文件列表 */
+export const getFileList = (params?: FileListParams) => {
+  return http.request<Result<PageResult<FileInfo>>>("get", "/api/files/list", { params });
+};
+
+/** 删除文件 */
+export const deleteFile = (url: string) => {
+  return http.request<Result<void>>("delete", "/api/files", { params: { url } });
+};
+
+/** 下载文件 */
+export const downloadFile = (url: string) => {
+  return http.request<Blob>("get", "/api/files/download", { 
+    params: { url },
+    responseType: "blob"
+  });
 };

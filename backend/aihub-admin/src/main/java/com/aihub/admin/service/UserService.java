@@ -6,6 +6,8 @@ import com.aihub.admin.dto.request.CreateUserRequest;
 import com.aihub.admin.dto.request.UpdateUserRequest;
 import com.aihub.admin.dto.response.UserListResponse;
 
+import java.util.List;
+
 /**
  * 用户服务接口
  */
@@ -40,4 +42,14 @@ public interface UserService {
      * 启用/禁用用户
      */
     void toggleUserStatus(Long id, Integer status);
+    
+    /**
+     * 获取用户的角色ID列表
+     */
+    List<Long> getRoleIdsByUserId(Long userId);
+    
+    /**
+     * 分配用户角色（支持多角色）
+     */
+    void assignUserRoles(Long userId, List<Long> roleIds);
 }

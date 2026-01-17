@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useColumns } from "./columns";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import { toRef } from "vue";
+
+const props = defineProps<{
+  tableData?: any[];
+}>();
 
 const { loading, columns, dataList, pagination, Empty, onCurrentChange } =
-  useColumns();
+  useColumns(props.tableData ? toRef(props, "tableData") : undefined);
 </script>
 
 <template>

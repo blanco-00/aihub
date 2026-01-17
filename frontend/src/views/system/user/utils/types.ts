@@ -8,7 +8,8 @@ interface FormItemProps {
   phone: string | number;
   email: string;
   sex: string | number;
-  role?: string;
+  role?: string; // 保留用于向后兼容，主角色
+  roleIds?: number[]; // 多角色ID列表
   departmentId?: number;
   status: number;
   remark: string;
@@ -25,7 +26,7 @@ interface RoleFormItemProps {
   /** 角色列表 */
   roleOptions: any[];
   /** 选中的角色列表 */
-  ids: Record<number, unknown>[];
+  ids: number[];
 }
 interface RoleFormProps {
   formInline: RoleFormItemProps;

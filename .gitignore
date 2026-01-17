@@ -14,9 +14,10 @@ target/
 *.war
 *.ear
 
-# 日志文件
+# 日志文件（运行时数据，不应提交到版本控制）
 *.log
 logs/
+**/logs/
 
 # 环境变量文件
 .env
@@ -41,6 +42,10 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+# 用户上传文件目录（运行时数据，不应提交到版本控制）
+uploads/
+**/uploads/
 
 # 测试覆盖率
 coverage/

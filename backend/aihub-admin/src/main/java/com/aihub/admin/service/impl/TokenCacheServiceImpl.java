@@ -97,15 +97,20 @@ public class TokenCacheServiceImpl implements TokenCacheService {
             String blacklistKey = TOKEN_BLACKLIST_PREFIX + token;
             String tokenKey = TOKEN_PREFIX + token;
             
-            // 将 Token 加入黑名单
-            redisUtil.set(blacklistKey, "1", expirationSeconds);
+            // 将 Token 加入黑名单（必须成功）
+            boolean blacklistSuccess = redisUtil.set(blacklistKey, "1", expirationSeconds);
+            if (!blacklistSuccess) {
+                log.error("Token 加入黑名单失败: token={}", token.substring(0, Math.min(20, token.length())) + "...");
+            }
             
             // 删除 Token 缓存
             redisUtil.delete(tokenKey);
             
-            log.debug("Token 已加入黑名单: {}, expiration={}秒", token, expirationSeconds);
+            log.info("Token 已加入黑名单: token={}, expiration={}秒, blacklistSuccess={}", 
+                token.substring(0, Math.min(20, token.length())) + "...", expirationSeconds, blacklistSuccess);
         } catch (Exception e) {
-            log.error("使 Token 失效失败", e);
+            log.error("使 Token 失效失败: token={}", token.substring(0, Math.min(20, token.length())) + "...", e);
+            throw new RuntimeException("使 Token 失效失败: " + e.getMessage(), e);
         }
     }
     

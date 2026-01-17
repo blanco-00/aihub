@@ -2,6 +2,7 @@ package com.aihub.admin.dto.response;
 
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 用户列表响应DTO
@@ -18,6 +19,8 @@ public class UserListResponse {
     private String description;
     private String role;
     private String roleDescription;
+    private List<Long> roleIds; // 用户的所有角色ID列表
+    private List<String> roleNames; // 用户的所有角色名称列表
     private Long departmentId;
     private String departmentName;
     private Integer status;

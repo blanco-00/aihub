@@ -11,11 +11,22 @@ export const mapJson = (params?: object) => {
   return http.request<Result>("get", "/get-map-info", { params });
 };
 
+/** 文件上传响应类型 */
+export type FileUploadResponse = {
+  url: string;
+  filename: string;
+  size: number;
+  contentType: string;
+};
+
 /** 文件上传 */
-export const formUpload = data => {
-  return http.request<Result>(
+export const formUpload = (data: FormData, category?: string) => {
+  const url = category 
+    ? `/api/files/upload?category=${category}`
+    : "/api/files/upload";
+  return http.request<Result<FileUploadResponse>>(
     "post",
-    "https://pureadmin.free.beeceptor.com/images",
+    url,
     { data },
     {
       headers: {

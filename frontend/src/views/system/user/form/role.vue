@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import ReCol from "@/components/ReCol";
 import { RoleFormProps } from "../utils/types";
 
@@ -13,6 +13,17 @@ const props = withDefaults(defineProps<RoleFormProps>(), {
 });
 
 const newFormInline = ref(props.formInline);
+
+// 监听 formInline 变化，同步到 newFormInline
+watch(() => props.formInline, (newVal) => {
+  newFormInline.value = { ...newVal };
+}, { deep: true, immediate: true });
+
+function getFormData() {
+  return newFormInline.value;
+}
+
+defineExpose({ getFormData });
 </script>
 
 <template>

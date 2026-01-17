@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "../utils/rule";
 import { FormProps } from "../utils/types";
 import { usePublicHooks } from "../../hooks";
 import { getDepartmentTree } from "@/api/department";
 import type { DepartmentInfo } from "@/api/department";
+import { getAllRolesFromDB } from "@/api/system";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     email: "",
     sex: "",
     role: "USER",
+    roleIds: [],
     departmentId: 0,
     status: 1,
     remark: ""
@@ -34,40 +36,41 @@ const sexOptions = [
   }
 ];
 
-const roleOptions = [
-  {
-    value: "SUPER_ADMIN",
-    label: "超级管理员"
-  },
-  {
-    value: "ADMIN",
-    label: "管理员"
-  },
-  {
-    value: "USER",
-    label: "普通用户"
-  }
-];
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
 const newFormInline = ref(props.formInline);
 const departmentTree = ref<DepartmentInfo[]>([]);
+const roleOptions = ref<Array<{ id: number; name: string }>>([]);
 const departmentProps = {
   value: "id",
   label: "name",
   children: "children"
 };
 
-// 加载部门树
+// 监听 formInline 变化，同步到 newFormInline
+watch(() => props.formInline, (newVal) => {
+  newFormInline.value = { ...newVal };
+}, { deep: true, immediate: true });
+
+// 加载部门树和角色列表
 onMounted(async () => {
   try {
+    // 加载部门树
     const { code, data } = await getDepartmentTree();
     if (code === 200 && data) {
-      // 后端已经返回树结构，直接使用，不需要再用 handleTree 处理
       departmentTree.value = data as DepartmentInfo[];
     }
+    
+    // 加载角色列表（从数据库）
+    const roleResponse = await getAllRolesFromDB();
+    if (roleResponse.code === 200 && roleResponse.data) {
+      roleOptions.value = roleResponse.data.map((role: any) => ({
+        id: role.id,
+        name: role.name
+      }));
+    }
   } catch (error) {
-    console.error("加载部门树失败", error);
+    console.error("加载数据失败", error);
   }
 });
 
@@ -75,7 +78,11 @@ function getRef() {
   return ruleFormRef.value;
 }
 
-defineExpose({ getRef });
+function getFormData() {
+  return newFormInline.value;
+}
+
+defineExpose({ getRef, getFormData });
 </script>
 
 <template>
@@ -156,19 +163,20 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col :value="12" :xs="24" :sm="24">
-        <el-form-item label="用户角色" prop="role">
+        <el-form-item label="用户角色" prop="roleIds">
           <el-select
-            v-model="newFormInline.role"
-            placeholder="请选择用户角色"
+            v-model="newFormInline.roleIds"
+            placeholder="请选择用户角色（可多选）"
             class="w-full"
+            multiple
+            clearable
             :disabled="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'"
           >
             <el-option
               v-for="(item, index) in roleOptions"
               :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="newFormInline.isLastSuperAdmin && newFormInline.title === '修改' && item.value !== 'SUPER_ADMIN'"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
           <div v-if="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'" class="text-xs text-yellow-600 mt-1">

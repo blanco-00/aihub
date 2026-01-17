@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, markRaw } from "vue";
+import { ref, markRaw, onMounted } from "vue";
 import ReCol from "@/components/ReCol";
 import { useDark, randomGradient } from "./utils";
 import WelcomeTable from "./components/table/index.vue";
@@ -7,7 +7,12 @@ import { ReNormalCountTo } from "@/components/ReCountTo";
 import { useRenderFlicker } from "@/components/ReFlicker";
 import { ChartBar, ChartLine, ChartRound } from "./components/charts";
 import Segmented, { type OptionsType } from "@/components/ReSegmented";
-import { chartData, barChartData, progressData, latestNewsData } from "./data";
+import { getWelcomeStatistics } from "@/api/system";
+import { message } from "@/utils/message";
+import GroupLine from "~icons/ri/group-line";
+import Question from "~icons/ri/question-answer-line";
+import CheckLine from "~icons/ri/chat-check-line";
+import Smile from "~icons/ri/star-smile-line";
 
 defineOptions({
   name: "Welcome"
@@ -24,6 +29,146 @@ const optionsBasis: Array<OptionsType> = [
     label: "本周"
   }
 ];
+
+// 响应式数据
+const chartData = ref([
+  {
+    icon: GroupLine,
+    bgColor: "#effaff",
+    color: "#41b6ff",
+    duration: 2200,
+    name: "用户总数",
+    value: 0,
+    percent: "+0%",
+    data: []
+  },
+  {
+    icon: Question,
+    bgColor: "#fff5f4",
+    color: "#e85f33",
+    duration: 1600,
+    name: "今日新增",
+    value: 0,
+    percent: "+0%",
+    data: []
+  },
+  {
+    icon: CheckLine,
+    bgColor: "#eff8f4",
+    color: "#26ce83",
+    duration: 1500,
+    name: "今日登录",
+    value: 0,
+    percent: "+0%",
+    data: []
+  },
+  {
+    icon: Smile,
+    bgColor: "#f6f4fe",
+    color: "#7846e5",
+    duration: 100,
+    name: "总登录数",
+    value: 0,
+    percent: "+0%",
+    data: []
+  }
+]);
+
+const barChartData = ref([
+  {
+    requireData: [],
+    questionData: []
+  },
+  {
+    requireData: [],
+    questionData: []
+  }
+]);
+
+const progressData = ref([
+  { week: "周一", percentage: 85, duration: 110, color: "#41b6ff" },
+  { week: "周二", percentage: 86, duration: 105, color: "#41b6ff" },
+  { week: "周三", percentage: 88, duration: 100, color: "#41b6ff" },
+  { week: "周四", percentage: 89, duration: 95, color: "#41b6ff" },
+  { week: "周五", percentage: 94, duration: 90, color: "#26ce83" },
+  { week: "周六", percentage: 96, duration: 85, color: "#26ce83" },
+  { week: "周日", percentage: 100, duration: 80, color: "#26ce83" }
+].reverse());
+
+const latestNewsData = ref([]);
+const tableData = ref([]);
+
+const loading = ref(false);
+
+// 加载统计数据
+const loadStatistics = async () => {
+  loading.value = true;
+  try {
+    const { code, data } = await getWelcomeStatistics();
+    if (code === 200 && data) {
+      // 更新统计卡片数据
+      if (data.cards && data.cards.length >= 4) {
+        chartData.value[0].value = data.cards[0].value || 0;
+        chartData.value[0].percent = `+${(data.cards[0].percent || 0).toFixed(0)}%`;
+        chartData.value[0].data = data.cards[0].data || [];
+        
+        chartData.value[1].value = data.cards[1].value || 0;
+        chartData.value[1].percent = "+0%";
+        chartData.value[1].data = data.cards[1].data || [];
+        
+        chartData.value[2].value = data.cards[2].value || 0;
+        chartData.value[2].percent = "+0%";
+        chartData.value[2].data = data.cards[2].data || [];
+        
+        chartData.value[3].value = data.cards[3].value || 0;
+        chartData.value[3].percent = `+${(data.cards[3].percent || 0).toFixed(0)}%`;
+        chartData.value[3].data = data.cards[3].data || [];
+      }
+      
+      // 更新图表数据
+      if (data.chartData) {
+        barChartData.value[0] = {
+          requireData: data.chartData.lastWeek?.requireData || [],
+          questionData: data.chartData.lastWeek?.questionData || []
+        };
+        barChartData.value[1] = {
+          requireData: data.chartData.thisWeek?.requireData || [],
+          questionData: data.chartData.thisWeek?.questionData || []
+        };
+      }
+      
+      // 更新最新动态
+      if (data.latestNews) {
+        latestNewsData.value = data.latestNews.map((item: any) => ({
+          date: item.date,
+          requiredNumber: item.requiredNumber || 0,
+          resolveNumber: item.resolveNumber || 0
+        }));
+      }
+      
+      // 更新表格数据
+      if (data.tableData) {
+        tableData.value = data.tableData.map((item: any, index: number) => ({
+          id: index + 1,
+          date: item.date,
+          requiredNumber: item.requiredNumber || 0,
+          questionNumber: item.questionNumber || 0,
+          resolveNumber: item.resolveNumber || 0,
+          satisfaction: item.satisfaction || 95
+        }));
+      }
+    }
+  } catch (error) {
+    console.error("加载统计数据失败", error);
+    message("加载统计数据失败", { type: "error" });
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadStatistics();
+});
 </script>
 
 <template>
@@ -189,7 +334,7 @@ const optionsBasis: Array<OptionsType> = [
           <div class="flex justify-between">
             <span class="text-md font-medium">数据统计</span>
           </div>
-          <WelcomeTable class="mt-3" />
+          <WelcomeTable :table-data="tableData" class="mt-3" />
         </el-card>
       </re-col>
 

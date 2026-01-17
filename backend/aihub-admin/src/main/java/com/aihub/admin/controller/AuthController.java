@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.admin.dto.request.LoginRequest;
 import com.aihub.admin.dto.response.LoginResponse;
@@ -34,6 +35,9 @@ public class AuthController {
     
     @Autowired
     private LoginLogService loginLogService;
+    
+    @Autowired
+    private com.aihub.admin.service.OnlineUserService onlineUserService;
     
     /**
      * 获取当前登录用户信息
@@ -73,6 +77,15 @@ public class AuthController {
                     response.getUser().getUsername(),
                     1,
                     "登录成功",
+                    httpRequest
+                );
+                
+                // 保存在线用户信息
+                onlineUserService.saveOnlineUser(
+                    response.getUser().getId(),
+                    response.getUser().getUsername(),
+                    response.getToken(),
+                    response.getExpiresIn(),
                     httpRequest
                 );
             }
@@ -121,6 +134,7 @@ public class AuthController {
     /**
      * 用户登出
      */
+    @OperationLog(module = "认证管理", operation = "用户登出")
     @PostMapping("/logout")
     public Result<Void> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
         try {
@@ -129,6 +143,12 @@ public class AuthController {
                 token = authorization.substring(7);
             }
             authService.logout(token);
+            
+            // 删除在线用户信息
+            if (token != null) {
+                onlineUserService.deleteOnlineUserByToken(token);
+            }
+            
             return Result.success();
         } catch (Exception e) {
             log.error("登出失败", e);
@@ -157,6 +177,7 @@ public class AuthController {
     /**
      * 用户注册
      */
+    @OperationLog(module = "认证管理", operation = "用户注册", recordParams = true)
     @PostMapping("/register")
     public Result<Void> register(@Valid @RequestBody RegisterRequest request) {
         try {
@@ -194,6 +215,7 @@ public class AuthController {
     /**
      * 重置密码
      */
+    @OperationLog(module = "认证管理", operation = "重置密码", recordParams = false)
     @PostMapping("/reset-password")
     public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
@@ -209,6 +231,7 @@ public class AuthController {
     /**
      * 更新个人信息
      */
+    @OperationLog(module = "个人中心", operation = "更新个人信息", recordParams = true)
     @PutMapping("/profile")
     public Result<Void> updateProfile(
             @RequestBody com.aihub.admin.dto.request.UpdateProfileRequest request,
@@ -238,6 +261,7 @@ public class AuthController {
     /**
      * 修改密码
      */
+    @OperationLog(module = "个人中心", operation = "修改密码", recordParams = false)
     @PutMapping("/password")
     public Result<Void> updatePassword(
             @Valid @RequestBody com.aihub.admin.dto.request.UpdatePasswordRequest request,

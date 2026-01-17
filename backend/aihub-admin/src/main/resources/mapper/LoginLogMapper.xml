@@ -10,20 +10,20 @@
             status, message, login_time
         FROM login_log
         <where>
-            <if test="username != null and username != ''">
-                AND username LIKE CONCAT('%', #{username}, '%')
+            <if test="request.username != null and request.username != ''">
+                AND username LIKE CONCAT('%', #{request.username}, '%')
             </if>
-            <if test="ip != null and ip != ''">
-                AND ip LIKE CONCAT('%', #{ip}, '%')
+            <if test="request.ip != null and request.ip != ''">
+                AND ip LIKE CONCAT('%', #{request.ip}, '%')
             </if>
-            <if test="status != null">
-                AND status = #{status}
+            <if test="request.status != null">
+                AND status = #{request.status}
             </if>
-            <if test="startTime != null and startTime != ''">
-                AND login_time &gt;= #{startTime}
+            <if test="request.startTime != null and request.startTime != ''">
+                AND login_time &gt;= #{request.startTime}
             </if>
-            <if test="endTime != null and endTime != ''">
-                AND login_time &lt;= #{endTime}
+            <if test="request.endTime != null and request.endTime != ''">
+                AND login_time &lt;= #{request.endTime}
             </if>
         </where>
         ORDER BY login_time DESC
@@ -35,20 +35,20 @@
         SELECT COUNT(*)
         FROM login_log
         <where>
-            <if test="username != null and username != ''">
-                AND username LIKE CONCAT('%', #{username}, '%')
+            <if test="request.username != null and request.username != ''">
+                AND username LIKE CONCAT('%', #{request.username}, '%')
             </if>
-            <if test="ip != null and ip != ''">
-                AND ip LIKE CONCAT('%', #{ip}, '%')
+            <if test="request.ip != null and request.ip != ''">
+                AND ip LIKE CONCAT('%', #{request.ip}, '%')
             </if>
-            <if test="status != null">
-                AND status = #{status}
+            <if test="request.status != null">
+                AND status = #{request.status}
             </if>
-            <if test="startTime != null and startTime != ''">
-                AND login_time &gt;= #{startTime}
+            <if test="request.startTime != null and request.startTime != ''">
+                AND login_time &gt;= #{request.startTime}
             </if>
-            <if test="endTime != null and endTime != ''">
-                AND login_time &lt;= #{endTime}
+            <if test="request.endTime != null and request.endTime != ''">
+                AND login_time &lt;= #{request.endTime}
             </if>
         </where>
     </select>

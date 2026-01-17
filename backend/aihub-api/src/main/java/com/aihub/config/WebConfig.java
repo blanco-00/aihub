@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
@@ -26,6 +28,42 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private WebApplicationContext webApplicationContext;
     
+    @Value("${file.upload.path:./uploads}")
+    private String uploadPath;
+    
+    @Value("${file.upload.url-prefix:/api/files}")
+    private String urlPrefix;
+    
+    /**
+     * 获取文件存储的绝对路径
+     */
+    private String getAbsoluteUploadPath() {
+        String path = uploadPath;
+        // 如果是相对路径，转换为绝对路径
+        if (path.startsWith("./") || (!path.startsWith("/") && !path.contains(":"))) {
+            // 获取项目根目录或用户目录
+            String baseDir = System.getProperty("user.dir");
+            if (path.startsWith("./")) {
+                path = path.substring(2);
+            }
+            path = baseDir + "/" + path;
+        }
+        return path;
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 配置文件访问路径：/api/files/** -> file.upload.path
+        String absolutePath = getAbsoluteUploadPath();
+        String resourcePath = "file:" + absolutePath.replace("\\", "/");
+        if (!resourcePath.endsWith("/")) {
+            resourcePath += "/";
+        }
+        registry.addResourceHandler(urlPrefix + "/**")
+                .addResourceLocations(resourcePath)
+                .setCachePeriod(3600); // 缓存1小时
+    }
+    
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 初始化拦截器（优先级高，先执行）
@@ -35,6 +73,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/init/**",
                         "/api/auth/login",  // 排除登录接口
                         "/api/auth/refresh",  // 排除刷新Token接口
+                        "/api/files/**",  // 排除文件访问路径（静态资源）
                         "/init",
                         "/login",  // 排除登录页面
                         "/static/**",
@@ -50,7 +89,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/auth/login",
                         "/api/auth/refresh",
                         "/api/auth/logout",  // 登出接口需要认证，但由拦截器内部处理
-                        "/api/init/**"
+                        "/api/init/**",
+                        "/api/files/**"  // 排除文件访问路径（静态资源，允许直接访问）
                 )
                 .order(2);
     }

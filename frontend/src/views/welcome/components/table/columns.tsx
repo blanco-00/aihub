@@ -1,14 +1,28 @@
-import { tableData } from "../../data";
 import { delay } from "@pureadmin/utils";
-import { ref, onMounted, reactive } from "vue";
+import { ref, watch, reactive, type Ref } from "vue";
 import type { PaginationProps } from "@pureadmin/table";
 import ThumbUp from "~icons/ri/thumb-up-line";
 import Hearts from "~icons/ri/hearts-line";
 import Empty from "./empty.svg?component";
 
-export function useColumns() {
+export function useColumns(tableData?: Ref<any[]>) {
   const dataList = ref([]);
   const loading = ref(true);
+  
+  // 监听外部传入的tableData
+  if (tableData) {
+    watch(
+      tableData,
+      (newData) => {
+        if (newData && newData.length > 0) {
+          dataList.value = newData;
+          pagination.total = newData.length;
+          loading.value = false;
+        }
+      },
+      { immediate: true }
+    );
+  }
   const columns: TableColumnList = [
     {
       sortable: true,
@@ -87,11 +101,10 @@ export function useColumns() {
     });
   }
 
-  onMounted(() => {
-    dataList.value = tableData;
-    pagination.total = dataList.value.length;
-    loading.value = false;
-  });
+  // 如果没有外部数据，保持loading状态
+  if (!tableData || !tableData.value || tableData.value.length === 0) {
+    loading.value = true;
+  }
 
   return {
     Empty,

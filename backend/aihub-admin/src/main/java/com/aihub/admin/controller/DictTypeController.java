@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.common.web.dto.PageResult;
 import com.aihub.admin.dto.request.DictTypeListRequest;
@@ -61,6 +62,7 @@ public class DictTypeController {
     /**
      * 创建字典类型
      */
+    @OperationLog(module = "字典管理", operation = "创建字典类型", recordParams = true)
     @PostMapping
     public Result<Void> createDictType(@Valid @RequestBody CreateDictTypeRequest request) {
         dictTypeService.createDictType(request);
@@ -70,6 +72,7 @@ public class DictTypeController {
     /**
      * 更新字典类型
      */
+    @OperationLog(module = "字典管理", operation = "修改字典类型", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateDictType(@PathVariable Long id, 
                                        @Valid @RequestBody UpdateDictTypeRequest request) {
@@ -80,6 +83,7 @@ public class DictTypeController {
     /**
      * 删除字典类型（逻辑删除）
      */
+    @OperationLog(module = "字典管理", operation = "删除字典类型")
     @DeleteMapping("/{id}")
     public Result<Void> deleteDictType(@PathVariable Long id) {
         dictTypeService.deleteDictType(id);
@@ -89,6 +93,7 @@ public class DictTypeController {
     /**
      * 刷新字典缓存
      */
+    @OperationLog(module = "字典管理", operation = "刷新字典缓存")
     @PostMapping("/refresh-cache")
     public Result<Void> refreshCache() {
         dictTypeService.refreshCache();

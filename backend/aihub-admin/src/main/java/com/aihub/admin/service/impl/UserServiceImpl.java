@@ -9,6 +9,9 @@ import com.aihub.admin.entity.User;
 import com.aihub.admin.enums.UserRole;
 import com.aihub.common.web.exception.BusinessException;
 import com.aihub.admin.mapper.UserMapper;
+import com.aihub.admin.mapper.UserRoleMapper;
+import com.aihub.admin.mapper.RoleMapper;
+import com.aihub.admin.entity.Role;
 import com.aihub.admin.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,12 @@ public class UserServiceImpl implements UserService {
     
     @Autowired
     private com.aihub.admin.mapper.DepartmentMapper departmentMapper;
+    
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+    
+    @Autowired
+    private RoleMapper roleMapper;
     
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -59,13 +69,31 @@ public class UserServiceImpl implements UserService {
             log.warn("[性能警告] 查询用户列表耗时: {}ms, 结果数量: {}", queryTime, users.size());
         }
         
-        // 设置角色描述
+        // 设置角色描述和所有角色信息
         users.forEach(user -> {
             try {
                 UserRole role = UserRole.valueOf(user.getRole());
                 user.setRoleDescription(role.getDescription());
             } catch (Exception e) {
                 user.setRoleDescription("未知角色");
+            }
+            
+            // 查询用户的所有角色ID和名称
+            List<Long> roleIds = userRoleMapper.selectRoleIdsByUserId(user.getId());
+            user.setRoleIds(roleIds);
+            
+            // 查询角色名称列表
+            if (roleIds != null && !roleIds.isEmpty()) {
+                List<String> roleNames = roleIds.stream()
+                    .map(roleId -> {
+                        Role role = roleMapper.selectById(roleId);
+                        return role != null ? role.getName() : null;
+                    })
+                    .filter(name -> name != null)
+                    .collect(Collectors.toList());
+                user.setRoleNames(roleNames);
+            } else {
+                user.setRoleNames(new ArrayList<>());
             }
         });
         
@@ -310,5 +338,114 @@ public class UserServiceImpl implements UserService {
         userMapper.updateById(user);
         
         log.info("用户状态更新成功: id={}, username={}, status={}", id, user.getUsername(), status);
+    }
+    
+    @Override
+    public List<Long> getRoleIdsByUserId(Long userId) {
+        // 检查用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getIsDeleted() == 1) {
+            log.warn("查询用户角色失败，用户不存在: userId={}", userId);
+            throw new BusinessException("用户不存在");
+        }
+        
+        return userRoleMapper.selectRoleIdsByUserId(userId);
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void assignUserRoles(Long userId, List<Long> roleIds) {
+        // 检查用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getIsDeleted() == 1) {
+            log.warn("分配用户角色失败，用户不存在: userId={}", userId);
+            throw new BusinessException("用户不存在");
+        }
+        
+        // 验证角色ID是否有效
+        if (roleIds != null && !roleIds.isEmpty()) {
+            for (Long roleId : roleIds) {
+                Role role = roleMapper.selectById(roleId);
+                if (role == null || role.getIsDeleted() == 1) {
+                    log.warn("分配用户角色失败，角色不存在: userId={}, roleId={}", userId, roleId);
+                    throw new BusinessException("角色不存在: " + roleId);
+                }
+            }
+        }
+        
+        // 检查超级管理员保护：如果用户是最后一个超级管理员，必须保留超级管理员角色
+        List<Long> currentRoleIds = userRoleMapper.selectRoleIdsByUserId(userId);
+        boolean hasSuperAdminRole = false;
+        if (currentRoleIds != null && !currentRoleIds.isEmpty()) {
+            for (Long roleId : currentRoleIds) {
+                Role role = roleMapper.selectById(roleId);
+                if (role != null && "SUPER_ADMIN".equals(role.getCode())) {
+                    hasSuperAdminRole = true;
+                    break;
+                }
+            }
+        }
+        
+        // 如果用户当前有超级管理员角色，检查是否要移除
+        if (hasSuperAdminRole) {
+            boolean willHaveSuperAdminRole = false;
+            if (roleIds != null && !roleIds.isEmpty()) {
+                for (Long roleId : roleIds) {
+                    Role role = roleMapper.selectById(roleId);
+                    if (role != null && "SUPER_ADMIN".equals(role.getCode())) {
+                        willHaveSuperAdminRole = true;
+                        break;
+                    }
+                }
+            }
+            
+            // 如果要移除超级管理员角色，检查是否为最后一个超级管理员
+            if (!willHaveSuperAdminRole) {
+                Long superAdminCount = userMapper.countByRoleAndNotDeleted(UserRole.SUPER_ADMIN.getCode());
+                if (superAdminCount <= 1) {
+                    log.warn("分配用户角色失败，不能移除最后一个超级管理员的角色: userId={}", userId);
+                    throw new BusinessException("不能移除最后一个超级管理员的角色");
+                }
+            }
+        }
+        
+        // 先删除原有的关联
+        userRoleMapper.deleteByUserId(userId);
+        
+        // 如果有角色ID，批量插入新的关联
+        if (roleIds != null && !roleIds.isEmpty()) {
+            userRoleMapper.batchInsert(userId, roleIds);
+            
+            // 保持向后兼容：更新 user.role 字段为主角色（第一个角色或最高权限角色）
+            // 优先级：SUPER_ADMIN > ADMIN > USER
+            String primaryRole = null;
+            for (Long roleId : roleIds) {
+                Role role = roleMapper.selectById(roleId);
+                if (role != null) {
+                    String roleCode = role.getCode();
+                    if ("SUPER_ADMIN".equals(roleCode)) {
+                        primaryRole = roleCode;
+                        break; // SUPER_ADMIN 优先级最高，直接使用
+                    } else if ("ADMIN".equals(roleCode) && !"SUPER_ADMIN".equals(primaryRole)) {
+                        primaryRole = roleCode;
+                    } else if ("USER".equals(roleCode) && primaryRole == null) {
+                        primaryRole = roleCode;
+                    }
+                }
+            }
+            
+            // 如果找到了主角色，更新 user.role 字段
+            if (primaryRole != null) {
+                user.setRole(primaryRole);
+                user.setUpdatedAt(LocalDateTime.now());
+                userMapper.updateById(user);
+            }
+        } else {
+            // 如果没有分配任何角色，保持 user.role 字段不变（向后兼容）
+            // 或者可以设置为默认角色 USER
+            // 这里选择保持原值不变，避免影响现有逻辑
+        }
+        
+        log.info("分配用户角色成功: userId={}, roleCount={}", userId, roleIds != null ? roleIds.size() : 0);
     }
 }

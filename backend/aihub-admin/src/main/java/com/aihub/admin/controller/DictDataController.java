@@ -1,5 +1,6 @@
 package com.aihub.admin.controller;
 
+import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
 import com.aihub.common.web.dto.PageResult;
 import com.aihub.admin.dto.request.CreateDictDataRequest;
@@ -47,6 +48,7 @@ public class DictDataController {
     /**
      * 创建字典数据
      */
+    @OperationLog(module = "字典管理", operation = "创建字典数据", recordParams = true)
     @PostMapping
     public Result<Void> createDictData(@Valid @RequestBody CreateDictDataRequest request) {
         dictDataService.createDictData(request);
@@ -56,6 +58,7 @@ public class DictDataController {
     /**
      * 更新字典数据
      */
+    @OperationLog(module = "字典管理", operation = "修改字典数据", recordParams = true)
     @PutMapping("/{id}")
     public Result<Void> updateDictData(@PathVariable Long id, 
                                       @Valid @RequestBody UpdateDictDataRequest request) {
@@ -66,6 +69,7 @@ public class DictDataController {
     /**
      * 删除字典数据（逻辑删除）
      */
+    @OperationLog(module = "字典管理", operation = "删除字典数据")
     @DeleteMapping("/{id}")
     public Result<Void> deleteDictData(@PathVariable Long id) {
         dictDataService.deleteDictData(id);

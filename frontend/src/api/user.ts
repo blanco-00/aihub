@@ -31,6 +31,8 @@ export type UserInfo = {
   phone?: string;
   role: string;
   roleDescription: string;
+  roleIds?: number[]; // 用户的所有角色ID列表
+  roleNames?: string[]; // 用户的所有角色名称列表
   departmentId?: number;
   departmentName?: string;
   status: number;
