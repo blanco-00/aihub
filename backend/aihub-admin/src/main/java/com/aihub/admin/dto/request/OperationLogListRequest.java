@@ -12,6 +12,8 @@ public class OperationLogListRequest {
     
     private Integer size = 10;
     
+    private Long userId;
+    
     private String username;
     
     private String module;

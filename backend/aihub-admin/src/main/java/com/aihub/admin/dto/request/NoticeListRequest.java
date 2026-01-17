@@ -3,20 +3,22 @@ package com.aihub.admin.dto.request;
 import lombok.Data;
 
 /**
- * 登录日志列表查询请求DTO
+ * 通知列表查询请求DTO
  */
 @Data
-public class LoginLogListRequest {
+public class NoticeListRequest {
     
     private Integer current = 1;
     
     private Integer size = 10;
     
-    private Long userId;
+    private String title;
     
-    private String username;
+    private Long categoryId;
     
-    private String ip;
+    private Integer type;
+    
+    private Integer publishType;
     
     private Integer status;
     

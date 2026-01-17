@@ -74,6 +74,9 @@ menus:
   pureDept: Dept Manage
   pureDict: Dict Manage
   pureFileManagement: File Management
+  pureNotice: Notice
+  pureNoticeCategory: Notice Category
+  pureNoticeManagement: Notice Management
   pureSysMonitor: System Monitor
   pureSystemMonitor: System Status
   pureOnlineUser: Online User

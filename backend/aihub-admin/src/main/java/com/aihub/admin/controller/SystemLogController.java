@@ -22,6 +22,8 @@ public class SystemLogController {
     
     /**
      * 获取系统日志列表（分页、搜索、筛选）
+     * 注意：此接口返回全量日志（所有系统日志），用于监控模块
+     * 系统日志不区分用户，记录的是系统级别的错误和事件
      */
     @GetMapping
     public Result<PageResult<SystemLogResponse>> getSystemLogList(

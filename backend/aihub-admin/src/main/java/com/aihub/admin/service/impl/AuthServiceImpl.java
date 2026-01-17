@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 认证服务实现
@@ -387,64 +386,63 @@ public class AuthServiceImpl implements AuthService {
         log.info("密码修改成功: userId={}", userId);
     }
     
+    /**
+     * 获取当前用户的安全日志（个人日志）
+     * 注意：此方法只返回指定用户的日志，用于"个人信息"页面的安全日志功能
+     * 与监控模块的全量日志接口不同，这里通过 userId 严格限制只返回当前用户的日志
+     */
     @Override
     public PageResult<SecurityLogResponse> getSecurityLogs(Long userId, Integer current, Integer size) {
-        // 获取用户信息
+        // 验证用户是否存在
         User user = userMapper.selectById(userId);
         if (user == null || user.getIsDeleted() == 1) {
             throw new BusinessException("用户不存在");
         }
         
-        String username = user.getUsername();
-        
-        // 查询登录日志（扩大查询范围，后续再筛选）
+        // 直接通过 userId 查询登录日志（确保只查询当前用户的日志 - 个人日志）
         LoginLogListRequest loginLogRequest = new LoginLogListRequest();
-        loginLogRequest.setUsername(username);
+        loginLogRequest.setUserId(userId); // 设置 userId，确保只返回当前用户的日志
         List<LoginLogResponse> allLoginLogs = loginLogMapper.selectLoginLogList(
             loginLogRequest, 0L, 1000); // 查询最多1000条
         
-        // 查询操作日志（扩大查询范围，后续再筛选）
+        // 直接通过 userId 查询操作日志（确保只查询当前用户的日志 - 个人日志）
         OperationLogListRequest operationLogRequest = new OperationLogListRequest();
-        operationLogRequest.setUsername(username);
+        operationLogRequest.setUserId(userId); // 设置 userId，确保只返回当前用户的日志
         List<OperationLogResponse> allOperationLogs = operationLogMapper.selectOperationLogList(
             operationLogRequest, 0L, 1000); // 查询最多1000条
         
         // 转换为安全日志响应
         List<SecurityLogResponse> securityLogs = new ArrayList<>();
         
-        // 转换登录日志
+        // 转换登录日志（已通过 userId 筛选，无需再次检查）
         for (LoginLogResponse loginLog : allLoginLogs) {
-            if (loginLog.getUserId() != null && loginLog.getUserId().equals(userId)) {
-                SecurityLogResponse securityLog = new SecurityLogResponse();
-                securityLog.setId(loginLog.getId());
-                securityLog.setType("LOGIN");
-                securityLog.setSummary(loginLog.getMessage() != null ? loginLog.getMessage() : 
-                    (loginLog.getStatus() != null && loginLog.getStatus() == 1 ? "登录成功" : "登录失败"));
-                securityLog.setIp(loginLog.getIp());
-                securityLog.setAddress(loginLog.getAddress());
-                securityLog.setSystem(UserAgentUtils.parseOS(loginLog.getUserAgent()));
-                securityLog.setBrowser(UserAgentUtils.parseBrowser(loginLog.getUserAgent()));
-                securityLog.setOperatingTime(loginLog.getLoginTime());
-                securityLogs.add(securityLog);
-            }
+            SecurityLogResponse securityLog = new SecurityLogResponse();
+            securityLog.setId(loginLog.getId());
+            securityLog.setType("LOGIN");
+            securityLog.setSummary(loginLog.getMessage() != null ? loginLog.getMessage() : 
+                (loginLog.getStatus() != null && loginLog.getStatus() == 1 ? "登录成功" : "登录失败"));
+            securityLog.setIp(loginLog.getIp());
+            securityLog.setAddress(loginLog.getAddress());
+            securityLog.setSystem(UserAgentUtils.parseOS(loginLog.getUserAgent()));
+            securityLog.setBrowser(UserAgentUtils.parseBrowser(loginLog.getUserAgent()));
+            securityLog.setOperatingTime(loginLog.getLoginTime());
+            securityLogs.add(securityLog);
         }
         
-        // 转换操作日志
+        // 转换操作日志（已通过 userId 筛选，无需再次检查）
         for (OperationLogResponse operationLog : allOperationLogs) {
-            if (operationLog.getUserId() != null && operationLog.getUserId().equals(userId)) {
-                SecurityLogResponse securityLog = new SecurityLogResponse();
-                securityLog.setId(operationLog.getId());
-                securityLog.setType("OPERATION");
-                String summary = (operationLog.getModule() != null ? operationLog.getModule() : "") + 
-                    " - " + (operationLog.getOperation() != null ? operationLog.getOperation() : "");
-                securityLog.setSummary(summary);
-                securityLog.setIp(operationLog.getIp());
-                securityLog.setAddress(null); // 操作日志可能没有地址信息
-                securityLog.setSystem("未知"); // 操作日志可能没有User-Agent
-                securityLog.setBrowser("未知");
-                securityLog.setOperatingTime(operationLog.getOperationTime());
-                securityLogs.add(securityLog);
-            }
+            SecurityLogResponse securityLog = new SecurityLogResponse();
+            securityLog.setId(operationLog.getId());
+            securityLog.setType("OPERATION");
+            String summary = (operationLog.getModule() != null ? operationLog.getModule() : "") + 
+                " - " + (operationLog.getOperation() != null ? operationLog.getOperation() : "");
+            securityLog.setSummary(summary);
+            securityLog.setIp(operationLog.getIp());
+            securityLog.setAddress(null); // 操作日志可能没有地址信息
+            securityLog.setSystem("未知"); // 操作日志可能没有User-Agent
+            securityLog.setBrowser("未知");
+            securityLog.setOperatingTime(operationLog.getOperationTime());
+            securityLogs.add(securityLog);
         }
         
         // 按时间倒序排序

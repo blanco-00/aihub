@@ -3,13 +3,46 @@ import { ListItem } from "../data";
 import { ref, PropType, nextTick } from "vue";
 import { useNav } from "@/layout/hooks/useNav";
 import { deviceDetection } from "@pureadmin/utils";
+import { markNoticeAsRead, getNoticeDetailForUser } from "@/api/notice";
+import { message } from "@/utils/message";
 
-defineProps({
+const props = defineProps({
   noticeItem: {
     type: Object as PropType<ListItem>,
     default: () => {}
   }
 });
+
+const emit = defineEmits<{
+  (e: "read", noticeId: number): void;
+}>();
+
+// 处理通知点击事件
+async function handleNoticeClick() {
+  const noticeId = props.noticeItem.noticeId;
+  if (!noticeId) {
+    return;
+  }
+
+  // 如果已经是已读状态，直接返回
+  if (props.noticeItem.extra === "已读") {
+    return;
+  }
+
+  try {
+    // 标记为已读
+    const response: any = await markNoticeAsRead(noticeId);
+    if (response && response.code === 200) {
+      // 通知父组件更新状态
+      emit("read", noticeId);
+      console.log("通知已标记为已读:", noticeId);
+    } else {
+      console.error("标记已读失败:", response);
+    }
+  } catch (error) {
+    console.error("标记通知为已读失败", error);
+  }
+}
 
 const titleRef = ref(null);
 const titleTooltip = ref(false);
@@ -49,7 +82,8 @@ function hoverDescription(event, description) {
 
 <template>
   <div
-    class="notice-container border-0 border-b-[1px] border-solid border-[#f0f0f0] dark:border-[#303030]"
+    class="notice-container border-0 border-b-[1px] border-solid border-[#f0f0f0] dark:border-[#303030] cursor-pointer hover:bg-[#f5f5f5] dark:hover:bg-[#1f1f1f] transition-colors px-4"
+    @click="handleNoticeClick"
   >
     <el-avatar
       v-if="noticeItem.avatar"
@@ -58,7 +92,7 @@ function hoverDescription(event, description) {
       class="notice-container-avatar"
     />
     <div class="notice-container-text">
-      <div class="notice-text-title text-[#000000d9] dark:text-white">
+      <div class="notice-text-title">
         <el-tooltip
           popper-class="notice-title-popper"
           :effect="tooltipEffect"
@@ -100,7 +134,7 @@ function hoverDescription(event, description) {
           {{ noticeItem.description }}
         </div>
       </el-tooltip>
-      <div class="notice-text-datetime text-[#00000073] dark:text-white">
+      <div class="notice-text-datetime">
         {{ noticeItem.datetime }}
       </div>
     </div>
@@ -117,7 +151,7 @@ function hoverDescription(event, description) {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 14px 0;
 
   // border-bottom: 1px solid #f0f0f0;
 
@@ -134,11 +168,16 @@ function hoverDescription(event, description) {
 
     .notice-text-title {
       display: flex;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-size: 14px;
-      font-weight: 400;
-      line-height: 1.5715;
+      font-weight: 500;
+      line-height: 1.5;
       cursor: pointer;
+      color: #000000d9;
+      
+      .dark & {
+        color: #ffffff;
+      }
 
       .notice-title-content {
         flex: 1;
@@ -146,31 +185,46 @@ function hoverDescription(event, description) {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        font-weight: 500;
       }
 
       .notice-title-extra {
         float: right;
         margin-top: -1.5px;
         font-weight: 400;
+        margin-left: 8px;
       }
     }
 
-    .notice-text-description,
-    .notice-text-datetime {
-      font-size: 12px;
-      line-height: 1.5715;
-    }
-
     .notice-text-description {
+      font-size: 13px;
+      line-height: 1.6;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
+      min-height: 40px;
+      color: #000000a6;
+      margin-bottom: 6px;
+      margin-top: 2px;
+      word-break: break-word;
+      
+      .dark & {
+        color: #ffffffa6;
+      }
     }
 
     .notice-text-datetime {
+      font-size: 12px;
+      line-height: 1.5;
       margin-top: 4px;
+      color: #00000073;
+      
+      .dark & {
+        color: #ffffff73;
+      }
     }
   }
 }

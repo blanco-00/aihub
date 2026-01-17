@@ -25,6 +25,8 @@ public class OperationLogController {
     
     /**
      * 获取操作日志列表（分页、搜索、筛选）
+     * 注意：此接口返回全量日志（所有用户的操作日志），用于监控模块
+     * 如需查看个人日志，请使用 /api/auth/security-logs 接口
      */
     @GetMapping
     public Result<PageResult<OperationLogResponse>> getOperationLogList(

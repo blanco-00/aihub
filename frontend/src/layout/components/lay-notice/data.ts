@@ -8,6 +8,7 @@ export interface ListItem {
   description: string;
   status?: "primary" | "success" | "warning" | "info" | "danger";
   extra?: string;
+  noticeId?: number;
 }
 
 export interface TabItem {

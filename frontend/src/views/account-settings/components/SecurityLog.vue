@@ -72,14 +72,19 @@ async function onSearch() {
       current: pagination.currentPage,
       size: pagination.pageSize
     });
-    if (code === 0 && data) {
+    if (code === 200 && data) {
       dataList.value = data.records || [];
       pagination.total = data.total || 0;
       pagination.pageSize = data.size || 10;
       pagination.currentPage = data.current || 1;
+    } else {
+      dataList.value = [];
+      pagination.total = 0;
     }
   } catch (error) {
     console.error("获取安全日志失败", error);
+    dataList.value = [];
+    pagination.total = 0;
   } finally {
     setTimeout(() => {
       loading.value = false;

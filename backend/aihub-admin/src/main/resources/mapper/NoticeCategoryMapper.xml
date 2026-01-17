@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.NoticeCategoryMapper">
+    
+    <!-- 查询通知分类列表（分页、搜索、筛选） -->
+    <select id="selectNoticeCategoryList" resultType="com.aihub.admin.dto.response.NoticeCategoryResponse">
+        SELECT 
+            id, name, code, description, sort_order, status,
+            created_at as createdAt, updated_at as updatedAt
+        FROM notice_category
+        WHERE is_deleted = 0
+        <if test="request.name != null and request.name != ''">
+            AND name LIKE CONCAT('%', #{request.name}, '%')
+        </if>
+        <if test="request.code != null and request.code != ''">
+            AND code LIKE CONCAT('%', #{request.code}, '%')
+        </if>
+        <if test="request.status != null">
+            AND status = #{request.status}
+        </if>
+        ORDER BY sort_order ASC, created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+    
+    <!-- 统计通知分类总数 -->
+    <select id="countNoticeCategoryList" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM notice_category
+        WHERE is_deleted = 0
+        <if test="request.name != null and request.name != ''">
+            AND name LIKE CONCAT('%', #{request.name}, '%')
+        </if>
+        <if test="request.code != null and request.code != ''">
+            AND code LIKE CONCAT('%', #{request.code}, '%')
+        </if>
+        <if test="request.status != null">
+            AND status = #{request.status}
+        </if>
+    </select>
+    
+</mapper>

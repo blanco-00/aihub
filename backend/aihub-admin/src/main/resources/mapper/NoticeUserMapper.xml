@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.NoticeUserMapper">
+    
+    <!-- 根据用户ID和已读状态查询通知ID列表 -->
+    <select id="selectNoticeIdsByUserId" resultType="java.lang.Long">
+        SELECT notice_id
+        FROM notice_user
+        WHERE user_id = #{userId}
+        <if test="isRead != null">
+            AND is_read = #{isRead}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+    
+    <!-- 统计用户的通知数量 -->
+    <select id="countNoticesByUserId" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM notice_user
+        WHERE user_id = #{userId}
+        <if test="isRead != null">
+            AND is_read = #{isRead}
+        </if>
+    </select>
+    
+    <!-- 统计未读通知数量 -->
+    <select id="countUnreadByUserId" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM notice_user
+        WHERE user_id = #{userId}
+        AND is_read = 0
+    </select>
+    
+</mapper>

@@ -74,6 +74,9 @@ menus:
   pureDept: 部门管理
   pureDict: 字典管理
   pureFileManagement: 文件管理
+  pureNotice: 通知公告
+  pureNoticeCategory: 通知分类
+  pureNoticeManagement: 通知公告管理
   pureSysMonitor: 系统监控
   pureSystemMonitor: 运行状况
   pureOnlineUser: 在线用户

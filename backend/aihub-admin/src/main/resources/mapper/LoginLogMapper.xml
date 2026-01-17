@@ -10,6 +10,9 @@
             status, message, login_time
         FROM login_log
         <where>
+            <if test="request.userId != null">
+                AND user_id = #{request.userId}
+            </if>
             <if test="request.username != null and request.username != ''">
                 AND username LIKE CONCAT('%', #{request.username}, '%')
             </if>
@@ -35,6 +38,9 @@
         SELECT COUNT(*)
         FROM login_log
         <where>
+            <if test="request.userId != null">
+                AND user_id = #{request.userId}
+            </if>
             <if test="request.username != null and request.username != ''">
                 AND username LIKE CONCAT('%', #{request.username}, '%')
             </if>

@@ -282,7 +282,12 @@ public class AuthController {
     }
     
     /**
-     * 获取当前用户的安全日志
+     * 获取当前用户的安全日志（个人日志）
+     * 注意：此接口只返回当前登录用户的日志，用于"个人信息"页面
+     * 如需查看全量日志，请使用监控模块的日志接口：
+     * - /api/login-logs - 登录日志（全量）
+     * - /api/operation-logs - 操作日志（全量）
+     * - /api/system-logs - 系统日志（全量）
      */
     @GetMapping("/security-logs")
     public Result<com.aihub.common.web.dto.PageResult<com.aihub.admin.dto.response.SecurityLogResponse>> getSecurityLogs(
@@ -295,6 +300,7 @@ public class AuthController {
                 return Result.error(401, "未登录或Token无效");
             }
             
+            // 只返回当前登录用户的日志（个人日志）
             com.aihub.common.web.dto.PageResult<com.aihub.admin.dto.response.SecurityLogResponse> result = 
                 authService.getSecurityLogs(userId, current, size);
             return Result.success(result);
