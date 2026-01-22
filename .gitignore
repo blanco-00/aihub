@@ -33,6 +33,7 @@ logs/
 *.swo
 *~
 .DS_Store
+.trae/
 
 # 操作系统文件
 Thumbs.db
