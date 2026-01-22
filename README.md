@@ -116,24 +116,25 @@ pnpm dev
 
 ## 📁 项目结构
 
-```
+ ```
 AIHub/
-├── README.md           # 项目主文档（本文件）- 文档入口
-├── LICENSE             # MIT 开源许可证
-├── .cursor/
-│   └── rules/          # Cursor IDE 开发规范
-│       ├── java-code-style.mdc    # Java 代码规范
-│       ├── logging.mdc            # 日志规范
-│       ├── documentation.mdc      # 文档规范
-│       ├── rule-management.mdc    # 规范管理
-│       └── frontend-ui-design.mdc # 前端UI/UX设计规范
-├── docs/              # 项目文档
-│   ├── architecture/  # 架构设计
-│   ├── frontend/      # 前端文档
-│   └── backend/       # 后端文档
-├── frontend/          # 前端代码（待创建）
-└── backend/           # 后端代码（待创建）
-```
+ ├── README.md           # 项目主文档（本文件）- 文档入口
+ ├── LICENSE             # MIT 开源许可证
+ ├── .cursor/
+ │   └── rules/          # Cursor IDE 开发规范
+ │       ├── java-code-style.mdc    # Java 代码规范
+ │       ├── logging.mdc            # 日志规范
+ │       ├── documentation.mdc      # 文档规范
+ │       ├── rule-management.mdc    # 规范管理
+ │       └── frontend-ui-design.mdc # 前端UI/UX设计规范
+ ├── docs/              # 项目文档
+ │   ├── architecture/  # 架构设计
+ │   ├── frontend/      # 前端文档
+ │   ├── backend/       # 后端文档
+ │   └── roadmap/      # 实施路线图
+ ├── frontend/          # 前端代码（待创建）
+ └── backend/           # 后端代码（待创建）
+ ```
 
 > **注意**: 本文档（README.md）是项目的唯一文档入口，所有文档都应该直接或间接地与本文档保持引用关系。
 
@@ -141,6 +142,7 @@ AIHub/
 
 ### 📋 功能规划与实施清单
 - **[功能清单](./docs/features.md)** - 功能规划、开发状态和实施进度跟踪
+- **[实施路线图](./docs/roadmap/implementation-roadmap.md)** - AI相关功能的详细实施计划和技术方案
 
 ### 🎨 开发指南
 
@@ -162,6 +164,7 @@ AIHub/
 
 ### 🏗️ 架构设计
 - **[系统架构总览](./docs/architecture/overview.md)** - 系统整体架构设计
+- **[RAG检索架构设计](./docs/architecture/rag-retrieval.md)** - RAG检索增强功能架构设计、组件选型、部署方案
 - **[网关架构设计](./docs/architecture/gateways.md)** - Agents网关、模型网关、MCP网关详细设计
 - **[模块规划](./docs/architecture/module-structure.md)** - 前端和后端模块详细规划
 

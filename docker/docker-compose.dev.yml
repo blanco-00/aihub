@@ -1,6 +1,6 @@
 version: '3.8'
 
-# 开发环境配置（仅启动基础设施，应用本地运行）
+# 开发环境配置（启动基础设施 + RAG 服务，应用本地运行）
 services:
   # MySQL 数据库
   mysql:
@@ -44,6 +44,46 @@ services:
       timeout: 3s
       retries: 5
 
+  # RAG 服务（轻量级，开源免费）
+
+  # Qdrant 向量数据库（轻量级，开源免费）
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: aihub-qdrant-dev
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_HTTP_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant_dev_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__STORAGE__OPTIMIZERS_SEGMENT_MAX_SIZE_BYTES=262144
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+
+  # Meilisearch 全文搜索引擎（超轻量级，开源免费）
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: aihub-meilisearch-dev
+    restart: unless-stopped
+    ports:
+      - "${MEILISEARCH_PORT:-7700}:7700"
+    volumes:
+      - meilisearch_dev_data:/meili_data
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-devKey123}
+      - MEILI_MAX_INDEXING_MEMORY=200MB
+      - MEILI_MAX_INDEXING_THREADS=2
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
 networks:
   default:
     name: aihub-dev-network
@@ -52,4 +92,8 @@ volumes:
   mysql_dev_data:
     driver: local
   redis_dev_data:
+    driver: local
+  qdrant_dev_data:
+    driver: local
+  meilisearch_dev_data:
     driver: local

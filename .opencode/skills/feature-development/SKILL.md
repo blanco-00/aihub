@@ -291,7 +291,7 @@ description: Guides complete feature development workflow in AIHub. Use when dev
 - [ ] 兼容性测试通过
 
 ### 文档
-- [ ] 功能文档已更新
+- [ ] 功能文档已更新（不包含时间估计，如"3-5天"）
 - [ ] API 文档已更新（如需要）
 
 ## 常见问题

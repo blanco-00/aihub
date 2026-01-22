@@ -159,10 +159,10 @@ function handleDropdownVisibleChange(visible: boolean) {
 onMounted(() => {
   // 页面加载时也加载一次（用于显示未读数量）
   loadSystemNotices();
-  // 每30秒刷新一次未读数量
+  // 每5分钟刷新一次未读数量（降低轮询频率，减少服务器压力）
   setInterval(() => {
     loadSystemNotices();
-  }, 30000);
+  }, 300000);
 });
 </script>
 
