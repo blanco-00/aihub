@@ -1,0 +1,289 @@
+# SQL 优化
+
+## 避免全表查询
+
+- **禁止使用 `SELECT *` 或查询所有字段**：只查询需要的字段
+- **禁止使用 `selectAll()`、`findAll()` 等方法查询所有数据**：必须使用分页或条件查询
+- **使用索引字段查询**：WHERE 条件应优先使用已建立索引的字段
+- **避免 N+1 查询**：使用 JOIN 或批量查询替代循环中的单条查询
+- **合理使用分页**：数据量大时必须使用分页查询，避免一次性加载大量数据
+- **UNION ALL + 应用层去重**：需要合并多个查询结果时，优先使用 `UNION ALL` 在应用层去重，而不是使用 `UNION` 或 `SELECT DISTINCT`
+
+### 错误示例
+
+```java
+// ❌ 错误：全表查询，查询所有字段
+List<User> users = userMapper.selectList(null);
+
+// ❌ 错误：查询所有数据，没有分页
+List<User> users = userMapper.selectAll();
+
+// ❌ 错误：循环中查询数据库（N+1 问题）
+for (Long userId : userIds) {
+    User user = userMapper.selectById(userId); // 每次循环都查询数据库
+}
+```
+
+```sql
+-- ❌ 错误：使用 SELECT * 查询所有字段
+SELECT * FROM user WHERE status = 1;
+
+-- ❌ 错误：查询所有数据，没有分页
+SELECT * FROM user;
+
+-- ❌ 错误：循环查询（N+1 问题）
+-- 在 Java 代码中循环调用：SELECT * FROM user WHERE id = ?
+```
+
+### 正确示例
+
+```java
+// ✅ 正确：只查询需要的字段，使用条件查询
+List<User> users = userMapper.selectList(
+    new LambdaQueryWrapper<User>()
+        .select(User::getId, User::getUsername, User::getEmail)
+        .eq(User::getStatus, 1)
+        .orderByDesc(User::getCreatedAt)
+);
+
+// ✅ 正确：使用分页查询
+Page<User> page = new Page<>(current, size);
+Page<User> result = userMapper.selectPage(page,
+    new LambdaQueryWrapper<User>()
+        .eq(User::getStatus, 1)
+);
+
+// ✅ 正确：批量查询，避免 N+1 问题
+List<User> users = userMapper.selectBatchIds(userIds); // 一次查询多条
+```
+
+```sql
+-- ✅ 正确：只查询需要的字段
+SELECT id, username, email, status, created_at
+FROM user
+WHERE status = 1
+ORDER BY created_at DESC;
+
+-- ✅ 正确：使用分页查询
+SELECT id, username, email
+FROM user
+WHERE status = 1
+ORDER BY created_at DESC
+LIMIT 10 OFFSET 0;
+
+-- ✅ 正确：使用 JOIN 或批量查询，避免 N+1 问题
+SELECT u.id, u.username, r.name as role_name
+FROM user u
+INNER JOIN user_role ur ON u.id = ur.user_id
+INNER JOIN role r ON ur.role_id = r.id
+WHERE u.id IN (1, 2, 3, 4, 5);
+```
+
+## 数据库设计规范
+
+### 避免使用保留关键字
+
+- **避免使用保留关键字**：数据库表名、字段名等应避免使用数据库的保留关键字（如 MySQL 的 `rank`、`order`、`group`、`select`、`table` 等）
+- **原因**：使用保留关键字会导致 SQL 语法错误，需要使用反引号包裹，增加维护成本，且容易出错
+- **命名建议**：使用有意义的、非保留关键字的名称，如 `rank` → `sort_order`、`order` → `sort`、`group` → `group_name`
+
+### 常见 MySQL 保留关键字
+
+以下是一些常见的 MySQL 保留关键字，应避免使用：
+- `rank`、`order`、`group`、`select`、`table`、`index`、`key`、`user`、`status`、`type`、`level`、`desc`、`asc`、`default`、`primary`、`foreign`、`unique`、`constraint`、`trigger`、`view`、`procedure`、`function`、`database`、`schema`、`column`、`row`、`value`、`values`、`where`、`from`、`join`、`inner`、`outer`、`left`、`right`、`union`、`distinct`、`limit`、`offset`、`having`、`case`、`when`、`then`、`else`、`end`、`if`、`elseif`、`while`、`loop`、`repeat`、`until`、`begin`、`end`、`declare`、`set`、`call`、`return`、`exit`、`leave`、`iterate`、`continue`、`handler`、`condition`、`signal`、`resignal`、`get`、`diagnostics`、`show`、`describe`、`explain`、`use`、`lock`、`unlock`、`grant`、`revoke`、`create`、`drop`、`alter`、`rename`、`truncate`、`insert`、`update`、`delete`、`replace`、`load`
+
+**注意**：以上列表不完整，建议在设计数据库时查阅对应数据库的官方文档，确认是否为保留关键字。
+
+### 错误示例
+
+```sql
+-- ❌ 错误：使用保留关键字作为字段名
+CREATE TABLE menu (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    rank INT DEFAULT 0 COMMENT '排序',  -- rank 是 MySQL 保留关键字
+    `order` INT DEFAULT 0 COMMENT '顺序',  -- order 是 MySQL 保留关键字
+    `group` VARCHAR(50) COMMENT '分组'  -- group 是 MySQL 保留关键字
+);
+
+-- ❌ 错误：在 SQL 中使用保留关键字未加反引号
+SELECT id, rank, `order` FROM menu ORDER BY rank;  -- 会报语法错误
+```
+
+```java
+// ❌ 错误：实体类字段名使用保留关键字，可能导致映射问题
+@Data
+@TableName("menu")
+public class Menu {
+    private Integer rank;  // rank 是保留关键字，可能导致 SQL 执行错误
+    private Integer order;  // order 是保留关键字
+}
+```
+
+### 正确示例
+
+```sql
+-- ✅ 正确：使用非保留关键字作为字段名
+CREATE TABLE menu (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    sort_order INT DEFAULT 0 COMMENT '排序',  -- 使用 sort_order 替代 rank
+    display_order INT DEFAULT 0 COMMENT '显示顺序',  -- 使用 display_order 替代 order
+    group_name VARCHAR(50) COMMENT '分组名称'  -- 使用 group_name 替代 group
+);
+
+-- ✅ 正确：如果必须使用保留关键字，需要用反引号包裹（不推荐）
+CREATE TABLE menu (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `rank` INT DEFAULT 0 COMMENT '排序'  -- 使用反引号包裹，但不推荐
+);
+```
+
+```java
+// ✅ 正确：实体类使用非保留关键字字段名，并正确映射
+@Data
+@TableName("menu")
+public class Menu {
+    @TableField("sort_order")
+    private Integer sortOrder;  // 使用 sortOrder 替代 rank
+
+    @TableField("display_order")
+    private Integer displayOrder;  // 使用 displayOrder 替代 order
+
+    @TableField("group_name")
+    private String groupName;  // 使用 groupName 替代 group
+}
+```
+
+## MyBatis Mapper XML 规范
+
+- **避免使用 SELECT *`**：在 Mapper XML 中明确列出需要查询的字段
+- **使用索引字段**：WHERE 条件优先使用已建立索引的字段
+- **合理使用 JOIN**：避免 N+1 查询，使用 JOIN 或批量查询
+- **注意字段映射**：如果数据库字段使用保留关键字，需要在 SQL 中使用反引号包裹
+
+### 错误示例
+
+```xml
+<!-- ❌ 错误：使用 SELECT * -->
+<select id="selectAll" resultType="com.aihub.entity.User">
+    SELECT * FROM user
+</select>
+
+<!-- ❌ 错误：使用保留关键字未加反引号 -->
+<select id="selectByRank" resultType="com.aihub.entity.Menu">
+    SELECT id, name, rank FROM menu ORDER BY rank
+</select>
+```
+
+### 正确示例
+
+```xml
+<!-- ✅ 正确：明确列出需要查询的字段 -->
+<select id="selectAll" resultType="com.aihub.entity.User">
+    SELECT
+        id, username, email, nickname, phone,
+        status, created_at, updated_at, is_deleted
+    FROM user
+    WHERE is_deleted = 0
+</select>
+
+<!-- ✅ 正确：使用保留关键字时加反引号 -->
+<select id="selectByRank" resultType="com.aihub.entity.Menu">
+    SELECT id, name, `rank` FROM menu ORDER BY `rank`
+</select>
+
+<!-- ✅ 正确：使用 JOIN 避免 N+1 查询 -->
+<select id="selectUsersWithRoles" resultType="com.aihub.entity.User">
+    SELECT
+        u.id, u.username, u.email,
+        r.id as role_id, r.name as role_name
+    FROM user u
+    INNER JOIN user_role ur ON u.id = ur.user_id
+    INNER JOIN role r ON ur.role_id = r.id
+    WHERE u.is_deleted = 0 AND r.is_deleted = 0
+</select>
+```
+
+## UNION ALL + 应用层去重性能优化
+
+- **优先使用 UNION ALL**：`UNION ALL` 比 `UNION` 性能更好，因为不需要去重
+- **应用层去重**：在 Java 代码中使用 `LinkedHashSet` 或 `Stream.distinct()` 去重，比数据库 `DISTINCT` 更快
+- **适用场景**：需要合并多个查询结果，且数据量不大（通常 < 10000 条）时
+- **性能优势**：
+  - 数据库层：`UNION ALL` 比 `UNION` 更快（不需要去重）
+  - 应用层：在内存中去重，比数据库去重更快
+  - 数据量小：内存去重开销很小
+
+### 错误示例
+
+```sql
+-- ❌ 错误：使用 UNION 去重，性能较差
+SELECT id, name FROM table1
+UNION
+SELECT id, name FROM table2;
+
+-- ❌ 错误：使用 SELECT DISTINCT，数据库层去重开销大
+SELECT DISTINCT * FROM (
+    SELECT id, name FROM table1
+    UNION ALL
+    SELECT id, name FROM table2
+) t;
+```
+
+```java
+// ❌ 错误：在 SQL 中使用 DISTINCT，数据库层去重
+List<Menu> menus = menuMapper.selectByRoleCode(roleCode);
+// SQL: SELECT DISTINCT ... UNION ALL ...
+```
+
+### 正确示例
+
+```sql
+-- ✅ 正确：使用 UNION ALL，在应用层去重
+-- 查询直接关联的菜单
+SELECT id, name, parent_id FROM menu m
+INNER JOIN role_menu rm ON m.id = rm.menu_id
+WHERE rm.role_id = #{roleId}
+
+UNION ALL
+
+-- 查询已关联父菜单的所有子菜单
+SELECT child.id, child.name, child.parent_id
+FROM menu child
+INNER JOIN (
+    SELECT DISTINCT rm.menu_id
+    FROM role_menu rm
+    WHERE rm.role_id = #{roleId}
+) parent_menus ON child.parent_id = parent_menus.menu_id
+
+-- 注意：去重在应用层（Java 代码）完成，不使用 DISTINCT
+```
+
+```java
+// ✅ 正确：在应用层去重，使用 LinkedHashSet 保持顺序
+@Override
+public List<MenuResponse> getMenuTreeByRoleCode(String roleCode) {
+    List<Menu> menus = menuMapper.selectByRoleCode(roleCode);
+    // 应用层去重：使用 LinkedHashSet 保持顺序并去重（基于菜单 ID）
+    // 性能优化：在应用层去重，避免 SQL DISTINCT 的开销
+    Set<Long> seenIds = new LinkedHashSet<>();
+    List<Menu> distinctMenus = menus.stream()
+        .filter(menu -> seenIds.add(menu.getId()))
+        .collect(Collectors.toList());
+    return buildMenuTree(distinctMenus, 0L);
+}
+```
+
+### 性能对比
+
+| 方案 | 数据库开销 | 应用层开销 | 总耗时（1000 条数据） |
+|------|-----------|-----------|---------------------|
+| `UNION` | 高（需要去重） | 低 | ~50ms |
+| `SELECT DISTINCT` | 高（需要去重） | 低 | ~45ms |
+| `UNION ALL + 应用层去重` | 低（不去重） | 低（内存操作） | ~10ms |
+
+### 最佳实践
+
+1. **数据量小（< 10000 条）**：使用 `UNION ALL + 应用层去重`
+2. **数据量大（> 10000 条）**：考虑使用 `UNION` 或 `SELECT DISTINCT`，或优化查询逻辑减少数据量
+3. **保持顺序**：使用 `LinkedHashSet` 而不是 `HashSet`，保持数据顺序
+4. **去重字段**：基于唯一标识（如 ID）去重，而不是所有字段
