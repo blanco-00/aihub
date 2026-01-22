@@ -172,11 +172,8 @@ AIHub/
 - **[Docker Compose 部署指南](./docs/deployment/docker-compose.md)** - 使用 Docker Compose 一键部署
 
 ### 📋 开发规范
-- **[Java 代码规范](.cursor/rules/java-code-style.mdc)** - Import规范、代码简洁性、抽象复用、实用主义
-- **[日志规范](.cursor/rules/logging.mdc)** - 日志等级使用、避免重复日志
-- **[文档规范](.cursor/rules/documentation.mdc)** - 代码文档对应要求、文档同步更新
-- **[前端UI/UX设计规范](.cursor/rules/frontend-ui-design.mdc)** - 布局、配色、组件使用、交互规范
-- **[规范管理](.cursor/rules/rule-management.mdc)** - 规范添加流程、规则文件组织
+- **[OpenCode Skills](.opencode/skills/README.md)** - AI智能代理开发技能集（Java/前端/数据库/功能开发）
+- **[AGENTS.md](./AGENTS.md)** - 快速开发指南（构建命令、代码规范摘要）
 
 > **文档规范**: 所有代码相关的功能、模块、架构设计都应该在 `docs/` 目录下有对应的设计文档说明。文档应该与代码保持同步更新。
 
