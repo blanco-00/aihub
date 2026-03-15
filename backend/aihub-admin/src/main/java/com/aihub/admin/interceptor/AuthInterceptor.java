@@ -42,6 +42,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             "/api/auth/reset-password",
             "/api/auth/refresh",
             "/api/init/",
+            "/api/init",
+            "/api/ai/chat",
             "/error"
     );
     

@@ -2,6 +2,8 @@ package com.aihub.admin.controller;
 
 import com.aihub.admin.annotation.OperationLog;
 import com.aihub.common.web.dto.Result;
+import com.aihub.admin.dto.request.InitSuperAdminRequest;
+import com.aihub.admin.dto.response.DatabaseStatusResponse;
 import com.aihub.admin.dto.request.LoginRequest;
 import com.aihub.admin.dto.response.LoginResponse;
 import com.aihub.admin.dto.request.RefreshTokenRequest;
@@ -11,6 +13,7 @@ import com.aihub.admin.dto.response.ForgotPasswordResponse;
 import com.aihub.admin.dto.request.ResetPasswordRequest;
 import com.aihub.admin.dto.response.UserListResponse;
 import com.aihub.common.web.exception.BusinessException;
+import com.aihub.admin.service.InitializationService;
 import com.aihub.admin.service.AuthService;
 import com.aihub.admin.service.LoginLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -308,5 +311,26 @@ public class AuthController {
             log.error("获取安全日志失败", e);
             throw e;
         }
+    }
+    
+    @Autowired
+    private InitializationService initializationService;
+    
+    @GetMapping("/init/status")
+    public Result<Boolean> getInitStatus() {
+        boolean initialized = initializationService.isInitialized();
+        return Result.success(initialized);
+    }
+
+    @GetMapping("/init/database/status")
+    public Result<DatabaseStatusResponse> getDatabaseStatus() {
+        DatabaseStatusResponse status = initializationService.checkDatabaseStatus();
+        return Result.success(status);
+    }
+
+    @PostMapping("/init/super-admin")
+    public Result<Void> createSuperAdmin(@Valid @RequestBody InitSuperAdminRequest request) {
+        initializationService.createSuperAdmin(request);
+        return Result.success(null);
     }
 }
