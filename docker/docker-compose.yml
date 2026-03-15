@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MySQL 数据库
   mysql:
@@ -16,7 +14,7 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ../docs/sql/init/init_v1.0.0.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - /Users/dong.bai/Work/AI/AIHub/docs/sql/init/init_v1.0.0.sql:/docker-entrypoint-initdb.d/init.sql:ro
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci

@@ -70,6 +70,7 @@ menus:
   pureSysManagement: System Manage
   pureModelManagement: Model Management
   pureModelConfig: Model Config
+  pureModelChat: AI Chat
   pureUser: User Manage
   pureRole: Role Manage
   pureSystemMenu: Menu Manage

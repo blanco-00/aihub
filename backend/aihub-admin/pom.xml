@@ -24,6 +24,13 @@
             <artifactId>aihub-common</artifactId>
         </dependency>
 
+        <!-- 依赖 AI 基础设施模块 -->
+        <dependency>
+            <groupId>com.aihub</groupId>
+            <artifactId>aihub-ai-infrastructure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -70,6 +70,7 @@ menus:
   pureSysManagement: 系统管理
   pureModelManagement: 模型管理
   pureModelConfig: 模型配置
+  pureModelChat: AI聊天
   pureUser: 用户管理
   pureRole: 角色管理
   pureSystemMenu: 菜单管理
