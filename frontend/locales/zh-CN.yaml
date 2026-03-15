@@ -68,6 +68,8 @@ menus:
   pureEmpty: 无Layout页
   pureTable: 表格
   pureSysManagement: 系统管理
+  pureModelManagement: 模型管理
+  pureModelConfig: 模型配置
   pureUser: 用户管理
   pureRole: 角色管理
   pureSystemMenu: 菜单管理

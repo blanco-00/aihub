@@ -68,6 +68,8 @@ menus:
   pureEmpty: Empty Page
   pureTable: Table
   pureSysManagement: System Manage
+  pureModelManagement: Model Management
+  pureModelConfig: Model Config
   pureUser: User Manage
   pureRole: Role Manage
   pureSystemMenu: Menu Manage

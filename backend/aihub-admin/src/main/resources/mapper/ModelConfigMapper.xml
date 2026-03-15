@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.ModelConfigMapper">
+
+    <select id="findByVendorAndModelId" resultType="com.aihub.admin.entity.ModelConfig">
+        SELECT
+            id, name, vendor, model_id, api_key, base_url, status, config,
+            created_at, updated_at, is_deleted
+        FROM model_config
+        WHERE vendor = #{vendor}
+        AND model_id = #{modelId}
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectEnabledModels" resultType="com.aihub.admin.entity.ModelConfig">
+        SELECT
+            id, name, vendor, model_id, api_key, base_url, status, config,
+            created_at, updated_at, is_deleted
+        FROM model_config
+        WHERE status = 1
+        AND is_deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="countEnabledModels" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM model_config
+        WHERE status = 1
+        AND is_deleted = 0
+    </select>
+
+</mapper>
