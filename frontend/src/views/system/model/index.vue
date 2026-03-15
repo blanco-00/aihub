@@ -3,8 +3,9 @@ defineOptions({
   name: "SystemModelConfig"
 });
 
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, h } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import type { TableColumnData } from "@pureadmin/table";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { PureTableBar } from "@/components/RePureTableBar";
 import {
@@ -45,34 +46,32 @@ const vendorOptions = [
   { label: "Azure", value: "azure" },
   { label: "百度", value: "baidu" },
   { label: "阿里", value: "ali" },
-  { label: "腾讯", value: "tencent" }
+  { label: "腾讯", value: "tencent" },
+  { label: "智谱", value: "zhipuai" }
 ];
 
-const columns = [
+const vendorMap: Record<string, string> = {
+  openai: "OpenAI",
+  anthropic: "Anthropic",
+  azure: "Azure",
+  baidu: "百度",
+  ali: "阿里",
+  tencent: "腾讯",
+  zhipuai: "智谱"
+};
+
+const columns: TableColumnData[] = [
   {
-    label: "ID",
-    prop: "id",
-    minWidth: 80
-  },
-  {
-    label: "名称",
+    label: "模型名称",
     prop: "name",
-    minWidth: 150
+    minWidth: 120
   },
   {
     label: "厂商",
     prop: "vendor",
-    minWidth: 120,
+    minWidth: 100,
     cellRenderer: ({ row }: { row: ModelConfig }) => {
-      const vendorMap: Record<string, string> = {
-        openai: "OpenAI",
-        anthropic: "Anthropic",
-        azure: "Azure",
-        baidu: "百度",
-        ali: "阿里",
-        tencent: "腾讯"
-      };
-      return vendorMap[row.vendor] || row.vendor;
+      return h("span", vendorMap[row.vendor] || row.vendor);
     }
   },
   {

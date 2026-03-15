@@ -194,4 +194,15 @@ public class ModelChatController {
             return Result.error(e.getMessage());
         }
     }
+
+    @GetMapping("/models")
+    public Result<List<String>> getModels(@RequestParam String vendor, @RequestParam String apiKey, @RequestParam(required = false) String baseUrl) {
+        try {
+            List<String> models = modelGateway.getModels(vendor, apiKey, baseUrl);
+            return Result.success(models);
+        } catch (Exception e) {
+            log.error("Get models error: vendor={}, error={}", vendor, e.getMessage(), e);
+            return Result.error("获取模型失败: " + e.getMessage());
+        }
+    }
 }

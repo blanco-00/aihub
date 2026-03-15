@@ -125,3 +125,9 @@ export const getTestHistory = (params: {
 }) => {
   return http.request<any>("get", "/api/ai/chat/history", { params });
 };
+
+export const getModelList = (vendor: string, apiKey: string, baseUrl?: string) => {
+  return http.request<any>("get", "/api/ai/chat/models", {
+    params: { vendor, apiKey, baseUrl },
+  });
+};

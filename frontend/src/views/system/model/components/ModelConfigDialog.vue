@@ -3,12 +3,13 @@ defineOptions({
   name: "ModelConfigDialog",
 });
 
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import {
   createModelConfig,
   updateModelConfig,
+  getModelList,
   type ModelConfig,
   type CreateModelConfigRequest,
   type UpdateModelConfigRequest,
@@ -23,6 +24,7 @@ const dialogTitle = ref("");
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 const submitLoading = ref(false);
+const modelLoading = ref(false);
 
 const formData = reactive<CreateModelConfigRequest & { id?: number }>({
   name: "",
@@ -41,7 +43,10 @@ const vendorOptions = [
   { label: "百度", value: "baidu" },
   { label: "阿里", value: "ali" },
   { label: "腾讯", value: "tencent" },
+  { label: "智谱", value: "zhipuai" },
 ];
+
+const modelOptions = ref<string[]>([]);
 
 const formRules: FormRules = {
   name: [
@@ -50,7 +55,7 @@ const formRules: FormRules = {
   ],
   vendor: [{ required: true, message: "请选择厂商", trigger: "change" }],
   modelId: [
-    { required: true, message: "请输入模型ID", trigger: "blur" },
+    { required: true, message: "请输入或选择模型ID", trigger: "blur" },
     { min: 1, max: 100, message: "长度在 1 到 100 个字符", trigger: "blur" },
   ],
   apiKey: [
@@ -67,9 +72,42 @@ const formRules: FormRules = {
   status: [{ required: true, message: "请选择状态", trigger: "change" }],
 };
 
+const fetchModels = async () => {
+  if (!formData.vendor || !formData.apiKey) {
+    ElMessage.warning("请先选择厂商并输入API Key");
+    return;
+  }
+
+  modelLoading.value = true;
+  try {
+    const res = await getModelList(
+      formData.vendor,
+      formData.apiKey,
+      formData.baseUrl || undefined
+    );
+    if (res.code === 200 && res.data) {
+      modelOptions.value = res.data;
+      if (res.data.length > 0) {
+        ElMessage.success(`成功获取 ${res.data.length} 个模型`);
+      } else {
+        ElMessage.warning("未获取到模型，请手动输入");
+      }
+    } else {
+      ElMessage.error(res.message || "获取模型列表失败");
+    }
+  } catch (error: any) {
+    console.error("获取模型列表失败", error);
+    const errMsg = error?.response?.data?.message || error?.message || "获取模型列表失败";
+    ElMessage.error(errMsg);
+  } finally {
+    modelLoading.value = false;
+  }
+};
+
 const openDialog = async (mode: "create" | "edit", row?: ModelConfig) => {
   dialogVisible.value = true;
   dialogTitle.value = mode === "create" ? "新增模型" : "编辑模型";
+  modelOptions.value = [];
 
   if (mode === "edit" && row) {
     formData.id = row.id;
@@ -180,6 +218,7 @@ defineExpose({
           v-model="formData.vendor"
           placeholder="请选择厂商"
           class="w-full!"
+          @change="modelOptions = []"
         >
           <el-option
             v-for="option in vendorOptions"
@@ -190,15 +229,6 @@ defineExpose({
         </el-select>
       </el-form-item>
 
-      <el-form-item label="模型ID" prop="modelId">
-        <el-input
-          v-model="formData.modelId"
-          placeholder="请输入模型ID，如：gpt-4"
-          clearable
-          maxlength="100"
-        />
-      </el-form-item>
-
       <el-form-item label="API Key" prop="apiKey">
         <el-input
           v-model="formData.apiKey"
@@ -207,15 +237,62 @@ defineExpose({
           placeholder="请输入API Key"
           show-password
           maxlength="500"
+          @input="modelOptions = []"
         />
       </el-form-item>
 
       <el-form-item label="Base URL" prop="baseUrl">
-        <el-input
-          v-model="formData.baseUrl"
-          placeholder="请输入Base URL，如：https://api.openai.com/v1"
-          clearable
-        />
+        <div class="w-full">
+          <el-input
+            v-model="formData.baseUrl"
+            placeholder="可选，不填则使用厂商默认地址"
+            clearable
+          >
+            <template #append>
+              <el-tooltip content="智谱默认: https://open.bigmodel.cn/api/paas/v4">
+                <el-button>?</el-button>
+              </el-tooltip>
+            </template>
+          </el-input>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="模型ID" prop="modelId">
+        <div class="flex gap-2 w-full">
+          <el-select
+            v-model="formData.modelId"
+            placeholder="请选择或输入模型ID"
+            filterable
+            allow-create
+            clearable
+            class="flex-1!"
+            :disabled="!formData.vendor || !formData.apiKey"
+          >
+            <el-option
+              v-for="model in modelOptions"
+              :key="model"
+              :label="model"
+              :value="model"
+            />
+            <el-option
+              v-if="modelOptions.length === 0 && formData.vendor && formData.apiKey"
+              label="点击获取模型或手动输入"
+              value=""
+              disabled
+            />
+          </el-select>
+          <el-button
+            :loading="modelLoading"
+            :disabled="!formData.vendor || !formData.apiKey"
+            type="primary"
+            @click="fetchModels"
+          >
+            获取模型
+          </el-button>
+        </div>
+        <div class="text-xs text-gray-500 mt-1" v-if="!formData.apiKey">
+          请先填写API Key后点击"获取模型"
+        </div>
       </el-form-item>
 
       <el-form-item label="状态" prop="status">
