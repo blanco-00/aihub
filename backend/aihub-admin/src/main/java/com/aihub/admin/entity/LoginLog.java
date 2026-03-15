@@ -30,10 +30,19 @@ public class LoginLog {
     @TableField("user_agent")
     private String userAgent;
     
-    private Integer status;
-    
-    private String message;
-    
+    @TableField("nickname")
+    private String nickname;
+
     @TableField("login_time")
     private LocalDateTime loginTime;
+    
+    /**
+     * 登录状态: 1-成功, 0-失败
+     */
+    private Integer status;
+    
+    /**
+     * 登录消息/备注
+     */
+    private String message;
 }
