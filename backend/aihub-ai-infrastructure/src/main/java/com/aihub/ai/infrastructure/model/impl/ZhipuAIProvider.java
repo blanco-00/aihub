@@ -95,9 +95,13 @@ public class ZhipuAIProvider implements ModelProvider {
 
     private String buildUrl(String baseUrl, String path) {
         if (baseUrl == null || baseUrl.isEmpty()) {
-            baseUrl = "https://open.bigmodel.cn/api/paas/v4";
+            baseUrl = "https://open.bigmodel.cn/api/paas";
         }
-        return baseUrl.endsWith("/") ? baseUrl + path : baseUrl + path;
+        String base = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+        if (base.endsWith("/v4")) {
+            base = base.substring(0, base.length() - 3);
+        }
+        return base + path;
     }
 
     private String extractContent(String body) {
