@@ -27,7 +27,7 @@ const messageContainerRef = ref<HTMLElement>();
 const modelList = ref<ModelConfig[]>([]);
 const selectedModelId = ref<number | null>(null);
 const selectedModel = ref<ModelConfig | null>(null);
-const modelHealthy = ref(false);
+const modelHealthy = ref<boolean | null>(null); // null 表示未检查
 
 const vendorMap: Record<string, string> = {
   openai: "OpenAI",
@@ -70,8 +70,8 @@ const sendMessage = async () => {
     const response = await chatWithModel(selectedModelId.value!, content);
 
     if (response.code === 200 && response.data) {
-      const modelContent =
-        response.data.response || response.data.text || response.data;
+      // 后端返回 Result.success(response)，data 已经是实际响应内容
+      const modelContent = response.data;
       messages.value.push({
         id: userMsgId + 1,
         role: "model",
@@ -82,7 +82,7 @@ const sendMessage = async () => {
       messages.value.push({
         id: userMsgId + 1,
         role: "model",
-        content: `[错误] ${response.message || response.error || "未知错误"}`,
+        content: `[错误] ${response.message || "未知错误"}`,
         timestamp: new Date().toISOString()
       });
     }
@@ -121,14 +121,19 @@ const clearChat = () => {
 const handleModelChange = async () => {
   selectedModel.value =
     modelList.value.find(m => m.id === selectedModelId.value) || null;
-  if (selectedModelId.value) {
-    try {
-      const result = await checkModelHealth(selectedModelId.value);
-      modelHealthy.value = result.code === 200 && result.data === true;
-    } catch {
-      modelHealthy.value = false;
-    }
-  } else {
+  
+  if (!selectedModelId.value) {
+    modelHealthy.value = null;
+    return;
+  }
+  
+  // 开始检查时设置为 null，表示正在检查
+  modelHealthy.value = null;
+  
+  try {
+    const result = await checkModelHealth(selectedModelId.value);
+    modelHealthy.value = result.code === 200 && result.data === true;
+  } catch {
     modelHealthy.value = false;
   }
 };
@@ -173,11 +178,18 @@ onMounted(() => {
           />
         </el-select>
         <el-tag
-          v-if="selectedModel"
+          v-if="selectedModel && modelHealthy !== null"
           :type="modelHealthy ? 'success' : 'danger'"
           style="margin-left: 12px"
         >
           {{ modelHealthy ? "可用" : "不可用" }}
+        </el-tag>
+        <el-tag
+          v-else-if="selectedModel && modelHealthy === null"
+          type="warning"
+          style="margin-left: 12px"
+        >
+          检查中...
         </el-tag>
       </div>
       <div class="header-actions">

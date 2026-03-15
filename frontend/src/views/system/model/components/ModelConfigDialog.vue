@@ -46,6 +46,17 @@ const vendorOptions = [
   { label: "智谱", value: "zhipuai" },
 ];
 
+// 厂商默认Base URL映射
+const vendorDefaultUrls: Record<string, string> = {
+  openai: "https://api.openai.com/v1",
+  anthropic: "https://api.anthropic.com",
+  azure: "https://{resource}.openai.azure.com",
+  baidu: "https://qianfan.aios.baidu.com",
+  ali: "https://dashscope.aliyuncs.com/api/v1",
+  tencent: "https://hunyuan.tencentcloudapi.com",
+  zhipuai: "https://open.bigmodel.cn/api/paas/v4",
+};
+
 const modelOptions = ref<string[]>([]);
 
 const formRules: FormRules = {
@@ -70,6 +81,15 @@ const formRules: FormRules = {
     },
   ],
   status: [{ required: true, message: "请选择状态", trigger: "change" }],
+};
+
+// 厂商选择变化时自动填充默认URL
+const handleVendorChange = () => {
+  modelOptions.value = [];
+  // 只有在baseUrl为空时才填充默认值，允许用户覆盖
+  if (formData.vendor && !formData.baseUrl && vendorDefaultUrls[formData.vendor]) {
+    formData.baseUrl = vendorDefaultUrls[formData.vendor];
+  }
 };
 
 const fetchModels = async () => {
@@ -218,7 +238,7 @@ defineExpose({
           v-model="formData.vendor"
           placeholder="请选择厂商"
           class="w-full!"
-          @change="modelOptions = []"
+          @change="handleVendorChange"
         >
           <el-option
             v-for="option in vendorOptions"

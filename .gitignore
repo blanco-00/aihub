@@ -52,6 +52,27 @@ uploads/
 coverage/
 .nyc_output/
 
+# 测试截图和输出文件
+*screenshot*.png
+*screenshot*.jpg
+*screenshot*.jpeg
+chat-*.png
+page-*.png
+menu-*.png
+console.txt
+console*.log
+console*.txt
+
+# Playwright/Cypress 测试输出
+playwright-report/
+test-results/
+playwright/.cache/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+test-output/
+test-screenshots/
+
 # 锁文件（可选，根据团队约定）
 # pnpm-lock.yaml
 # package-lock.json

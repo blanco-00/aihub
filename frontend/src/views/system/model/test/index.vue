@@ -70,20 +70,21 @@ const sendMessage = async () => {
     });
 
     // Add model response
-    if (response.data) {
+    if (response.code === 200 && response.data) {
+      // 后端返回 Result.success(response)，data 已经是实际响应内容
       messages.value.push({
         id: currentMessageId.value + 1,
         role: "model",
-        content: response.data.response || response.data,
+        content: response.data,
         timestamp: new Date().toISOString(),
       });
 
       currentMessageId.value = currentMessageId.value + 2;
-    } else if (response.error) {
+    } else if (response.code !== 200) {
       messages.value.push({
         id: currentMessageId.value + 1,
         role: "model",
-        content: `[错误] ${response.error || "未知错误"}`,
+        content: `[错误] ${response.message || "未知错误"}`,
         timestamp: new Date().toISOString(),
       });
     }
@@ -107,11 +108,11 @@ const handleModelChange = async () => {
   try {
     const health = await checkModelHealth(modelId);
 
-    if (health && health.data) {
+    if (health.code === 200 && health.data === true) {
       ElMessage.success(`模型 "${selectedModelName.value}" 可用`);
     } else {
       ElMessage.warning(
-        `模型 "${selectedModelName.value}" 不可用: ${health?.error || "未知错误"}`,
+        `模型 "${selectedModelName.value}" 不可用: ${health.message || "未知错误"}`,
       );
       selectedModelId.value = null;
       selectedModelName.value = "";
