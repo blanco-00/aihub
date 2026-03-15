@@ -8,7 +8,7 @@ export interface schemaItem {
 }
 
 defineOptions({
-  name: "About"
+  name: "About",
 });
 
 const { pkg } = __APP_INFO__;
@@ -42,18 +42,18 @@ const words = [
   "tailwindcss",
   "typescript",
   "vite",
-  "vue-tsc"
+  "vue-tsc",
 ];
 
 const getMainLabel = computed(
-  () => (label: string) => words.find(w => w === label) && "main-label"
+  () => (label: string) => words.find((w) => w === label) && "main-label",
 );
 
-Object.keys(dependencies).forEach(key => {
+Object.keys(dependencies).forEach((key) => {
   schema.push({ field: dependencies[key], label: key });
 });
 
-Object.keys(devDependencies).forEach(key => {
+Object.keys(devDependencies).forEach((key) => {
   devSchema.push({ field: devDependencies[key], label: key });
 });
 </script>

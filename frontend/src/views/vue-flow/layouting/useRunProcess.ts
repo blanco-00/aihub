@@ -22,11 +22,11 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
     upcomingTasks.add(node.id);
 
     const incomers = getConnectedEdges(node.id).filter(
-      connection => connection.target === node.id
+      (connection) => connection.target === node.id,
     );
 
     await Promise.all(
-      incomers.map(incomer => until(() => !incomer.data.isAnimating))
+      incomers.map((incomer) => until(() => !incomer.data.isAnimating)),
     );
 
     upcomingTasks.clear();
@@ -41,12 +41,12 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
       isRunning: true,
       isFinished: false,
       hasError: false,
-      isCancelled: false
+      isCancelled: false,
     });
 
     const delay = Math.floor(Math.random() * 2000) + 1000;
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const timeout = setTimeout(
         async () => {
           const children = graph.value.successors(node.id);
@@ -71,13 +71,13 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
           runningTasks.delete(node.id);
 
           if (children.length > 0) {
-            await Promise.all(children.map(id => runNode({ id })));
+            await Promise.all(children.map((id) => runNode({ id })));
           }
 
           // @ts-expect-error
           resolve();
         },
-        isStart ? 0 : delay
+        isStart ? 0 : delay,
       );
 
       runningTasks.set(node.id, timeout);
@@ -94,10 +94,10 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
     isRunning.value = true;
 
     const startingNodes = nodes.filter(
-      node => graph.value.predecessors(node.id)?.length === 0
+      (node) => graph.value.predecessors(node.id)?.length === 0,
     );
 
-    await Promise.all(startingNodes.map(node => runNode(node, true)));
+    await Promise.all(startingNodes.map((node) => runNode(node, true)));
 
     clear();
   }
@@ -111,7 +111,7 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
         isFinished: false,
         hasError: false,
         isSkipped: false,
-        isCancelled: false
+        isCancelled: false,
       });
     }
   }
@@ -137,7 +137,7 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
         isFinished: false,
         hasError: false,
         isSkipped: false,
-        isCancelled: true
+        isCancelled: true,
       });
       await skipDescendants(nodeId);
     }
@@ -150,7 +150,7 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
         isFinished: false,
         hasError: false,
         isSkipped: false,
-        isCancelled: true
+        isCancelled: true,
       });
       await skipDescendants(nodeId);
     }
@@ -169,7 +169,7 @@ export function useRunProcess({ graph: dagreGraph, cancelOnError = true }) {
 }
 
 async function until(condition) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const interval = setInterval(() => {
       if (condition()) {
         clearInterval(interval);

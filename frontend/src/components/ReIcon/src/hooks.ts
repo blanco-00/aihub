@@ -18,7 +18,7 @@ export function useRenderIcon(icon: any, attrs?: iconType): Component {
     const name = icon.split(ifReg)[1];
     const iconName = name.slice(
       0,
-      name.indexOf(" ") == -1 ? name.length : name.indexOf(" ")
+      name.indexOf(" ") == -1 ? name.length : name.indexOf(" "),
     );
     const iconType = name.slice(name.indexOf(" ") + 1, name.length);
     return defineComponent({
@@ -27,9 +27,9 @@ export function useRenderIcon(icon: any, attrs?: iconType): Component {
         return h(FontIcon, {
           icon: iconName,
           iconType,
-          ...attrs
+          ...attrs,
         });
-      }
+      },
     });
   } else if (typeof icon === "function" || typeof icon?.render === "function") {
     // svg
@@ -40,9 +40,9 @@ export function useRenderIcon(icon: any, attrs?: iconType): Component {
       render() {
         return h(IconifyIconOffline, {
           icon: icon,
-          ...attrs
+          ...attrs,
         });
-      }
+      },
     });
   } else {
     // 通过是否存在 : 符号来判断是在线还是本地图标，存在即是在线图标，反之
@@ -55,9 +55,9 @@ export function useRenderIcon(icon: any, attrs?: iconType): Component {
           : IconifyIconOffline;
         return h(IconifyIcon, {
           icon,
-          ...attrs
+          ...attrs,
         });
-      }
+      },
     });
   }
 }

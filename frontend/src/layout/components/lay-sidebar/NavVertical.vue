@@ -16,8 +16,8 @@ const route = useRoute();
 const isShow = ref(false);
 const showLogo = ref(
   storageLocal().getItem<StorageConfigs>(
-    `${responsiveStorageNameSpace()}configure`
-  )?.showLogo ?? true
+    `${responsiveStorageNameSpace()}configure`,
+  )?.showLogo ?? true,
 );
 
 const {
@@ -26,7 +26,7 @@ const {
   isCollapse,
   tooltipEffect,
   menuSelect,
-  toggleSideBar
+  toggleSideBar,
 } = useNav();
 
 const subMenuData = ref([]);
@@ -38,11 +38,11 @@ const menuData = computed(() => {
 });
 
 const loading = computed(() =>
-  pureApp.layout === "mix" ? false : menuData.value.length === 0 ? true : false
+  pureApp.layout === "mix" ? false : menuData.value.length === 0 ? true : false,
 );
 
 const defaultActive = computed(() =>
-  !isAllEmpty(route.meta?.activePath) ? route.meta.activePath : route.path
+  !isAllEmpty(route.meta?.activePath) ? route.meta.activePath : route.path,
 );
 
 function getSubMenuData() {
@@ -52,12 +52,12 @@ function getSubMenuData() {
   // path的上级路由组成的数组
   const parentPathArr = getParentPaths(
     path,
-    usePermissionStoreHook().wholeMenus
+    usePermissionStoreHook().wholeMenus,
   );
   // 当前路由的父级路由信息
   const parenetRoute = findRouteByPath(
     parentPathArr[0] || path,
-    usePermissionStoreHook().wholeMenus
+    usePermissionStoreHook().wholeMenus,
   );
   if (!parenetRoute?.children) return;
   subMenuData.value = parenetRoute?.children;
@@ -69,13 +69,13 @@ watch(
     if (route.path.includes("/redirect")) return;
     getSubMenuData();
     menuSelect(route.path);
-  }
+  },
 );
 
 onMounted(() => {
   getSubMenuData();
 
-  emitter.on("logoChange", key => {
+  emitter.on("logoChange", (key) => {
     showLogo.value = key;
   });
 });

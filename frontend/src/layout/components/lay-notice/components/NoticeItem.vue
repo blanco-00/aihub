@@ -9,8 +9,8 @@ import { message } from "@/utils/message";
 const props = defineProps({
   noticeItem: {
     type: Object as PropType<ListItem>,
-    default: () => {}
-  }
+    default: () => {},
+  },
 });
 
 const emit = defineEmits<{
@@ -174,7 +174,7 @@ function hoverDescription(event, description) {
       line-height: 1.5;
       cursor: pointer;
       color: #000000d9;
-      
+
       .dark & {
         color: #ffffff;
       }
@@ -210,7 +210,7 @@ function hoverDescription(event, description) {
       margin-bottom: 6px;
       margin-top: 2px;
       word-break: break-word;
-      
+
       .dark & {
         color: #ffffffa6;
       }
@@ -221,7 +221,7 @@ function hoverDescription(event, description) {
       line-height: 1.5;
       margin-top: 4px;
       color: #00000073;
-      
+
       .dark & {
         color: #ffffff73;
       }

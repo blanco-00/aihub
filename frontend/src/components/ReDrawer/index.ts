@@ -7,7 +7,7 @@ import type {
   ArgsType,
   DrawerProps,
   DrawerOptions,
-  ButtonProps
+  ButtonProps,
 } from "./type";
 
 const drawerStore = ref<Array<DrawerOptions>>([]);
@@ -60,5 +60,5 @@ export {
   addDrawer,
   closeDrawer,
   updateDrawer,
-  closeAllDrawer
+  closeAllDrawer,
 };

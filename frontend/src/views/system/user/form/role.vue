@@ -8,16 +8,20 @@ const props = withDefaults(defineProps<RoleFormProps>(), {
     username: "",
     nickname: "",
     roleOptions: [],
-    ids: []
-  })
+    ids: [],
+  }),
 });
 
 const newFormInline = ref(props.formInline);
 
 // 监听 formInline 变化，同步到 newFormInline
-watch(() => props.formInline, (newVal) => {
-  newFormInline.value = { ...newVal };
-}, { deep: true, immediate: true });
+watch(
+  () => props.formInline,
+  (newVal) => {
+    newFormInline.value = { ...newVal };
+  },
+  { deep: true, immediate: true },
+);
 
 function getFormData() {
   return newFormInline.value;

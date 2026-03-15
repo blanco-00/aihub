@@ -9,7 +9,7 @@ export default {
     icon: "ri/terminal-window-line",
     title: $t("menus.pureFormDesign"),
     rank: formdesign,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -21,8 +21,8 @@ export default {
         keepAlive: true,
         frameSrc:
           "https://haixin-fang.github.io/vue-form-design/playground/index.html",
-        frameLoading: false
-      }
-    }
-  ]
+        frameLoading: false,
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

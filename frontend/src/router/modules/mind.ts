@@ -9,7 +9,7 @@ export default {
     icon: "ri/mind-map",
     title: $t("menus.pureMindMap"),
     rank: mind,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -19,8 +19,8 @@ export default {
       meta: {
         title: $t("menus.pureMindMap"),
         keepAlive: true,
-        frameSrc: "https://wanglin2.github.io/mind-map/#/"
-      }
-    }
-  ]
+        frameSrc: "https://wanglin2.github.io/mind-map/#/",
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

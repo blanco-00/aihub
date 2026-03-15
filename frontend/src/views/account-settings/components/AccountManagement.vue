@@ -6,7 +6,7 @@ import { updatePassword, getMine, type UserInfo } from "@/api/user";
 import type { FormInstance, FormRules } from "element-plus";
 
 defineOptions({
-  name: "AccountManagement"
+  name: "AccountManagement",
 });
 
 const passwordDialogVisible = ref(false);
@@ -16,14 +16,14 @@ const passwordFormRef = ref<FormInstance>();
 const passwordForm = reactive({
   oldPassword: "",
   newPassword: "",
-  confirmPassword: ""
+  confirmPassword: "",
 });
 
 const passwordRules = reactive<FormRules>({
   oldPassword: [{ required: true, message: "请输入当前密码", trigger: "blur" }],
   newPassword: [
     { required: true, message: "请输入新密码", trigger: "blur" },
-    { min: 6, message: "密码长度不能少于6位", trigger: "blur" }
+    { min: 6, message: "密码长度不能少于6位", trigger: "blur" },
   ],
   confirmPassword: [
     { required: true, message: "请确认新密码", trigger: "blur" },
@@ -35,9 +35,9 @@ const passwordRules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: "blur"
-    }
-  ]
+      trigger: "blur",
+    },
+  ],
 });
 
 // 用户信息
@@ -72,7 +72,7 @@ const onSubmitPassword = async (formEl: FormInstance) => {
       try {
         await updatePassword({
           oldPassword: passwordForm.oldPassword,
-          newPassword: passwordForm.newPassword
+          newPassword: passwordForm.newPassword,
         });
         message("修改密码成功", { type: "success" });
         passwordDialogVisible.value = false;
@@ -125,29 +125,29 @@ const list = ref([
     title: "账户密码",
     illustrate: `当前密码强度：${getPasswordStrength()}`,
     button: "修改",
-    action: "password"
+    action: "password",
   },
   {
     title: "密保手机",
     illustrate: `已经绑定手机：${getMaskedPhone()}`,
     button: "修改",
     action: "phone",
-    disabled: true
+    disabled: true,
   },
   {
     title: "密保问题",
     illustrate: "未设置密保问题，密保问题可有效保护账户安全",
     button: "修改",
     action: "question",
-    disabled: true
+    disabled: true,
   },
   {
     title: "备用邮箱",
     illustrate: `已绑定邮箱：${getMaskedEmail()}`,
     button: "修改",
     action: "email",
-    disabled: true
-  }
+    disabled: true,
+  },
 ]);
 
 function onClick(item: any) {
@@ -155,7 +155,7 @@ function onClick(item: any) {
     message("该功能暂未实现", { type: "info" });
     return;
   }
-  
+
   if (item.action === "password") {
     openPasswordDialog();
   } else {
@@ -171,7 +171,7 @@ loadUserInfo();
   <div
     :class="[
       'min-w-[180px]',
-      deviceDetection() ? 'max-w-[100%]' : 'max-w-[70%]'
+      deviceDetection() ? 'max-w-[100%]' : 'max-w-[70%]',
     ]"
   >
     <h3 class="my-8!">账户管理</h3>
@@ -181,9 +181,9 @@ loadUserInfo();
           <p>{{ item.title }}</p>
           <el-text class="mx-1" type="info">{{ item.illustrate }}</el-text>
         </div>
-        <el-button 
-          type="primary" 
-          text 
+        <el-button
+          type="primary"
+          text
           :disabled="item.disabled"
           @click="onClick(item)"
         >
@@ -192,7 +192,7 @@ loadUserInfo();
       </div>
       <el-divider />
     </div>
-    
+
     <!-- 密码修改对话框 -->
     <el-dialog
       v-model="passwordDialogVisible"

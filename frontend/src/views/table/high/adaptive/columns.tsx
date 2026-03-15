@@ -1,7 +1,7 @@
 import type {
   LoadingConfig,
   AdaptiveConfig,
-  PaginationProps
+  PaginationProps,
 } from "@pureadmin/table";
 import { tableData } from "../data";
 import { ref, onMounted, reactive } from "vue";
@@ -13,16 +13,16 @@ export function useColumns() {
   const columns: TableColumnList = [
     {
       label: "日期",
-      prop: "date"
+      prop: "date",
     },
     {
       label: "姓名",
-      prop: "name"
+      prop: "name",
     },
     {
       label: "地址",
-      prop: "address"
-    }
+      prop: "address",
+    },
   ];
 
   /** 分页配置 */
@@ -33,7 +33,7 @@ export function useColumns() {
     total: 0,
     align: "right",
     background: true,
-    size: "default"
+    size: "default",
   });
 
   /** 加载动画配置 */
@@ -49,7 +49,7 @@ export function useColumns() {
           A 15 15, 0, 1, 1, 27.99 7.5
           L 15 15
         " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
-      `
+      `,
     // svg: "",
     // background: rgba()
   });
@@ -57,7 +57,7 @@ export function useColumns() {
   /** 撑满内容区自适应高度相关配置 */
   const adaptiveConfig: AdaptiveConfig = {
     /** 表格距离页面底部的偏移量，默认值为 `96` */
-    offsetBottom: 110
+    offsetBottom: 110,
     /** 是否固定表头，默认值为 `true`（如果不想固定表头，fixHeader设置为false并且表格要设置table-layout="auto"） */
     // fixHeader: true
     /** 页面 `resize` 时的防抖时间，默认值为 `60` ms */
@@ -100,6 +100,6 @@ export function useColumns() {
     loadingConfig,
     adaptiveConfig,
     onSizeChange,
-    onCurrentChange
+    onCurrentChange,
   };
 }

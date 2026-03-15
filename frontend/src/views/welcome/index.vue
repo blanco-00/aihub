@@ -15,7 +15,7 @@ import CheckLine from "~icons/ri/chat-check-line";
 import Smile from "~icons/ri/star-smile-line";
 
 defineOptions({
-  name: "Welcome"
+  name: "Welcome",
 });
 
 const { isDark } = useDark();
@@ -23,11 +23,11 @@ const { isDark } = useDark();
 let curWeek = ref(1); // 0上周、1本周
 const optionsBasis: Array<OptionsType> = [
   {
-    label: "上周"
+    label: "上周",
   },
   {
-    label: "本周"
-  }
+    label: "本周",
+  },
 ];
 
 // 响应式数据
@@ -40,7 +40,7 @@ const chartData = ref([
     name: "用户总数",
     value: 0,
     percent: "+0%",
-    data: []
+    data: [],
   },
   {
     icon: Question,
@@ -50,7 +50,7 @@ const chartData = ref([
     name: "今日新增",
     value: 0,
     percent: "+0%",
-    data: []
+    data: [],
   },
   {
     icon: CheckLine,
@@ -60,7 +60,7 @@ const chartData = ref([
     name: "今日登录",
     value: 0,
     percent: "+0%",
-    data: []
+    data: [],
   },
   {
     icon: Smile,
@@ -70,30 +70,32 @@ const chartData = ref([
     name: "总登录数",
     value: 0,
     percent: "+0%",
-    data: []
-  }
+    data: [],
+  },
 ]);
 
 const barChartData = ref([
   {
     requireData: [],
-    questionData: []
+    questionData: [],
   },
   {
     requireData: [],
-    questionData: []
-  }
+    questionData: [],
+  },
 ]);
 
-const progressData = ref([
-  { week: "周一", percentage: 85, duration: 110, color: "#41b6ff" },
-  { week: "周二", percentage: 86, duration: 105, color: "#41b6ff" },
-  { week: "周三", percentage: 88, duration: 100, color: "#41b6ff" },
-  { week: "周四", percentage: 89, duration: 95, color: "#41b6ff" },
-  { week: "周五", percentage: 94, duration: 90, color: "#26ce83" },
-  { week: "周六", percentage: 96, duration: 85, color: "#26ce83" },
-  { week: "周日", percentage: 100, duration: 80, color: "#26ce83" }
-].reverse());
+const progressData = ref(
+  [
+    { week: "周一", percentage: 85, duration: 110, color: "#41b6ff" },
+    { week: "周二", percentage: 86, duration: 105, color: "#41b6ff" },
+    { week: "周三", percentage: 88, duration: 100, color: "#41b6ff" },
+    { week: "周四", percentage: 89, duration: 95, color: "#41b6ff" },
+    { week: "周五", percentage: 94, duration: 90, color: "#26ce83" },
+    { week: "周六", percentage: 96, duration: 85, color: "#26ce83" },
+    { week: "周日", percentage: 100, duration: 80, color: "#26ce83" },
+  ].reverse(),
+);
 
 const latestNewsData = ref([]);
 const tableData = ref([]);
@@ -111,41 +113,41 @@ const loadStatistics = async () => {
         chartData.value[0].value = data.cards[0].value || 0;
         chartData.value[0].percent = `+${(data.cards[0].percent || 0).toFixed(0)}%`;
         chartData.value[0].data = data.cards[0].data || [];
-        
+
         chartData.value[1].value = data.cards[1].value || 0;
         chartData.value[1].percent = "+0%";
         chartData.value[1].data = data.cards[1].data || [];
-        
+
         chartData.value[2].value = data.cards[2].value || 0;
         chartData.value[2].percent = "+0%";
         chartData.value[2].data = data.cards[2].data || [];
-        
+
         chartData.value[3].value = data.cards[3].value || 0;
         chartData.value[3].percent = `+${(data.cards[3].percent || 0).toFixed(0)}%`;
         chartData.value[3].data = data.cards[3].data || [];
       }
-      
+
       // 更新图表数据
       if (data.chartData) {
         barChartData.value[0] = {
           requireData: data.chartData.lastWeek?.requireData || [],
-          questionData: data.chartData.lastWeek?.questionData || []
+          questionData: data.chartData.lastWeek?.questionData || [],
         };
         barChartData.value[1] = {
           requireData: data.chartData.thisWeek?.requireData || [],
-          questionData: data.chartData.thisWeek?.questionData || []
+          questionData: data.chartData.thisWeek?.questionData || [],
         };
       }
-      
+
       // 更新最新动态
       if (data.latestNews) {
         latestNewsData.value = data.latestNews.map((item: any) => ({
           date: item.date,
           requiredNumber: item.requiredNumber || 0,
-          resolveNumber: item.resolveNumber || 0
+          resolveNumber: item.resolveNumber || 0,
         }));
       }
-      
+
       // 更新表格数据
       if (data.tableData) {
         tableData.value = data.tableData.map((item: any, index: number) => ({
@@ -154,7 +156,7 @@ const loadStatistics = async () => {
           requiredNumber: item.requiredNumber || 0,
           questionNumber: item.questionNumber || 0,
           resolveNumber: item.resolveNumber || 0,
-          satisfaction: item.satisfaction || 95
+          satisfaction: item.satisfaction || 95,
         }));
       }
     }
@@ -185,14 +187,14 @@ onMounted(() => {
         :xs="24"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 80 * (index + 1)
-          }
+            delay: 80 * (index + 1),
+          },
         }"
       >
         <el-card class="line-card" shadow="never">
@@ -203,7 +205,7 @@ onMounted(() => {
             <div
               class="w-8 h-8 flex justify-center items-center rounded-md"
               :style="{
-                backgroundColor: isDark ? 'transparent' : item.bgColor
+                backgroundColor: isDark ? 'transparent' : item.bgColor,
               }"
             >
               <IconifyIconOffline
@@ -242,14 +244,14 @@ onMounted(() => {
         :xs="24"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 400
-          }
+            delay: 400,
+          },
         }"
       >
         <el-card class="bar-card" shadow="never">
@@ -273,14 +275,14 @@ onMounted(() => {
         :xs="24"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 480
-          }
+            delay: 480,
+          },
         }"
       >
         <el-card shadow="never">
@@ -294,7 +296,7 @@ onMounted(() => {
               'flex',
               'justify-between',
               'items-start',
-              index === 0 ? 'mt-8' : 'mt-[2.15rem]'
+              index === 0 ? 'mt-8' : 'mt-[2.15rem]',
             ]"
           >
             <el-progress
@@ -320,14 +322,14 @@ onMounted(() => {
         :xs="24"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 560
-          }
+            delay: 560,
+          },
         }"
       >
         <el-card shadow="never" class="h-[580px]">
@@ -345,14 +347,14 @@ onMounted(() => {
         :xs="24"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 640
-          }
+            delay: 640,
+          },
         }"
       >
         <el-card shadow="never">
@@ -370,9 +372,9 @@ onMounted(() => {
                   markRaw(
                     useRenderFlicker({
                       background: randomGradient({
-                        randomizeHue: true
-                      })
-                    })
+                        randomizeHue: true,
+                      }),
+                    }),
                   )
                 "
                 :timestamp="item.date"

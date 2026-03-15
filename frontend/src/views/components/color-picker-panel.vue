@@ -2,7 +2,7 @@
 import { ref } from "vue";
 
 defineOptions({
-  name: "ColorPickerPanel"
+  name: "ColorPickerPanel",
 });
 
 const disabled = ref(false);
@@ -21,7 +21,7 @@ const predefineColors = [
   "hsva(120, 40, 94, 0.5)",
   "hsl(181, 100%, 37%)",
   "hsla(209, 100%, 56%, 0.73)",
-  "#c7158577"
+  "#c7158577",
 ];
 </script>
 
@@ -32,7 +32,7 @@ const predefineColors = [
         <el-space wrap :size="40">
           <el-link
             v-tippy="{
-              content: '点击查看详细文档'
+              content: '点击查看详细文档',
             }"
             href="https://element-plus.org/zh-CN/component/color-picker-panel.html"
             target="_blank"

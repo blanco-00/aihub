@@ -3,7 +3,7 @@ import { ref, onMounted, nextTick, onBeforeUnmount } from "vue";
 import { useWatermark } from "@pureadmin/utils";
 
 defineOptions({
-  name: "WaterMark"
+  name: "WaterMark",
 });
 
 const local = ref();
@@ -20,7 +20,7 @@ onMounted(() => {
     setPreventLocalWatermark("无法删除的水印", {
       forever: true,
       width: 180,
-      height: 70
+      height: 70,
     });
   });
 });
@@ -71,8 +71,8 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
-            ]
+              { value: 1.0, color: 'red' },
+            ],
           })
         "
       >
@@ -86,8 +86,8 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
-            ]
+              { value: 1.0, color: 'red' },
+            ],
           })
         "
       >
@@ -100,9 +100,9 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
+              { value: 1.0, color: 'red' },
             ],
-            shadowConfig: [20]
+            shadowConfig: [20],
           })
         "
       >
@@ -116,8 +116,8 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
-            ]
+              { value: 1.0, color: 'red' },
+            ],
           })
         "
       >
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
           setLocalWatermark('局部水印', {
             color,
             width: 140,
-            height: 65
+            height: 65,
           })
         "
       >
@@ -150,8 +150,8 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
-            ]
+              { value: 1.0, color: 'red' },
+            ],
           })
         "
       >
@@ -167,8 +167,8 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
-            ]
+              { value: 1.0, color: 'red' },
+            ],
           })
         "
       >
@@ -183,9 +183,9 @@ onBeforeUnmount(() => {
             gradient: [
               { value: 0, color: 'magenta' },
               { value: 0.5, color: 'blue' },
-              { value: 1.0, color: 'red' }
+              { value: 1.0, color: 'red' },
             ],
-            shadowConfig: [20]
+            shadowConfig: [20],
           })
         "
       >

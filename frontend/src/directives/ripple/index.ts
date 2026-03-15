@@ -29,7 +29,7 @@ function transform(el: HTMLElement, value: string) {
 const calculate = (
   e: PointerEvent,
   el: HTMLElement,
-  value: RippleOptions = {}
+  value: RippleOptions = {},
 ) => {
   const offset = el.getBoundingClientRect();
 
@@ -101,7 +101,7 @@ const ripples = {
     animation.classList.add("v-ripple__animation--visible");
     transform(
       animation,
-      `translate(${x}, ${y}) scale3d(${scale},${scale},${scale})`
+      `translate(${x}, ${y}) scale3d(${scale},${scale},${scale})`,
     );
     animation.dataset.activated = String(performance.now());
 
@@ -141,7 +141,7 @@ const ripples = {
           el.removeChild(animation.parentNode);
       }, 300);
     }, delay);
-  }
+  },
 };
 
 function isRippleEnabled(value: any): value is true {
@@ -177,7 +177,7 @@ function rippleHide(e: Event) {
 function updateRipple(
   el: HTMLElement,
   binding: RippleDirectiveBinding,
-  wasEnabled: boolean
+  wasEnabled: boolean,
 ) {
   const { value, modifiers } = binding;
   const enabled = isRippleEnabled(value);
@@ -227,5 +227,5 @@ function updated(el: HTMLElement, binding: RippleDirectiveBinding) {
 export const Ripple: Directive = {
   mounted,
   unmounted,
-  updated
+  updated,
 };

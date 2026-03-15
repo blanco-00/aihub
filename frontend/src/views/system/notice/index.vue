@@ -62,20 +62,13 @@
         >
           搜索
         </el-button>
-        <el-button
-          :icon="useRenderIcon('ri:refresh-line')"
-          @click="resetForm"
-        >
+        <el-button :icon="useRenderIcon('ri:refresh-line')" @click="resetForm">
           重置
         </el-button>
       </el-form-item>
     </el-form>
 
-    <PureTableBar
-      title="通知公告管理"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="通知公告管理" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
@@ -100,7 +93,7 @@
           :paginationSmall="size === 'small'"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"
@@ -163,7 +156,7 @@ import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
 defineOptions({
-  name: "SystemNotice"
+  name: "SystemNotice",
 });
 
 const formRef = ref();
@@ -184,7 +177,7 @@ const {
   handleDelete,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
 } = useNotice(tableRef);
 </script>
 

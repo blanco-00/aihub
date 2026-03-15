@@ -19,7 +19,7 @@ type PageResult<T = any> = {
 /** 获取通知分类列表 */
 export const getNoticeCategoryList = (params?: any) => {
   return http.request<Result<PageResult>>("get", "/api/notice-categories", {
-    params
+    params,
   });
 };
 
@@ -48,7 +48,7 @@ export const deleteNoticeCategory = (id: number) => {
 /** 获取通知列表 */
 export const getNoticeList = (params?: any) => {
   return http.request<Result<PageResult>>("get", "/api/notices", {
-    params
+    params,
   });
 };
 
@@ -87,7 +87,7 @@ export const deleteNotice = (id: number) => {
 /** 获取我的通知列表 */
 export const getMyNotices = (params?: any) => {
   return http.request<Result<PageResult>>("get", "/api/notices/my", {
-    params
+    params,
   });
 };
 

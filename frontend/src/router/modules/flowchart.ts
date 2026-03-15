@@ -8,7 +8,7 @@ export default {
     icon: "ep/set-up",
     title: $t("menus.pureFlowChart"),
     rank: flowchart,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       name: "FlowChart",
       component: () => import("@/views/flow-chart/index.vue"),
       meta: {
-        title: $t("menus.pureFlowChart")
-      }
-    }
-  ]
+        title: $t("menus.pureFlowChart"),
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

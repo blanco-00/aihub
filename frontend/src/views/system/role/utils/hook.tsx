@@ -9,7 +9,16 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getAllRoles, createRole, updateRole, deleteRole, getRoleMenus, saveRoleMenus, type CreateRoleRequest, type UpdateRoleRequest } from "@/api/role";
+import {
+  getAllRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+  getRoleMenus,
+  saveRoleMenus,
+  type CreateRoleRequest,
+  type UpdateRoleRequest,
+} from "@/api/role";
 import { getMenuTree } from "@/api/menu";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 
@@ -17,7 +26,7 @@ export function useRole(treeRef: Ref) {
   const form = reactive({
     name: "",
     code: "",
-    status: ""
+    status: "",
   });
   const curRow = ref();
   const formRef = ref();
@@ -35,30 +44,30 @@ export function useRole(treeRef: Ref) {
   const treeProps = {
     value: "id",
     label: "title",
-    children: "children"
+    children: "children",
   };
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
   const columns: TableColumnList = [
     {
       label: "角色编号",
-      prop: "id"
+      prop: "id",
     },
     {
       label: "角色名称",
-      prop: "name"
+      prop: "name",
     },
     {
       label: "角色标识",
-      prop: "code"
+      prop: "code",
     },
     {
       label: "状态",
-      cellRenderer: scope => (
+      cellRenderer: (scope) => (
         <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
@@ -72,26 +81,26 @@ export function useRole(treeRef: Ref) {
           onChange={() => onChange(scope as any)}
         />
       ),
-      minWidth: 90
+      minWidth: 90,
     },
     {
       label: "备注",
       prop: "description",
-      minWidth: 160
+      minWidth: 160,
     },
     {
       label: "创建时间",
       prop: "createdAt",
       minWidth: 160,
       formatter: ({ createdAt }) =>
-        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-"
+        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-",
     },
     {
       label: "操作",
       fixed: "right",
       width: 210,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
   // const buttonClass = computed(() => {
   //   return [
@@ -116,16 +125,16 @@ export function useRole(treeRef: Ref) {
         cancelButtonText: "取消",
         type: "warning",
         dangerouslyUseHTMLString: true,
-        draggable: true
-      }
+        draggable: true,
+      },
     )
       .then(async () => {
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
           {
-            loading: true
-          }
+            loading: true,
+          },
         );
         try {
           const newStatus = row.status === 0 ? 1 : 0;
@@ -134,7 +143,7 @@ export function useRole(treeRef: Ref) {
           if (response.code === 200) {
             row.status = newStatus;
             message(`已${row.status === 0 ? "停用" : "启用"}${row.name}`, {
-              type: "success"
+              type: "success",
             });
           } else {
             message(response.message || "更新角色状态失败", { type: "error" });
@@ -148,8 +157,8 @@ export function useRole(treeRef: Ref) {
             {},
             switchLoadMap.value[index],
             {
-              loading: false
-            }
+              loading: false,
+            },
           );
         }
       })
@@ -191,10 +200,10 @@ export function useRole(treeRef: Ref) {
     loading.value = true;
     try {
       const searchStartTime = performance.now();
-      
+
       const response = await getAllRoles();
       const searchTime = performance.now() - searchStartTime;
-      
+
       // 只记录超过1秒的请求
       if (searchTime > 1000) {
         console.warn(`[性能警告] 角色列表查询耗时: ${searchTime.toFixed(2)}ms`);
@@ -202,7 +211,7 @@ export function useRole(treeRef: Ref) {
       // 后端返回 code: 200 表示成功
       if (response.code === 200 && response.data) {
         let roles = response.data;
-        
+
         // 前端筛选
         if (form.name) {
           roles = roles.filter((item: any) => item.name.includes(form.name));
@@ -211,9 +220,11 @@ export function useRole(treeRef: Ref) {
           roles = roles.filter((item: any) => item.code.includes(form.code));
         }
         if (form.status !== "") {
-          roles = roles.filter((item: any) => item.status === Number(form.status));
+          roles = roles.filter(
+            (item: any) => item.status === Number(form.status),
+          );
         }
-        
+
         dataList.value = roles;
         pagination.total = roles.length;
         pagination.pageSize = 10;
@@ -230,7 +241,7 @@ export function useRole(treeRef: Ref) {
     }
   }
 
-  const resetForm = formEl => {
+  const resetForm = (formEl) => {
     if (!formEl) return;
     formEl.resetFields();
     onSearch();
@@ -244,8 +255,8 @@ export function useRole(treeRef: Ref) {
           id: row?.id,
           name: row?.name ?? "",
           code: row?.code ?? "",
-          remark: row?.remark ?? row?.description ?? ""
-        }
+          remark: row?.remark ?? row?.description ?? "",
+        },
       },
       width: "40%",
       draggable: true,
@@ -264,32 +275,36 @@ export function useRole(treeRef: Ref) {
                   code: curData.code,
                   name: curData.name,
                   description: curData.remark || undefined,
-                  status: 1
+                  status: 1,
                 };
                 const response = await createRole(request);
                 if (response.code === 200) {
                   message(`您${title}了角色名称为${curData.name}的这条数据`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
-                  message(response.message || "创建角色失败", { type: "error" });
+                  message(response.message || "创建角色失败", {
+                    type: "error",
+                  });
                 }
               } else {
                 const request: UpdateRoleRequest = {
                   name: curData.name || undefined,
-                  description: curData.remark || undefined
+                  description: curData.remark || undefined,
                 };
                 const response = await updateRole(curData.id, request);
                 if (response.code === 200) {
                   message(`您${title}了角色名称为${curData.name}的这条数据`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
-                  message(response.message || "更新角色失败", { type: "error" });
+                  message(response.message || "更新角色失败", {
+                    type: "error",
+                  });
                 }
               }
             } catch (error: any) {
@@ -297,7 +312,7 @@ export function useRole(treeRef: Ref) {
             }
           }
         });
-      }
+      },
     });
   }
 
@@ -307,7 +322,7 @@ export function useRole(treeRef: Ref) {
     if (id) {
       curRow.value = row;
       isShow.value = true;
-      
+
       // 从后端获取已选中的菜单ID
       try {
         const response = await getRoleMenus(id);
@@ -330,7 +345,7 @@ export function useRole(treeRef: Ref) {
   function rowStyle({ row: { id } }) {
     return {
       cursor: "pointer",
-      background: id === curRow.value?.id ? "var(--el-fill-color-light)" : ""
+      background: id === curRow.value?.id ? "var(--el-fill-color-light)" : "",
     };
   }
 
@@ -365,7 +380,7 @@ export function useRole(treeRef: Ref) {
     // 优化：先等待第一个请求完成，避免同时建立多个连接导致的延迟
     // 这样可以复用第一个请求建立的连接
     await onSearch();
-    
+
     // 获取菜单树用于权限配置（在第一个请求完成后发起，可以复用连接）
     try {
       const response = await getMenuTree();
@@ -378,13 +393,13 @@ export function useRole(treeRef: Ref) {
     }
   });
 
-  watch(isExpandAll, val => {
+  watch(isExpandAll, (val) => {
     val
       ? treeRef.value.setExpandedKeys(treeIds.value)
       : treeRef.value.setExpandedKeys([]);
   });
 
-  watch(isSelectAll, val => {
+  watch(isSelectAll, (val) => {
     val
       ? treeRef.value.setCheckedKeys(treeIds.value)
       : treeRef.value.setCheckedKeys([]);
@@ -418,6 +433,6 @@ export function useRole(treeRef: Ref) {
     // handleDatabase,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

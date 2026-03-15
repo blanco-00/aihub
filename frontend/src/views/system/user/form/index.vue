@@ -21,19 +21,19 @@ const props = withDefaults(defineProps<FormProps>(), {
     roleIds: [],
     departmentId: 0,
     status: 1,
-    remark: ""
-  })
+    remark: "",
+  }),
 });
 
 const sexOptions = [
   {
     value: 0,
-    label: "男"
+    label: "男",
   },
   {
     value: 1,
-    label: "女"
-  }
+    label: "女",
+  },
 ];
 
 const ruleFormRef = ref();
@@ -44,13 +44,17 @@ const roleOptions = ref<Array<{ id: number; name: string }>>([]);
 const departmentProps = {
   value: "id",
   label: "name",
-  children: "children"
+  children: "children",
 };
 
 // 监听 formInline 变化，同步到 newFormInline
-watch(() => props.formInline, (newVal) => {
-  newFormInline.value = { ...newVal };
-}, { deep: true, immediate: true });
+watch(
+  () => props.formInline,
+  (newVal) => {
+    newFormInline.value = { ...newVal };
+  },
+  { deep: true, immediate: true },
+);
 
 // 加载部门树和角色列表
 onMounted(async () => {
@@ -60,13 +64,13 @@ onMounted(async () => {
     if (code === 200 && data) {
       departmentTree.value = data as DepartmentInfo[];
     }
-    
+
     // 加载角色列表（从数据库）
     const roleResponse = await getAllRolesFromDB();
     if (roleResponse.code === 200 && roleResponse.data) {
       roleOptions.value = roleResponse.data.map((role: any) => ({
         id: role.id,
-        name: role.name
+        name: role.name,
       }));
     }
   } catch (error) {
@@ -170,7 +174,9 @@ defineExpose({ getRef, getFormData });
             class="w-full"
             multiple
             clearable
-            :disabled="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'"
+            :disabled="
+              newFormInline.isLastSuperAdmin && newFormInline.title === '修改'
+            "
           >
             <el-option
               v-for="(item, index) in roleOptions"
@@ -179,7 +185,12 @@ defineExpose({ getRef, getFormData });
               :value="item.id"
             />
           </el-select>
-          <div v-if="newFormInline.isLastSuperAdmin && newFormInline.title === '修改'" class="text-xs text-yellow-600 mt-1">
+          <div
+            v-if="
+              newFormInline.isLastSuperAdmin && newFormInline.title === '修改'
+            "
+            class="text-xs text-yellow-600 mt-1"
+          >
             不能修改最后一个超级管理员的角色
           </div>
         </el-form-item>

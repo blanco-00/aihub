@@ -14,7 +14,7 @@ import {
   getKeyList,
   isAllEmpty,
   hideTextAtIndex,
-  deviceDetection
+  deviceDetection,
 } from "@pureadmin/utils";
 import {
   getRoleIds,
@@ -25,14 +25,14 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  toggleUserStatus
+  toggleUserStatus,
 } from "@/api/system";
 import {
   ElForm,
   ElInput,
   ElFormItem,
   ElProgress,
-  ElMessageBox
+  ElMessageBox,
 } from "element-plus";
 import {
   type Ref,
@@ -42,7 +42,7 @@ import {
   watch,
   computed,
   reactive,
-  onMounted
+  onMounted,
 } from "vue";
 
 export function useUser(tableRef: Ref) {
@@ -50,7 +50,7 @@ export function useUser(tableRef: Ref) {
     username: "",
     phone: "",
     status: "",
-    departmentId: undefined as number | undefined
+    departmentId: undefined as number | undefined,
   });
   const formRef = ref();
   const ruleFormRef = ref();
@@ -66,19 +66,19 @@ export function useUser(tableRef: Ref) {
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
   const columns: TableColumnList = [
     {
       label: "勾选列", // 如果需要表格多选，此处label必须设置
       type: "selection",
       fixed: "left",
-      reserveSelection: true // 数据刷新后保留选项
+      reserveSelection: true, // 数据刷新后保留选项
     },
     {
       label: "用户编号",
       prop: "id",
-      width: 90
+      width: 90,
     },
     {
       label: "用户头像",
@@ -92,17 +92,17 @@ export function useUser(tableRef: Ref) {
           class="w-[24px] h-[24px] rounded-full align-middle"
         />
       ),
-      width: 90
+      width: 90,
     },
     {
       label: "用户名称",
       prop: "username",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       label: "用户昵称",
       prop: "nickname",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       label: "性别",
@@ -116,18 +116,18 @@ export function useUser(tableRef: Ref) {
         >
           {row.sex === 1 ? "女" : "男"}
         </el-tag>
-      )
+      ),
     },
     {
       label: "手机号码",
       prop: "phone",
       minWidth: 90,
-      formatter: ({ phone }) => hideTextAtIndex(phone, { start: 3, end: 6 })
+      formatter: ({ phone }) => hideTextAtIndex(phone, { start: 3, end: 6 }),
     },
     {
       label: "部门",
       prop: "departmentName",
-      minWidth: 120
+      minWidth: 120,
     },
     {
       label: "角色",
@@ -144,7 +144,13 @@ export function useUser(tableRef: Ref) {
               <el-tag
                 key={index}
                 size="small"
-                type={name === "超级管理员" ? "danger" : name === "管理员" ? "warning" : "info"}
+                type={
+                  name === "超级管理员"
+                    ? "danger"
+                    : name === "管理员"
+                      ? "warning"
+                      : "info"
+                }
                 effect="plain"
               >
                 {name}
@@ -152,13 +158,13 @@ export function useUser(tableRef: Ref) {
             ))}
           </div>
         );
-      }
+      },
     },
     {
       label: "状态",
       prop: "status",
       minWidth: 90,
-      cellRenderer: scope => (
+      cellRenderer: (scope) => (
         <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
@@ -171,27 +177,27 @@ export function useUser(tableRef: Ref) {
           style={switchStyle.value}
           onChange={() => onChange(scope as any)}
         />
-      )
+      ),
     },
     {
       label: "创建时间",
       minWidth: 90,
       prop: "createTime",
       formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       label: "备注",
       prop: "remark",
       minWidth: 200,
-      showOverflowTooltip: true
+      showOverflowTooltip: true,
     },
     {
       label: "操作",
       fixed: "right",
       width: 180,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
   const buttonClass = computed(() => {
     return [
@@ -199,19 +205,19 @@ export function useUser(tableRef: Ref) {
       "reset-margin",
       "text-gray-500!",
       "dark:text-white!",
-      "dark:hover:text-primary!"
+      "dark:hover:text-primary!",
     ];
   });
   // 重置的新密码
   const pwdForm = reactive({
-    newPwd: ""
+    newPwd: "",
   });
   const pwdProgress = [
     { color: "#e74242", text: "非常弱" },
     { color: "#EFBD47", text: "弱" },
     { color: "#ffa500", text: "一般" },
     { color: "#1bbf1b", text: "强" },
-    { color: "#008000", text: "非常强" }
+    { color: "#008000", text: "非常强" },
   ];
   // 当前密码强度（0-4）
   const curScore = ref();
@@ -222,14 +228,14 @@ export function useUser(tableRef: Ref) {
     const originalStatus = row.status;
     // 计算新状态
     const newStatus = row.status === 0 ? 1 : 0;
-    
+
     // 注意：不在这里检查最后一个超级管理员，因为前端只能看到当前页数据，不准确
     // 完全依赖后端检查，后端会返回明确的错误信息
-    
+
     try {
       // 先恢复状态，避免 switch 已经改变
       row.status = originalStatus;
-      
+
       await ElMessageBox.confirm(
         `确认要<strong>${
           originalStatus === 0 ? "启用" : "停用"
@@ -242,25 +248,25 @@ export function useUser(tableRef: Ref) {
           cancelButtonText: "取消",
           type: "warning",
           dangerouslyUseHTMLString: true,
-          draggable: true
-        }
+          draggable: true,
+        },
       );
-      
+
       switchLoadMap.value[index] = Object.assign(
         {},
         switchLoadMap.value[index],
         {
-          loading: true
-        }
+          loading: true,
+        },
       );
-      
+
       const response = await toggleUserStatus(row.id, newStatus);
       const { code, message: responseMessage } = response;
-      
+
       if (code === 200) {
         row.status = newStatus;
         message("已成功修改用户状态", {
-          type: "success"
+          type: "success",
         });
       } else {
         // 失败时恢复原状态（包括后端返回的业务错误，如：不能禁用最后一个超级管理员）
@@ -268,33 +274,34 @@ export function useUser(tableRef: Ref) {
         // 显示后端返回的具体错误消息
         const errorMsg = responseMessage || "修改用户状态失败";
         message(errorMsg, {
-          type: "error"
+          type: "error",
         });
       }
-      
+
       switchLoadMap.value[index] = Object.assign(
         {},
         switchLoadMap.value[index],
         {
-          loading: false
-        }
+          loading: false,
+        },
       );
     } catch (error: any) {
       // 取消或失败时恢复原状态
       row.status = originalStatus;
       if (error !== "cancel") {
         // 尝试从错误响应中获取消息
-        const errorMsg = error?.response?.data?.message || error?.message || "操作失败";
+        const errorMsg =
+          error?.response?.data?.message || error?.message || "操作失败";
         message(errorMsg, {
-          type: "error"
+          type: "error",
         });
       }
       switchLoadMap.value[index] = Object.assign(
         {},
         switchLoadMap.value[index],
         {
-          loading: false
-        }
+          loading: false,
+        },
       );
     }
   }
@@ -309,14 +316,14 @@ export function useUser(tableRef: Ref) {
       // 检查是否是最后一个超级管理员
       if (row.role === "SUPER_ADMIN") {
         const superAdminCount = dataList.value.filter(
-          (item: any) => item.role === "SUPER_ADMIN" && item.status === 1
+          (item: any) => item.role === "SUPER_ADMIN" && item.status === 1,
         ).length;
         if (superAdminCount <= 1) {
           message("不能删除最后一个超级管理员", { type: "warning" });
           return;
         }
       }
-      
+
       const { code } = await deleteUser(row.id);
       if (code === 200) {
         message(`已成功删除用户 ${row.username}`, { type: "success" });
@@ -362,14 +369,14 @@ export function useUser(tableRef: Ref) {
       message("请选择要删除的用户", { type: "warning" });
       return;
     }
-    
+
     try {
       // 批量删除
       const deletePromises = curSelected.map((row: any) => deleteUser(row.id));
       await Promise.all(deletePromises);
-      
+
       message(`已成功删除 ${curSelected.length} 个用户`, {
-        type: "success"
+        type: "success",
       });
       tableRef.value.getTableRef().clearSelection();
       onSearch();
@@ -382,20 +389,20 @@ export function useUser(tableRef: Ref) {
     const searchStartTime = performance.now();
     loading.value = true;
     const loadingStartTime = performance.now();
-    
+
     try {
       // 构建查询参数，包含 departmentId
       // 注意：如果 departmentId 是 0，表示未分配，应该传递 0 而不是 undefined
       // 如果 departmentId 是 undefined 或 null，则不传递该参数（显示所有用户）
       const params: any = {
-        ...toRaw(form)
+        ...toRaw(form),
       };
       // 明确处理 departmentId：只有非 undefined 和非 null 时才传递
       if (form.departmentId !== undefined && form.departmentId !== null) {
         params.departmentId = form.departmentId;
       }
       const { code, data } = await getUserList(params);
-      
+
       if (code === 0 && data) {
         dataList.value = data.list || [];
         pagination.total = data.total || 0;
@@ -405,22 +412,24 @@ export function useUser(tableRef: Ref) {
         // 如果返回错误，清空列表
         dataList.value = [];
         message("获取用户列表失败", {
-          type: "error"
+          type: "error",
         });
       }
     } catch (error: any) {
       console.error("[用户列表查询] 请求失败", error);
       dataList.value = [];
       message(error?.message || "获取用户列表失败", {
-        type: "error"
-      }); 
+        type: "error",
+      });
     } finally {
       const totalTime = performance.now() - searchStartTime;
       // 只记录超过1秒的请求
       if (totalTime > 1000) {
-        console.warn(`[性能警告] 用户列表查询总耗时: ${totalTime.toFixed(2)}ms`);
+        console.warn(
+          `[性能警告] 用户列表查询总耗时: ${totalTime.toFixed(2)}ms`,
+        );
       }
-      
+
       // 立即关闭 loading，不要延迟
       // 注意：如果请求很快（< 300ms），可以考虑添加最小显示时间避免闪烁
       // 但当前请求很慢（5秒），所以立即关闭即可
@@ -428,7 +437,7 @@ export function useUser(tableRef: Ref) {
     }
   }
 
-  const resetForm = formEl => {
+  const resetForm = (formEl) => {
     if (!formEl) return;
     formEl.resetFields();
     onSearch();
@@ -439,11 +448,14 @@ export function useUser(tableRef: Ref) {
     let isLastSuperAdmin = false;
     if (title === "修改" && row?.role === "SUPER_ADMIN") {
       const superAdminCount = dataList.value.filter(
-        (item: any) => item.role === "SUPER_ADMIN" && item.status === 1 && item.id !== row?.id
+        (item: any) =>
+          item.role === "SUPER_ADMIN" &&
+          item.status === 1 &&
+          item.id !== row?.id,
       ).length;
       isLastSuperAdmin = superAdminCount === 0;
     }
-    
+
     // 如果是修改，保存原始数据用于比较是否发生变化
     let originalRoleIds: number[] = [];
     let roleIds: number[] = [];
@@ -468,10 +480,10 @@ export function useUser(tableRef: Ref) {
         role: row?.role ?? "USER",
         departmentId: row?.departmentId ?? 0,
         status: row?.status ?? 1,
-        remark: row?.remark ?? ""
+        remark: row?.remark ?? "",
       };
     }
-    
+
     addDialog({
       title: `${title}用户`,
       props: {
@@ -489,8 +501,8 @@ export function useUser(tableRef: Ref) {
           departmentId: row?.departmentId ?? 0,
           status: row?.status ?? 1,
           remark: row?.remark ?? "",
-          isLastSuperAdmin: isLastSuperAdmin // 传递是否是最后一个超级管理员
-        }
+          isLastSuperAdmin: isLastSuperAdmin, // 传递是否是最后一个超级管理员
+        },
       },
       width: "46%",
       draggable: true,
@@ -502,16 +514,18 @@ export function useUser(tableRef: Ref) {
       beforeSure: async (done, { options, closeLoading }) => {
         const FormRef = formRef.value.getRef();
         // 从表单组件获取最新的表单数据，而不是从 options.props.formInline
-        const formData = formRef.value.getFormData ? formRef.value.getFormData() : null;
+        const formData = formRef.value.getFormData
+          ? formRef.value.getFormData()
+          : null;
         const curData = (formData || options.props.formInline) as FormItemProps;
-        
+
         // 新增时验证密码必填
         if (title === "新增" && !curData.password) {
           closeLoading(); // 验证失败时关闭 loading
           message("用户密码为必填项", { type: "error" });
           return;
         }
-        
+
         FormRef.validate(async (valid: boolean) => {
           if (valid) {
             try {
@@ -527,11 +541,13 @@ export function useUser(tableRef: Ref) {
                   role: defaultRole,
                   // 处理部门ID：如果 departmentId 是 undefined 或 null，则传递 0（未分配）
                   // 如果 departmentId 是 0 或其他数字，则正常传递
-                  departmentId: curData.departmentId !== undefined && curData.departmentId !== null 
-                    ? curData.departmentId 
-                    : 0,
+                  departmentId:
+                    curData.departmentId !== undefined &&
+                    curData.departmentId !== null
+                      ? curData.departmentId
+                      : 0,
                   status: curData.status,
-                  remark: curData.remark || ""
+                  remark: curData.remark || "",
                 });
                 if (response.code === 200) {
                   // 创建用户成功后，分配角色（如果选择了角色）
@@ -539,9 +555,19 @@ export function useUser(tableRef: Ref) {
                     try {
                       // 获取新创建用户的ID（需要从响应中获取，或者重新查询）
                       // 这里先查询用户列表获取最新创建的用户的ID
-                      const userListResponse = await getUserList({ keyword: curData.username, current: 1, size: 1 });
-                      if (userListResponse.code === 200 && userListResponse.data) {
-                        const userList = (userListResponse.data as any).records || (userListResponse.data as any).list || [];
+                      const userListResponse = await getUserList({
+                        keyword: curData.username,
+                        current: 1,
+                        size: 1,
+                      });
+                      if (
+                        userListResponse.code === 200 &&
+                        userListResponse.data
+                      ) {
+                        const userList =
+                          (userListResponse.data as any).records ||
+                          (userListResponse.data as any).list ||
+                          [];
                         if (userList.length > 0) {
                           const newUserId = userList[0].id;
                           await assignUserRoles(newUserId, curData.roleIds);
@@ -553,7 +579,7 @@ export function useUser(tableRef: Ref) {
                     }
                   }
                   message(`成功创建用户 ${curData.username}`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
@@ -573,14 +599,16 @@ export function useUser(tableRef: Ref) {
                   phone: curData.phone,
                   role: curData.role || "USER", // 保留主角色字段用于向后兼容
                   status: curData.status,
-                  remark: curData.remark || ""
+                  remark: curData.remark || "",
                 };
                 // 处理部门ID：如果 departmentId 是 undefined 或 null，则传递 0（未分配）
                 // 如果 departmentId 是 0 或其他数字，则正常传递
-                updateData.departmentId = curData.departmentId !== undefined && curData.departmentId !== null 
-                  ? curData.departmentId 
-                  : 0;
-                
+                updateData.departmentId =
+                  curData.departmentId !== undefined &&
+                  curData.departmentId !== null
+                    ? curData.departmentId
+                    : 0;
+
                 // 比较用户信息是否发生变化
                 const newUserData = {
                   username: curData.username,
@@ -589,13 +617,17 @@ export function useUser(tableRef: Ref) {
                   phone: curData.phone || "",
                   sex: curData.sex ?? "",
                   role: curData.role || "USER",
-                  departmentId: curData.departmentId !== undefined && curData.departmentId !== null ? curData.departmentId : 0,
+                  departmentId:
+                    curData.departmentId !== undefined &&
+                    curData.departmentId !== null
+                      ? curData.departmentId
+                      : 0,
                   status: curData.status,
-                  remark: curData.remark || ""
+                  remark: curData.remark || "",
                 };
-                
+
                 // 比较用户信息是否发生变化（排除密码，因为密码是可选更新的）
-                const userInfoChanged = 
+                const userInfoChanged =
                   newUserData.username !== originalUserData.username ||
                   newUserData.nickname !== originalUserData.nickname ||
                   newUserData.email !== originalUserData.email ||
@@ -606,27 +638,33 @@ export function useUser(tableRef: Ref) {
                   newUserData.status !== originalUserData.status ||
                   newUserData.remark !== (originalUserData.remark || "") ||
                   !!curData.password; // 如果提供了新密码，也算作变化
-                
+
                 // 比较角色是否发生变化（排序后比较，避免顺序不同导致的误判）
-                const newRoleIds = [...(curData.roleIds || [])].sort((a, b) => a - b);
+                const newRoleIds = [...(curData.roleIds || [])].sort(
+                  (a, b) => a - b,
+                );
                 const oldRoleIds = [...originalRoleIds].sort((a, b) => a - b);
-                const roleChanged = JSON.stringify(newRoleIds) !== JSON.stringify(oldRoleIds);
-                
+                const roleChanged =
+                  JSON.stringify(newRoleIds) !== JSON.stringify(oldRoleIds);
+
                 // 如果用户信息和角色都没有变化，提示用户
                 if (!userInfoChanged && !roleChanged) {
                   closeLoading();
                   message("没有修改任何内容", { type: "warning" });
                   return;
                 }
-                
+
                 // 如果用户信息发生变化，调用更新接口
                 if (userInfoChanged) {
                   // 如果提供了新密码，则更新密码
                   if (curData.password) {
                     updateData.password = curData.password;
                   }
-                  
-                  const updateResponse = await updateUser(curData.id!, updateData);
+
+                  const updateResponse = await updateUser(
+                    curData.id!,
+                    updateData,
+                  );
                   if (updateResponse.code !== 200) {
                     closeLoading(); // 失败时关闭 loading
                     // 显示后端返回的具体错误信息
@@ -635,52 +673,62 @@ export function useUser(tableRef: Ref) {
                     return;
                   }
                 }
-                
+
                 // 如果角色发生变化，调用角色分配接口
                 if (roleChanged) {
                   try {
-                    console.log("角色发生变化，准备分配角色，用户ID:", curData.id, "原始角色IDs:", oldRoleIds, "新角色IDs:", newRoleIds);
+                    console.log(
+                      "角色发生变化，准备分配角色，用户ID:",
+                      curData.id,
+                      "原始角色IDs:",
+                      oldRoleIds,
+                      "新角色IDs:",
+                      newRoleIds,
+                    );
                     await assignUserRoles(curData.id!, newRoleIds);
                     console.log("角色分配成功");
                   } catch (error: any) {
                     console.error("分配角色失败", error);
                     closeLoading();
-                    message(error?.message || "分配角色失败", { type: "error" });
+                    message(error?.message || "分配角色失败", {
+                      type: "error",
+                    });
                     return;
                   }
                 }
-                
+
                 // 根据实际变化情况显示提示信息
                 if (userInfoChanged && roleChanged) {
                   message(`成功更新用户 ${curData.username} 的信息和角色`, {
-                    type: "success"
+                    type: "success",
                   });
                 } else if (userInfoChanged) {
                   message(`成功更新用户 ${curData.username} 的信息`, {
-                    type: "success"
+                    type: "success",
                   });
                 } else if (roleChanged) {
                   message(`成功更新用户 ${curData.username} 的角色`, {
-                    type: "success"
+                    type: "success",
                   });
                 }
-                
+
                 done();
                 onSearch();
               }
             } catch (error: any) {
               closeLoading(); // 异常时关闭 loading
               // 从错误响应中提取具体的错误信息
-              const errorMsg = error?.response?.data?.message 
-                || error?.message 
-                || `${title === "新增" ? "创建" : "更新"}用户失败`;
+              const errorMsg =
+                error?.response?.data?.message ||
+                error?.message ||
+                `${title === "新增" ? "创建" : "更新"}用户失败`;
               message(errorMsg, { type: "error" });
             }
           } else {
             closeLoading(); // 表单验证失败时关闭 loading
           }
         });
-      }
+      },
     });
   }
 
@@ -697,7 +745,7 @@ export function useUser(tableRef: Ref) {
         h(ReCropperPreview, {
           ref: cropRef,
           imgSrc: row.avatar || userAvatar,
-          onCropper: info => (avatarInfo.value = info)
+          onCropper: (info) => (avatarInfo.value = info),
         }),
       beforeSure: (done, { closeLoading }) => {
         try {
@@ -711,14 +759,14 @@ export function useUser(tableRef: Ref) {
           message(error?.message || "上传头像失败", { type: "error" });
         }
       },
-      closeCallBack: () => cropRef.value.hidePopover()
+      closeCallBack: () => cropRef.value.hidePopover(),
     });
   }
 
   watch(
     pwdForm,
     ({ newPwd }) =>
-      (curScore.value = isAllEmpty(newPwd) ? -1 : zxcvbn(newPwd).score)
+      (curScore.value = isAllEmpty(newPwd) ? -1 : zxcvbn(newPwd).score),
   );
 
   /** 重置密码 */
@@ -739,8 +787,8 @@ export function useUser(tableRef: Ref) {
                 {
                   required: true,
                   message: "请输入新密码",
-                  trigger: "blur"
-                }
+                  trigger: "blur",
+                },
               ]}
             >
               <ElInput
@@ -790,11 +838,11 @@ export function useUser(tableRef: Ref) {
                 phone: row.phone,
                 role: row.role || "USER",
                 status: row.status,
-                password: pwdForm.newPwd
+                password: pwdForm.newPwd,
               });
               if (code === 200) {
                 message(`已成功重置 ${row.username} 用户的密码`, {
-                  type: "success"
+                  type: "success",
                 });
                 done();
                 onSearch();
@@ -810,7 +858,7 @@ export function useUser(tableRef: Ref) {
             closeLoading(); // 表单验证失败时关闭 loading
           }
         });
-      }
+      },
     });
   }
 
@@ -825,8 +873,8 @@ export function useUser(tableRef: Ref) {
           username: row?.username ?? "",
           nickname: row?.nickname ?? "",
           roleOptions: roleOptions.value ?? [],
-          ids
-        }
+          ids,
+        },
       },
       width: "400px",
       draggable: true,
@@ -834,13 +882,17 @@ export function useUser(tableRef: Ref) {
       fullscreenIcon: true,
       closeOnClickModal: false,
       sureBtnLoading: true, // 启用确定按钮的 loading 状态，防止重复提交
-      contentRenderer: () => h(roleForm, { ref: roleFormRef, formInline: null }),
+      contentRenderer: () =>
+        h(roleForm, { ref: roleFormRef, formInline: null }),
       beforeSure: async (done, { options, closeLoading }) => {
         try {
           // 从表单组件获取最新的表单数据
-          const formData = roleFormRef.value?.getFormData ? roleFormRef.value.getFormData() : null;
-          const curData = (formData || options.props.formInline) as RoleFormItemProps;
-          
+          const formData = roleFormRef.value?.getFormData
+            ? roleFormRef.value.getFormData()
+            : null;
+          const curData = (formData ||
+            options.props.formInline) as RoleFormItemProps;
+
           console.log("分配角色，用户ID:", row.id, "角色IDs:", curData.ids);
           // 调用API保存用户角色分配（支持多角色）
           await assignUserRoles(row.id, curData.ids ?? []);
@@ -853,7 +905,7 @@ export function useUser(tableRef: Ref) {
           closeLoading(); // 异常时关闭 loading
           message(error?.message || "分配角色失败", { type: "error" });
         }
-      }
+      },
     });
   }
 
@@ -865,7 +917,7 @@ export function useUser(tableRef: Ref) {
     if (roleResponse.code === 200 && roleResponse.data) {
       roleOptions.value = roleResponse.data.map((role: any) => ({
         id: role.id,
-        name: role.name
+        name: role.name,
       }));
     } else {
       roleOptions.value = [];
@@ -892,6 +944,6 @@ export function useUser(tableRef: Ref) {
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

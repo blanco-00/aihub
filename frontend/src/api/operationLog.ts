@@ -46,11 +46,13 @@ export type OperationLogListRequest = {
  * 获取操作日志列表
  */
 export const getOperationLogList = (params: OperationLogListRequest) => {
-  return http.request<Result<{
-    records: OperationLogInfo[];
-    total: number;
-    current: number;
-    size: number;
-    pages: number;
-  }>>("get", "/api/operation-logs", { params });
+  return http.request<
+    Result<{
+      records: OperationLogInfo[];
+      total: number;
+      current: number;
+      size: number;
+      pages: number;
+    }>
+  >("get", "/api/operation-logs", { params });
 };

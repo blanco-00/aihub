@@ -8,7 +8,7 @@ export default {
     icon: "ri/list-check",
     title: $t("menus.pureList"),
     rank: list,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -18,8 +18,8 @@ export default {
       meta: {
         icon: "ri/bank-card-line",
         title: $t("menus.pureCardList"),
-        showParent: true
-      }
-    }
-  ]
+        showParent: true,
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

@@ -8,14 +8,14 @@ export default {
     title: $t("menus.pureMenus"),
     icon: "ep/histogram",
     rank: nested,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
       path: "/nested/menu1",
       meta: {
         title: $t("menus.pureMenu1"),
-        keepAlive: true
+        keepAlive: true,
       },
       redirect: "/nested/menu1/menu1-1",
       children: [
@@ -25,15 +25,15 @@ export default {
           name: "Menu1-1",
           meta: {
             title: $t("menus.pureMenu1-1"),
-            keepAlive: true
-          }
+            keepAlive: true,
+          },
         },
         {
           path: "/nested/menu1/menu1-2",
           redirect: "/nested/menu1/menu1-2/menu1-2-1",
           meta: {
             title: $t("menus.pureMenu1-2"),
-            keepAlive: true
+            keepAlive: true,
           },
           children: [
             {
@@ -43,8 +43,8 @@ export default {
               name: "Menu1-2-1",
               meta: {
                 title: $t("menus.pureMenu1-2-1"),
-                keepAlive: true
-              }
+                keepAlive: true,
+              },
             },
             {
               path: "/nested/menu1/menu1-2/menu1-2-2",
@@ -53,10 +53,10 @@ export default {
               name: "Menu1-2-2",
               meta: {
                 title: $t("menus.pureMenu1-2-2"),
-                keepAlive: true
-              }
-            }
-          ]
+                keepAlive: true,
+              },
+            },
+          ],
         },
         {
           path: "/nested/menu1/menu1-3",
@@ -64,10 +64,10 @@ export default {
           name: "Menu1-3",
           meta: {
             title: $t("menus.pureMenu1-3"),
-            keepAlive: true
-          }
-        }
-      ]
+            keepAlive: true,
+          },
+        },
+      ],
     },
     {
       path: "/nested/menu2",
@@ -75,8 +75,8 @@ export default {
       component: () => import("@/views/nested/menu2/index.vue"),
       meta: {
         title: $t("menus.pureMenu2"),
-        keepAlive: true
-      }
-    }
-  ]
+        keepAlive: true,
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

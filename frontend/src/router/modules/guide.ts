@@ -8,7 +8,7 @@ export default {
     icon: "ep/guide",
     title: $t("menus.pureGuide"),
     rank: guide,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       name: "Guide",
       component: () => import("@/views/guide/index.vue"),
       meta: {
-        title: $t("menus.pureGuide")
-      }
-    }
-  ]
+        title: $t("menus.pureGuide"),
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

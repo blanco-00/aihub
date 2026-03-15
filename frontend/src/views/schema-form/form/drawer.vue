@@ -5,7 +5,7 @@ import "plus-pro-components/es/components/drawer-form/style/css";
 import {
   type PlusColumn,
   type FieldValues,
-  PlusDrawerForm
+  PlusDrawerForm,
 } from "plus-pro-components";
 
 const columns: PlusColumn[] = [
@@ -14,7 +14,7 @@ const columns: PlusColumn[] = [
     width: 120,
     prop: "name",
     valueType: "copy",
-    tooltip: "名称最多显示6个字符"
+    tooltip: "名称最多显示6个字符",
   },
   {
     label: "状态",
@@ -25,42 +25,42 @@ const columns: PlusColumn[] = [
       {
         label: "未解决",
         value: "0",
-        color: "red"
+        color: "red",
       },
       {
         label: "已解决",
         value: "1",
-        color: "blue"
+        color: "blue",
       },
       {
         label: "解决中",
         value: "2",
-        color: "yellow"
+        color: "yellow",
       },
       {
         label: "失败",
         value: "3",
-        color: "red"
-      }
-    ]
+        color: "red",
+      },
+    ],
   },
   {
     label: "是否显示",
     width: 100,
     prop: "switch",
-    valueType: "switch"
+    valueType: "switch",
   },
 
   {
     label: "时间",
     prop: "time",
-    valueType: "date-picker"
+    valueType: "date-picker",
   },
   {
     label: "数量",
     prop: "number",
     valueType: "input-number",
-    fieldProps: { precision: 2, step: 2 }
+    fieldProps: { precision: 2, step: 2 },
   },
   {
     label: "城市",
@@ -77,19 +77,19 @@ const columns: PlusColumn[] = [
             children: [
               {
                 value: "0-0-0",
-                label: "新城区"
+                label: "新城区",
               },
               {
                 value: "0-0-1",
-                label: "高新区"
+                label: "高新区",
               },
               {
                 value: "0-0-2",
-                label: "灞桥区"
-              }
-            ]
-          }
-        ]
+                label: "灞桥区",
+              },
+            ],
+          },
+        ],
       },
       {
         value: "1",
@@ -101,29 +101,29 @@ const columns: PlusColumn[] = [
             children: [
               {
                 value: "1-0-0",
-                label: "小店区"
+                label: "小店区",
               },
               {
                 value: "1-0-1",
-                label: "古交市"
+                label: "古交市",
               },
               {
                 value: "1-0-2",
-                label: "万柏林区"
-              }
-            ]
-          }
-        ]
-      }
-    ]
+                label: "万柏林区",
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
   {
     label: "地区",
     prop: "place",
     tooltip: "请精确到门牌号",
     fieldProps: {
-      placeholder: "请精确到门牌号"
-    }
+      placeholder: "请精确到门牌号",
+    },
   },
   {
     label: "要求",
@@ -132,17 +132,17 @@ const columns: PlusColumn[] = [
     options: [
       {
         label: "四六级",
-        value: "0"
+        value: "0",
       },
       {
         label: "计算机二级证书",
-        value: "1"
+        value: "1",
       },
       {
         label: "普通话证书",
-        value: "2"
-      }
-    ]
+        value: "2",
+      },
+    ],
   },
   {
     label: "梦想",
@@ -151,17 +151,17 @@ const columns: PlusColumn[] = [
     options: [
       {
         label: "诗",
-        value: "0"
+        value: "0",
       },
       {
         label: "远方",
-        value: "1"
+        value: "1",
       },
       {
         label: "美食",
-        value: "2"
-      }
-    ]
+        value: "2",
+      },
+    ],
   },
   {
     label: "到期时间",
@@ -170,8 +170,8 @@ const columns: PlusColumn[] = [
     fieldProps: {
       type: "datetimerange",
       startPlaceholder: "请选择开始时间",
-      endPlaceholder: "请选择结束时间"
-    }
+      endPlaceholder: "请选择结束时间",
+    },
   },
   {
     label: "说明",
@@ -180,9 +180,9 @@ const columns: PlusColumn[] = [
     fieldProps: {
       maxlength: 10,
       showWordLimit: true,
-      autosize: { minRows: 2, maxRows: 4 }
-    }
-  }
+      autosize: { minRows: 2, maxRows: 4 },
+    },
+  },
 ];
 
 const visible = ref(false);

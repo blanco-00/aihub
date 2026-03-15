@@ -5,22 +5,28 @@ import {
   router,
   resetRouter,
   routerArrays,
-  storageLocal
+  storageLocal,
 } from "../utils";
 import {
   type UserResult,
   type RefreshTokenResult,
   getLogin,
-  refreshTokenApi
+  refreshTokenApi,
 } from "@/api/user";
 import {
   type LoginRequest,
   type RefreshTokenRequest,
   login as authLogin,
-  refreshToken as authRefreshToken
+  refreshToken as authRefreshToken,
 } from "@/api/auth";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey, saveLastUsername } from "@/utils/auth";
+import {
+  type DataInfo,
+  setToken,
+  removeToken,
+  userKey,
+  saveLastUsername,
+} from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
@@ -40,7 +46,7 @@ export const useUserStore = defineStore("pure-user", {
     // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：二维码登录、3：注册、4：忘记密码）
     currentPage: 0,
     // 是否勾选了登录页的免登录（后端固定30天）
-    isRemembered: false
+    isRemembered: false,
   }),
   actions: {
     /** 存储头像 */
@@ -82,24 +88,27 @@ export const useUserStore = defineStore("pure-user", {
         const loginData: LoginRequest = {
           usernameOrEmail: data.username || "",
           password: data.password || "",
-          rememberMe: this.isRemembered
+          rememberMe: this.isRemembered,
         };
         authLogin(loginData)
-          .then(response => {
+          .then((response) => {
             if (response.code === 200) {
               // 转换后端数据格式为前端需要的格式
               const loginResponse = response.data;
               // 计算过期时间：当前时间 + expiresIn（秒）转毫秒
-              const expires = new Date(Date.now() + loginResponse.expiresIn * 1000);
+              const expires = new Date(
+                Date.now() + loginResponse.expiresIn * 1000,
+              );
               const tokenData = {
                 accessToken: loginResponse.token, // 后端返回的是 token
                 refreshToken: loginResponse.refreshToken,
                 expires: expires, // 根据 expiresIn 计算过期时间
                 username: loginResponse.user.username,
                 avatar: "", // 后端暂未返回头像
-                nickname: loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
+                nickname:
+                  loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
                 roles: [loginResponse.user.role],
-                permissions: [] // 后端暂未返回权限，后续可扩展
+                permissions: [], // 后端暂未返回权限，后续可扩展
               };
               setToken(tokenData);
               // 保存上次登录的用户名
@@ -110,17 +119,17 @@ export const useUserStore = defineStore("pure-user", {
               const userResult: UserResult = {
                 code: 0,
                 message: "登录成功",
-                data: tokenData
+                data: tokenData,
               };
               resolve(userResult);
             } else {
               reject(response.message || "登录失败");
             }
           })
-          .catch(error => {
+          .catch((error) => {
             // 兼容旧 API 调用（降级处理）
             getLogin(data)
-              .then(data => {
+              .then((data) => {
                 if (data.code === 0) {
                   setToken(data.data);
                   // 保存上次登录的用户名
@@ -132,7 +141,7 @@ export const useUserStore = defineStore("pure-user", {
                   reject(data.message);
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 reject(error?.message || err?.message || "登录失败");
               });
           });
@@ -153,24 +162,27 @@ export const useUserStore = defineStore("pure-user", {
       return new Promise<RefreshTokenResult>((resolve, reject) => {
         // 使用新的 auth API
         const refreshData: RefreshTokenRequest = {
-          refreshToken: data.refreshToken || ""
+          refreshToken: data.refreshToken || "",
         };
         authRefreshToken(refreshData)
-          .then(response => {
+          .then((response) => {
             if (response.code === 200) {
               // 转换后端数据格式为前端需要的格式
               const loginResponse = response.data;
               // 计算过期时间：当前时间 + expiresIn（秒）转毫秒
-              const expires = new Date(Date.now() + loginResponse.expiresIn * 1000);
+              const expires = new Date(
+                Date.now() + loginResponse.expiresIn * 1000,
+              );
               const tokenData = {
                 accessToken: loginResponse.token, // 后端返回的是 token
                 refreshToken: loginResponse.refreshToken,
                 expires: expires, // 根据 expiresIn 计算过期时间
                 username: loginResponse.user.username,
                 avatar: "", // 后端暂未返回头像
-                nickname: loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
+                nickname:
+                  loginResponse.user.nickname || loginResponse.user.username, // 使用后端返回的nickname，如果没有则使用username
                 roles: [loginResponse.user.role],
-                permissions: [] // 后端暂未返回权限，后续可扩展
+                permissions: [], // 后端暂未返回权限，后续可扩展
               };
               setToken(tokenData);
               // 返回兼容旧格式的数据
@@ -180,18 +192,18 @@ export const useUserStore = defineStore("pure-user", {
                 data: {
                   accessToken: tokenData.accessToken,
                   refreshToken: tokenData.refreshToken,
-                  expires: tokenData.expires
-                }
+                  expires: tokenData.expires,
+                },
               };
               resolve(refreshResult);
             } else {
               reject(response.message || "刷新失败");
             }
           })
-          .catch(error => {
+          .catch((error) => {
             // 兼容旧 API 调用（降级处理）
             refreshTokenApi(data)
-              .then(data => {
+              .then((data) => {
                 if (data.code === 0) {
                   setToken(data.data);
                   resolve(data);
@@ -199,13 +211,13 @@ export const useUserStore = defineStore("pure-user", {
                   reject(data.message);
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 reject(error?.message || err?.message || "刷新失败");
               });
           });
       });
-    }
-  }
+    },
+  },
 });
 
 export function useUserStoreHook() {

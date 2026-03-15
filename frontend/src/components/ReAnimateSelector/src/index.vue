@@ -4,14 +4,14 @@ import { animates } from "./animate";
 import { cloneDeep } from "@pureadmin/utils";
 
 defineOptions({
-  name: "ReAnimateSelector"
+  name: "ReAnimateSelector",
 });
 
 defineProps({
   placeholder: {
     type: String,
-    default: "请选择动画"
-  }
+    default: "请选择动画",
+  },
 });
 
 const inputValue = defineModel({ type: String });
@@ -33,7 +33,7 @@ const animateClass = computed(() => {
     "justify-center",
     "border-[#e5e7eb]",
     "hover:text-primary",
-    "hover:duration-[700ms]"
+    "hover:duration-[700ms]",
   ];
 });
 
@@ -42,9 +42,9 @@ const animateStyle = computed(
     inputValue.value === i
       ? {
           borderColor: "var(--el-color-primary)",
-          color: "var(--el-color-primary)"
+          color: "var(--el-color-primary)",
         }
-      : ""
+      : "",
 );
 
 function onChangeIcon(animate: string) {
@@ -58,7 +58,7 @@ function onClear() {
 function filterMethod(value: any) {
   searchVal.value = value;
   animatesList.value = copyAnimatesList.value.filter((i: string | any[]) =>
-    i.includes(value)
+    i.includes(value),
   );
 }
 
@@ -66,10 +66,10 @@ const animateMap = ref({});
 function onMouseEnter(index: string | number) {
   animateMap.value[index] = animateMap.value[index]?.loading
     ? Object.assign({}, animateMap.value[index], {
-        loading: false
+        loading: false,
       })
     : Object.assign({}, animateMap.value[index], {
-        loading: true
+        loading: true,
       });
 }
 function onMouseleave() {
@@ -111,7 +111,7 @@ function onMouseleave() {
                     animateMap[index]?.loading
                       ? animate + ' animate__infinite'
                       : ''
-                  } `
+                  } `,
                 ]"
               >
                 {{ animate }}

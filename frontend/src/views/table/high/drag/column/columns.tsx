@@ -10,38 +10,38 @@ export function useColumns() {
   const columnsDrag = ref<TableColumnList>([
     {
       label: "ID",
-      prop: "id"
+      prop: "id",
     },
     {
       label: "日期",
-      prop: "date"
+      prop: "date",
     },
     {
       label: "姓名",
-      prop: "name"
-    }
+      prop: "name",
+    },
   ]);
 
   const columns = ref<TableColumnList>([
     {
       label: "ID",
-      prop: index => columnsDrag.value[index].prop as string
+      prop: (index) => columnsDrag.value[index].prop as string,
     },
     {
       label: "日期",
-      prop: index => columnsDrag.value[index].prop as string
+      prop: (index) => columnsDrag.value[index].prop as string,
     },
     {
       label: "姓名",
-      prop: index => columnsDrag.value[index].prop as string
-    }
+      prop: (index) => columnsDrag.value[index].prop as string,
+    },
   ]);
 
   const columnDrop = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     nextTick(() => {
       const wrapper: HTMLElement = document.querySelector(
-        ".el-table__header-wrapper tr"
+        ".el-table__header-wrapper tr",
       );
       Sortable.create(wrapper, {
         animation: 300,
@@ -50,7 +50,7 @@ export function useColumns() {
           const oldItem = columnsDrag.value[oldIndex];
           columnsDrag.value.splice(oldIndex, 1);
           columnsDrag.value.splice(newIndex, 0, oldItem);
-        }
+        },
       });
     });
   };
@@ -64,6 +64,6 @@ export function useColumns() {
   return {
     columns,
     dataList,
-    columnsDrag
+    columnsDrag,
   };
 }

@@ -7,7 +7,7 @@ import {
   toggleUserStatus as toggleUserStatusNew,
   type UserListParams,
   type CreateUserRequest,
-  type UpdateUserRequest
+  type UpdateUserRequest,
 } from "./user";
 import { getDeptList as getDeptListNew } from "./department";
 
@@ -43,7 +43,7 @@ type ResultTable = {
 /** 获取系统管理-用户管理列表 */
 export const getUserList = (data?: any) => {
   const transformStartTime = performance.now();
-  
+
   // 转换参数格式：从 { username, phone, status, currentPage, pageSize, departmentId } 转换为 { keyword, role, status, departmentId, current, size }
   const params: UserListParams = {};
   if (data) {
@@ -65,23 +65,23 @@ export const getUserList = (data?: any) => {
       params.departmentId = Number(data.departmentId);
     }
   }
-  
+
   const transformTime = performance.now() - transformStartTime;
   if (transformTime > 10) {
     console.warn(`[getUserList] 参数转换耗时: ${transformTime.toFixed(2)}ms`);
   }
-  
+
   const requestStartTime = performance.now();
   return getUserListNew(params).then((response: any) => {
     const requestTime = performance.now() - requestStartTime;
     const responseProcessStart = performance.now();
-    
+
     console.log("[getUserList] API响应接收", {
       code: response.code,
       requestTime: `${requestTime.toFixed(2)}ms`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    
+
     // 转换响应格式：从 { records, total, current, size, pages } 转换为 { list, total, pageSize, currentPage }
     // 后端返回 code: 200 表示成功
     if ((response.code === 200 || response.code === 0) && response.data) {
@@ -102,20 +102,24 @@ export const getUserList = (data?: any) => {
         departmentId: item.departmentId || 0,
         departmentName: item.departmentName || "未分配",
         createTime: item.createdAt,
-        updatedAt: item.updatedAt
+        updatedAt: item.updatedAt,
       }));
-      
+
       const responseProcessTime = performance.now() - responseProcessStart;
       const totalTime = performance.now() - transformStartTime;
-      
+
       if (responseProcessTime > 10) {
-        console.warn(`[getUserList] 响应处理耗时: ${responseProcessTime.toFixed(2)}ms`);
+        console.warn(
+          `[getUserList] 响应处理耗时: ${responseProcessTime.toFixed(2)}ms`,
+        );
       }
-      
+
       if (totalTime > 1000) {
-        console.warn(`[getUserList] 总耗时过长: ${totalTime.toFixed(2)}ms (请求: ${requestTime.toFixed(2)}ms, 处理: ${responseProcessTime.toFixed(2)}ms)`);
+        console.warn(
+          `[getUserList] 总耗时过长: ${totalTime.toFixed(2)}ms (请求: ${requestTime.toFixed(2)}ms, 处理: ${responseProcessTime.toFixed(2)}ms)`,
+        );
       }
-      
+
       return {
         code: 0,
         message: response.message || "success",
@@ -123,8 +127,8 @@ export const getUserList = (data?: any) => {
           list,
           total: response.data.total || 0,
           pageSize: response.data.size || 10,
-          currentPage: response.data.current || 1
-        }
+          currentPage: response.data.current || 1,
+        },
       };
     }
     // 如果响应格式不符合预期，返回错误格式
@@ -135,8 +139,8 @@ export const getUserList = (data?: any) => {
         list: [],
         total: 0,
         pageSize: 10,
-        currentPage: 1
-      }
+        currentPage: 1,
+      },
     };
   });
 };
@@ -150,9 +154,12 @@ export const createUser = (data: any) => {
     phone: data.phone,
     password: data.password,
     role: data.role || "USER", // 默认角色
-    departmentId: data.departmentId !== undefined && data.departmentId !== null ? data.departmentId : 0, // 部门ID
+    departmentId:
+      data.departmentId !== undefined && data.departmentId !== null
+        ? data.departmentId
+        : 0, // 部门ID
     status: data.status !== undefined ? data.status : 1,
-    remark: data.remark || "" // 备注
+    remark: data.remark || "", // 备注
   };
   return createUserNew(request);
 };
@@ -165,10 +172,11 @@ export const updateUser = (id: number, data: any) => {
     email: data.email,
     phone: data.phone,
     role: data.role || "USER",
-    departmentId: data.departmentId !== undefined ? data.departmentId : undefined, // 包含部门ID
+    departmentId:
+      data.departmentId !== undefined ? data.departmentId : undefined, // 包含部门ID
     status: data.status,
     remark: data.remark, // 包含备注
-    password: data.password || undefined // 只有提供密码时才更新
+    password: data.password || undefined, // 只有提供密码时才更新
   };
   return updateUserNew(id, request);
 };
@@ -200,7 +208,9 @@ export const getRoleIds = (userId: number) => {
 
 /** 系统管理-用户管理-分配用户角色（支持多角色） */
 export const assignUserRoles = (userId: number, roleIds: number[]) => {
-  return http.request<Result<void>>("post", `/api/users/${userId}/roles`, { data: roleIds });
+  return http.request<Result<void>>("post", `/api/users/${userId}/roles`, {
+    data: roleIds,
+  });
 };
 
 /** 获取系统管理-角色管理列表 */
@@ -220,7 +230,9 @@ export const getDeptList = (data?: object) => {
 
 /** 获取系统监控-在线用户列表 */
 export const getOnlineLogsList = (data?: object) => {
-  return http.request<ResultTable>("get", "/api/online-users", { params: data });
+  return http.request<ResultTable>("get", "/api/online-users", {
+    params: data,
+  });
 };
 
 /** 强制用户下线 */
@@ -230,17 +242,23 @@ export const forceOfflineUser = (userId: number) => {
 
 /** 获取系统监控-登录日志列表 */
 export const getLoginLogsList = (params?: object) => {
-  return http.request<Result<PageResult<any>>>("get", "/api/login-logs", { params });
+  return http.request<Result<PageResult<any>>>("get", "/api/login-logs", {
+    params,
+  });
 };
 
 /** 获取系统监控-操作日志列表 */
 export const getOperationLogsList = (params?: object) => {
-  return http.request<Result<PageResult<any>>>("get", "/api/operation-logs", { params });
+  return http.request<Result<PageResult<any>>>("get", "/api/operation-logs", {
+    params,
+  });
 };
 
 /** 获取系统监控-系统日志列表 */
 export const getSystemLogsList = (params?: object) => {
-  return http.request<Result<PageResult<any>>>("get", "/api/system-logs", { params });
+  return http.request<Result<PageResult<any>>>("get", "/api/system-logs", {
+    params,
+  });
 };
 
 /** 获取系统监控-系统日志-根据 id 查日志详情 */
@@ -292,7 +310,10 @@ export type WelcomeStatisticsResponse = {
 
 /** 获取欢迎页面统计数据 */
 export const getWelcomeStatistics = () => {
-  return http.request<Result<WelcomeStatisticsResponse>>("get", "/api/welcome/statistics");
+  return http.request<Result<WelcomeStatisticsResponse>>(
+    "get",
+    "/api/welcome/statistics",
+  );
 };
 
 /** 文件管理相关类型 */
@@ -315,18 +336,22 @@ export type FileListParams = {
 
 /** 获取文件列表 */
 export const getFileList = (params?: FileListParams) => {
-  return http.request<Result<PageResult<FileInfo>>>("get", "/api/files/list", { params });
+  return http.request<Result<PageResult<FileInfo>>>("get", "/api/files/list", {
+    params,
+  });
 };
 
 /** 删除文件 */
 export const deleteFile = (url: string) => {
-  return http.request<Result<void>>("delete", "/api/files", { params: { url } });
+  return http.request<Result<void>>("delete", "/api/files", {
+    params: { url },
+  });
 };
 
 /** 下载文件 */
 export const downloadFile = (url: string) => {
-  return http.request<Blob>("get", "/api/files/download", { 
+  return http.request<Blob>("get", "/api/files/download", {
     params: { url },
-    responseType: "blob"
+    responseType: "blob",
   });
 };

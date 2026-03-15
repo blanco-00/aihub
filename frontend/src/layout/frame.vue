@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { ref, unref, watch, onMounted, nextTick } from "vue";
 
 defineOptions({
-  name: "LayFrame"
+  name: "LayFrame",
 });
 
 const props = defineProps<{
@@ -54,7 +54,7 @@ let isRedirect = false;
 
 watch(
   () => currentRoute.fullPath,
-  path => {
+  (path) => {
     if (
       currentRoute.name === "Redirect" &&
       props.frameInfo?.fullPath &&
@@ -78,7 +78,7 @@ watch(
       isRedirect = false;
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(() => {

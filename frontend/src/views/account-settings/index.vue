@@ -18,7 +18,7 @@ import SecurityLogIcon from "~icons/ri/window-line";
 import AccountManagementIcon from "~icons/ri/profile-line";
 
 defineOptions({
-  name: "AccountSettings"
+  name: "AccountSettings",
 });
 
 const router = useRouter();
@@ -31,33 +31,33 @@ onBeforeMount(() => {
 const userInfo = ref({
   avatar: "",
   username: "",
-  nickname: ""
+  nickname: "",
 });
 const panes = [
   {
     key: "profile",
     label: "个人信息",
     icon: ProfileIcon,
-    component: Profile
+    component: Profile,
   },
   {
     key: "preferences",
     label: "偏好设置",
     icon: PreferencesIcon,
-    component: Preferences
+    component: Preferences,
   },
   {
     key: "securityLog",
     label: "安全日志",
     icon: SecurityLogIcon,
-    component: SecurityLog
+    component: SecurityLog,
   },
   {
     key: "accountManagement",
     label: "账户管理",
     icon: AccountManagementIcon,
-    component: AccountManagement
-  }
+    component: AccountManagement,
+  },
 ];
 const witchPane = ref("profile");
 
@@ -127,7 +127,7 @@ onMounted(async () => {
         @toggleClick="isOpen = !isOpen"
       />
       <component
-        :is="panes.find(item => item.key === witchPane).component"
+        :is="panes.find((item) => item.key === witchPane).component"
         :class="[!deviceDetection() && 'ml-[120px]']"
       />
     </el-main>

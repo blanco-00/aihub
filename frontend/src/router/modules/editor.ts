@@ -8,7 +8,7 @@ export default {
     icon: "ep/edit",
     title: $t("menus.pureEditor"),
     rank: editor,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -17,8 +17,8 @@ export default {
       component: () => import("@/views/editor/index.vue"),
       meta: {
         title: $t("menus.pureEditor"),
-        keepAlive: true
-      }
-    }
-  ]
+        keepAlive: true,
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

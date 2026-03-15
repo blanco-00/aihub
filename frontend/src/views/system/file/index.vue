@@ -10,7 +10,7 @@ import View from "~icons/ep/view";
 import Refresh from "~icons/ep/refresh";
 
 defineOptions({
-  name: "SystemFile"
+  name: "SystemFile",
 });
 
 const formRef = ref();
@@ -30,7 +30,7 @@ const {
   handleSizeChange,
   handleCurrentChange,
   handleSelectionChange,
-  onSelectionCancel
+  onSelectionCancel,
 } = useFile();
 </script>
 
@@ -116,7 +116,7 @@ const {
           :pagination="{ ...pagination, size }"
           :header-cell-style="{
             background: 'var(--el-fill-color-light)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @selection-change="handleSelectionChange"
           @page-size-change="handleSizeChange"
@@ -171,7 +171,7 @@ const {
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
-  
+
   :deep(.el-form-item__label) {
     color: var(--el-text-color-primary);
   }

@@ -2,14 +2,19 @@
 import { formUpload } from "@/api/mock";
 import { message } from "@/utils/message";
 import { onMounted, reactive, ref } from "vue";
-import { type UserInfo, getMine, updateProfile, updatePassword } from "@/api/user";
+import {
+  type UserInfo,
+  getMine,
+  updateProfile,
+  updatePassword,
+} from "@/api/user";
 import type { FormInstance, FormRules } from "element-plus";
 import ReCropperPreview from "@/components/ReCropperPreview";
 import { createFormData, deviceDetection } from "@pureadmin/utils";
 import uploadLine from "~icons/ri/upload-line";
 
 defineOptions({
-  name: "Profile"
+  name: "Profile",
 });
 
 const imgSrc = ref("");
@@ -26,32 +31,36 @@ const userInfos = reactive({
   nickname: "",
   email: "",
   phone: "",
-  description: ""
+  description: "",
 });
 
 // 密码修改表单
 const passwordForm = reactive({
   oldPassword: "",
   newPassword: "",
-  confirmPassword: ""
+  confirmPassword: "",
 });
 
 const rules = reactive<FormRules<UserInfo>>({
   nickname: [{ required: true, message: "昵称必填", trigger: "blur" }],
   email: [
     { required: true, message: "邮箱必填", trigger: "blur" },
-    { type: "email", message: "请输入正确的邮箱地址", trigger: "blur" }
+    { type: "email", message: "请输入正确的邮箱地址", trigger: "blur" },
   ],
   phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号码", trigger: "blur" }
-  ]
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: "请输入正确的手机号码",
+      trigger: "blur",
+    },
+  ],
 });
 
 const passwordRules = reactive<FormRules>({
   oldPassword: [{ required: true, message: "请输入当前密码", trigger: "blur" }],
   newPassword: [
     { required: true, message: "请输入新密码", trigger: "blur" },
-    { min: 6, message: "密码长度不能少于6位", trigger: "blur" }
+    { min: 6, message: "密码长度不能少于6位", trigger: "blur" },
   ],
   confirmPassword: [
     { required: true, message: "请确认新密码", trigger: "blur" },
@@ -63,34 +72,34 @@ const passwordRules = reactive<FormRules>({
           callback();
         }
       },
-      trigger: "blur"
-    }
-  ]
+      trigger: "blur",
+    },
+  ],
 });
 
 function queryEmail(queryString, callback) {
   const emailList = [
     { value: "@qq.com" },
     { value: "@126.com" },
-    { value: "@163.com" }
+    { value: "@163.com" },
   ];
   let results = [];
   let queryList = [];
-  emailList.map(item =>
-    queryList.push({ value: queryString.split("@")[0] + item.value })
+  emailList.map((item) =>
+    queryList.push({ value: queryString.split("@")[0] + item.value }),
   );
   results = queryString
     ? queryList.filter(
-        item =>
-          item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+        (item) =>
+          item.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0,
       )
     : queryList;
   callback(results);
 }
 
-const onChange = uploadFile => {
+const onChange = (uploadFile) => {
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = (e) => {
     imgSrc.value = e.target.result as string;
     isShow.value = true;
   };
@@ -108,13 +117,13 @@ const onCropper = ({ blob }) => (cropperBlob.value = blob);
 const handleSubmitImage = async () => {
   try {
     const formData = createFormData({
-      file: new File([cropperBlob.value], "avatar.jpg", { type: "image/jpeg" })
+      file: new File([cropperBlob.value], "avatar.jpg", { type: "image/jpeg" }),
     });
     const { code, data } = await formUpload(formData, "avatar");
     if (code === 200 && data) {
       // 更新用户头像
       await updateProfile({
-        avatar: data.url
+        avatar: data.url,
       });
       message("更新头像成功", { type: "success" });
       handleClose();
@@ -137,7 +146,7 @@ const onSubmit = async (formEl: FormInstance) => {
           nickname: userInfos.nickname,
           email: userInfos.email,
           phone: userInfos.phone,
-          description: userInfos.description
+          description: userInfos.description,
         });
         message("更新信息成功", { type: "success" });
         loadUserInfo();
@@ -155,7 +164,7 @@ const onSubmitPassword = async (formEl: FormInstance) => {
       try {
         await updatePassword({
           oldPassword: passwordForm.oldPassword,
-          newPassword: passwordForm.newPassword
+          newPassword: passwordForm.newPassword,
         });
         message("修改密码成功", { type: "success" });
         passwordForm.oldPassword = "";
@@ -194,7 +203,7 @@ onMounted(() => {
   <div
     :class="[
       'min-w-[180px]',
-      deviceDetection() ? 'max-w-[100%]' : 'max-w-[70%]'
+      deviceDetection() ? 'max-w-[100%]' : 'max-w-[70%]',
     ]"
   >
     <h3 class="my-8!">个人信息</h3>

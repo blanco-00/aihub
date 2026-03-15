@@ -15,7 +15,7 @@ import Refresh from "~icons/ep/refresh";
 import AddFill from "~icons/ri/add-circle-line";
 
 defineOptions({
-  name: "SystemUser"
+  name: "SystemUser",
 });
 
 const formRef = ref();
@@ -44,7 +44,7 @@ const {
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
 } = useUser(tableRef);
 
 // 加载部门树
@@ -67,11 +67,11 @@ function handleDepartmentNodeClick(data: DepartmentInfo) {
     clearDepartmentFilter();
     return;
   }
-  
+
   // 设置选中的部门ID
   selectedDepartmentId.value = data.id;
   form.departmentId = data.id;
-  
+
   // 重置到第一页并搜索
   pagination.currentPage = 1;
   onSearch();
@@ -81,7 +81,7 @@ function handleDepartmentNodeClick(data: DepartmentInfo) {
 function clearDepartmentFilter() {
   selectedDepartmentId.value = undefined;
   form.departmentId = undefined;
-  
+
   // 重置到第一页并搜索
   pagination.currentPage = 1;
   onSearch();
@@ -89,9 +89,12 @@ function clearDepartmentFilter() {
 
 // 根据部门ID获取部门名称（用于显示当前筛选）
 function getDepartmentName(deptId: number | undefined): string {
-  if (!deptId) return '';
-  
-  function findDept(depts: DepartmentInfo[], id: number): DepartmentInfo | null {
+  if (!deptId) return "";
+
+  function findDept(
+    depts: DepartmentInfo[],
+    id: number,
+  ): DepartmentInfo | null {
     for (const dept of depts) {
       if (dept.id === id) return dept;
       if (dept.children) {
@@ -101,9 +104,9 @@ function getDepartmentName(deptId: number | undefined): string {
     }
     return null;
   }
-  
+
   const dept = findDept(departmentTree.value, deptId);
-  return dept ? dept.name : '未知部门';
+  return dept ? dept.name : "未知部门";
 }
 </script>
 
@@ -111,14 +114,19 @@ function getDepartmentName(deptId: number | undefined): string {
   <div class="user-management-container">
     <el-container class="h-full">
       <!-- 左侧：组织机构树 -->
-      <el-aside 
-        :width="sidebarCollapsed ? '60px' : '280px'" 
+      <el-aside
+        :width="sidebarCollapsed ? '60px' : '280px'"
         class="dept-sidebar"
-        :class="{ 'collapsed': sidebarCollapsed }"
+        :class="{ collapsed: sidebarCollapsed }"
       >
         <div class="p-4">
           <div class="flex items-center justify-between mb-4">
-            <h3 v-if="!sidebarCollapsed" class="text-lg font-semibold dept-title">组织机构</h3>
+            <h3
+              v-if="!sidebarCollapsed"
+              class="text-lg font-semibold dept-title"
+            >
+              组织机构
+            </h3>
             <div class="flex items-center gap-2">
               <el-button
                 v-if="!sidebarCollapsed && selectedDepartmentId"
@@ -133,15 +141,26 @@ function getDepartmentName(deptId: number | undefined): string {
                 text
                 type="primary"
                 size="small"
-                :icon="useRenderIcon(sidebarCollapsed ? 'ri:menu-unfold-line' : 'ri:menu-fold-line')"
+                :icon="
+                  useRenderIcon(
+                    sidebarCollapsed
+                      ? 'ri:menu-unfold-line'
+                      : 'ri:menu-fold-line',
+                  )
+                "
                 @click="sidebarCollapsed = !sidebarCollapsed"
                 :title="sidebarCollapsed ? '展开' : '折叠'"
               />
             </div>
           </div>
           <!-- 显示当前筛选的部门（如果有） -->
-          <div v-if="!sidebarCollapsed && selectedDepartmentId" class="mb-3 p-2 rounded bg-[var(--el-fill-color-light)]">
-            <div class="text-xs text-[var(--el-text-color-secondary)] mb-1">当前筛选：</div>
+          <div
+            v-if="!sidebarCollapsed && selectedDepartmentId"
+            class="mb-3 p-2 rounded bg-[var(--el-fill-color-light)]"
+          >
+            <div class="text-xs text-[var(--el-text-color-secondary)] mb-1">
+              当前筛选：
+            </div>
             <div class="text-sm font-medium text-[var(--el-color-primary)]">
               {{ getDepartmentName(selectedDepartmentId) }}
             </div>
@@ -161,7 +180,7 @@ function getDepartmentName(deptId: number | undefined): string {
                 <el-icon class="mr-2 dept-icon">
                   <component :is="useRenderIcon('ri:folder-line')" />
                 </el-icon>
-                <span 
+                <span
                   class="dept-label"
                   :class="{ 'dept-selected': selectedDepartmentId === data.id }"
                 >
@@ -180,12 +199,18 @@ function getDepartmentName(deptId: number | undefined): string {
             >
               <div
                 class="cursor-pointer p-2 rounded hover:bg-[var(--el-fill-color-light)] transition-colors"
-                :class="{ 'bg-[var(--el-color-primary-light-9)]': selectedDepartmentId === dept.id }"
+                :class="{
+                  'bg-[var(--el-color-primary-light-9)]':
+                    selectedDepartmentId === dept.id,
+                }"
                 @click="handleDepartmentNodeClick(dept)"
               >
-                <el-icon 
+                <el-icon
                   class="text-lg block"
-                  :class="{ 'text-[var(--el-color-primary)]': selectedDepartmentId === dept.id }"
+                  :class="{
+                    'text-[var(--el-color-primary)]':
+                      selectedDepartmentId === dept.id,
+                  }"
                 >
                   <component :is="useRenderIcon('ri:folder-line')" />
                 </el-icon>
@@ -240,17 +265,16 @@ function getDepartmentName(deptId: number | undefined): string {
               >
                 搜索
               </el-button>
-              <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
+              <el-button
+                :icon="useRenderIcon(Refresh)"
+                @click="resetForm(formRef)"
+              >
                 重置
               </el-button>
             </el-form-item>
           </el-form>
 
-          <PureTableBar
-            title="用户管理"
-            :columns="columns"
-            @refresh="onSearch"
-          >
+          <PureTableBar title="用户管理" :columns="columns" @refresh="onSearch">
             <template #buttons>
               <el-button
                 type="primary"
@@ -299,7 +323,7 @@ function getDepartmentName(deptId: number | undefined): string {
                 :pagination="{ ...pagination, size }"
                 :header-cell-style="{
                   background: 'var(--el-fill-color-light)',
-                  color: 'var(--el-text-color-primary)'
+                  color: 'var(--el-text-color-primary)',
                 }"
                 @selection-change="handleSelectionChange"
                 @page-size-change="handleSizeChange"
@@ -397,7 +421,7 @@ function getDepartmentName(deptId: number | undefined): string {
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
-  
+
   /* 表单标签颜色 - 使用主题变量 */
   :deep(.el-form-item__label) {
     color: var(--el-text-color-primary);
@@ -410,11 +434,11 @@ function getDepartmentName(deptId: number | undefined): string {
   border-right: 1px solid var(--el-border-color);
   overflow-y: auto;
   transition: width 0.3s ease;
-  
+
   &.collapsed {
     overflow: visible;
   }
-  
+
   .dept-title {
     color: var(--el-text-color-primary);
   }
@@ -425,7 +449,7 @@ function getDepartmentName(deptId: number | undefined): string {
     background-color: transparent;
     color: var(--el-text-color-primary);
   }
-  
+
   :deep(.el-tree-node__content) {
     height: 36px;
     padding: 0 8px;
@@ -433,40 +457,40 @@ function getDepartmentName(deptId: number | undefined): string {
     border-radius: 4px;
     margin-bottom: 2px;
   }
-  
+
   :deep(.el-tree-node__content:hover) {
     background-color: var(--el-fill-color-light);
   }
-  
+
   :deep(.el-tree-node.is-current > .el-tree-node__content) {
     background-color: var(--el-color-primary-light-9);
     color: var(--el-color-primary);
     font-weight: 500;
   }
-  
+
   :deep(.el-tree-node__expand-icon) {
     color: var(--el-text-color-regular);
   }
-  
+
   :deep(.el-tree-node__label) {
     color: var(--el-text-color-primary);
   }
-  
+
   /* 部门树节点样式 */
   .dept-tree-node {
     width: 100%;
   }
-  
+
   .dept-icon {
     color: var(--el-text-color-regular);
     font-size: 16px;
   }
-  
+
   .dept-label {
     color: var(--el-text-color-primary);
     transition: color 0.2s;
   }
-  
+
   .dept-selected {
     color: var(--el-color-primary);
     font-weight: 500;
@@ -488,12 +512,12 @@ function getDepartmentName(deptId: number | undefined): string {
 .user-management-container {
   /* 容器内所有文本默认使用主题变量 */
   color: var(--el-text-color-primary);
-  
+
   /* 确保链接颜色使用主题变量 */
   a {
     color: var(--el-color-primary);
   }
-  
+
   /* 确保图标颜色使用主题变量 */
   .el-icon {
     color: var(--el-text-color-regular);

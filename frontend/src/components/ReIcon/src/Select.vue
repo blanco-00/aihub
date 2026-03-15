@@ -7,7 +7,7 @@ import Search from "~icons/ri/search-eye-line";
 type ParameterCSSProperties = (item?: string) => CSSProperties | undefined;
 
 defineOptions({
-  name: "IconSelect"
+  name: "IconSelect",
 });
 
 const inputValue = defineModel({ type: String });
@@ -28,33 +28,33 @@ const filterValue = ref("");
 const tabsList = [
   {
     label: "Element Plus",
-    name: "ep:"
+    name: "ep:",
   },
   {
     label: "Remix Icon",
-    name: "ri:"
+    name: "ri:",
   },
   {
     label: "Font Awesome 5 Solid",
-    name: "fa-solid:"
-  }
+    name: "fa-solid:",
+  },
 ];
 
 const pageList = computed(() =>
   copyIconList[currentActiveType.value]
-    .filter(i => i.includes(filterValue.value))
+    .filter((i) => i.includes(filterValue.value))
     .slice(
       (currentPage.value - 1) * pageSize.value,
-      currentPage.value * pageSize.value
-    )
+      currentPage.value * pageSize.value,
+    ),
 );
 
 const iconItemStyle = computed((): ParameterCSSProperties => {
-  return item => {
+  return (item) => {
     if (inputValue.value === currentActiveType.value + item) {
       return {
         borderColor: "var(--el-color-primary)",
-        color: "var(--el-color-primary)"
+        color: "var(--el-color-primary)",
       };
     }
   };
@@ -63,7 +63,7 @@ const iconItemStyle = computed((): ParameterCSSProperties => {
 function setVal() {
   currentActiveType.value = inputValue.value.substring(
     0,
-    inputValue.value.indexOf(":") + 1
+    inputValue.value.indexOf(":") + 1,
   );
   icon.value = inputValue.value.substring(inputValue.value.indexOf(":") + 1);
 }
@@ -73,7 +73,7 @@ function onBeforeEnter() {
   setVal();
   // 寻找当前图标在第几页
   const curIconIndex = copyIconList[currentActiveType.value].findIndex(
-    i => i === icon.value
+    (i) => i === icon.value,
   );
   currentPage.value = Math.ceil((curIconIndex + 1) / pageSize.value);
 }
@@ -104,19 +104,19 @@ function onClear() {
 watch(
   () => pageList.value,
   () =>
-    (totalPage.value = copyIconList[currentActiveType.value].filter(i =>
-      i.includes(filterValue.value)
+    (totalPage.value = copyIconList[currentActiveType.value].filter((i) =>
+      i.includes(filterValue.value),
     ).length),
-  { immediate: true }
+  { immediate: true },
 );
 watch(
   () => inputValue.value,
-  val => val && setVal(),
-  { immediate: true }
+  (val) => val && setVal(),
+  { immediate: true },
 );
 watch(
   () => filterValue.value,
-  () => (currentPage.value = 1)
+  () => (currentPage.value = 1),
 );
 </script>
 
@@ -129,7 +129,7 @@ watch(
           trigger="click"
           popper-class="pure-popper"
           :popper-options="{
-            placement: 'auto'
+            placement: 'auto',
           }"
           @before-enter="onBeforeEnter"
           @after-leave="onAfterLeave"

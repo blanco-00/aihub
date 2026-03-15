@@ -11,7 +11,7 @@ import Refresh from "~icons/ep/refresh";
 import AddFill from "~icons/ri/add-circle-line";
 
 defineOptions({
-  name: "SystemMenu"
+  name: "SystemMenu",
 });
 
 const formRef = ref();
@@ -25,7 +25,7 @@ const {
   resetForm,
   openDialog,
   handleDelete,
-  handleSelectionChange
+  handleSelectionChange,
 } = useMenu();
 
 function onFullscreen() {
@@ -97,7 +97,7 @@ function onFullscreen() {
           :columns="dynamicColumns"
           :header-cell-style="{
             background: 'var(--el-fill-color-light)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @selection-change="handleSelectionChange"
         >

@@ -41,11 +41,13 @@ export type LoginLogListRequest = {
  * 获取登录日志列表
  */
 export const getLoginLogList = (params: LoginLogListRequest) => {
-  return http.request<Result<{
-    records: LoginLogInfo[];
-    total: number;
-    current: number;
-    size: number;
-    pages: number;
-  }>>("get", "/api/login-logs", { params });
+  return http.request<
+    Result<{
+      records: LoginLogInfo[];
+      total: number;
+      current: number;
+      size: number;
+      pages: number;
+    }>
+  >("get", "/api/login-logs", { params });
 };

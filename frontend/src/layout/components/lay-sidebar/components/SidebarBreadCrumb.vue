@@ -17,13 +17,13 @@ const getBreadcrumb = (): void => {
   let currentRoute;
 
   if (Object.keys(route.query).length > 0) {
-    multiTags.forEach(item => {
+    multiTags.forEach((item) => {
       if (isEqual(route.query, item?.query)) {
         currentRoute = toRaw(item);
       }
     });
   } else if (Object.keys(route.params).length > 0) {
-    multiTags.forEach(item => {
+    multiTags.forEach((item) => {
       if (isEqual(route.params, item?.params)) {
         currentRoute = toRaw(item);
       }
@@ -36,13 +36,13 @@ const getBreadcrumb = (): void => {
   const parentRoutes = getParentPaths(
     router.currentRoute.value.name as string,
     routes,
-    "name"
+    "name",
   );
   // 存放组成面包屑的数组
   const matched = [];
 
   // 获取每个父级路径对应的路由信息
-  parentRoutes.forEach(path => {
+  parentRoutes.forEach((path) => {
     if (path !== "/") matched.push(findRouteByPath(path, routes));
   });
 
@@ -51,7 +51,7 @@ const getBreadcrumb = (): void => {
   matched.forEach((item, index) => {
     if (currentRoute?.query || currentRoute?.params) return;
     if (item?.children) {
-      item.children.forEach(v => {
+      item.children.forEach((v) => {
         if (v?.meta?.title === item?.meta?.title) {
           matched.splice(index, 1);
         }
@@ -60,11 +60,11 @@ const getBreadcrumb = (): void => {
   });
 
   levelList.value = matched.filter(
-    item => item?.meta && item?.meta.title !== false
+    (item) => item?.meta && item?.meta.title !== false,
   );
 };
 
-const handleLink = item => {
+const handleLink = (item) => {
   const { redirect, name, path } = item;
   if (redirect) {
     router.push(redirect as any);
@@ -73,12 +73,12 @@ const handleLink = item => {
       if (item.query) {
         router.push({
           name,
-          query: item.query
+          query: item.query,
         });
       } else if (item.params) {
         router.push({
           name,
-          params: item.params
+          params: item.params,
         });
       } else {
         router.push({ name });
@@ -99,8 +99,8 @@ watch(
     getBreadcrumb();
   },
   {
-    deep: true
-  }
+    deep: true,
+  },
 );
 </script>
 

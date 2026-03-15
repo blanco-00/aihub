@@ -19,12 +19,12 @@ const instance = getCurrentInstance()!;
 const props = withDefaults(defineProps<Props>(), {});
 
 const itemStyle = computed(() => {
-  return item => {
+  return (item) => {
     return {
       background:
         item?.path === active.value ? useEpThemeStoreHook().epThemeColor : "",
       color: item.path === active.value ? "#fff" : "",
-      fontSize: item.path === active.value ? "16px" : "14px"
+      fontSize: item.path === active.value ? "16px" : "14px",
     };
   };
 });
@@ -35,7 +35,7 @@ const active = computed({
   },
   set(val: string) {
     emit("update:value", val);
-  }
+  },
 });
 
 /** 鼠标移入 */

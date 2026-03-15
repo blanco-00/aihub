@@ -15,8 +15,8 @@ export default defineComponent({
   props: {
     splitSet: {
       type: Object as PropType<ContextProps>,
-      require: true
-    }
+      require: true,
+    },
   },
   emits: ["resize"],
   setup(props, ctx) {
@@ -28,12 +28,12 @@ export default defineComponent({
 
     const leftClass = ref([
       "splitter-pane splitter-paneL",
-      props.splitSet?.split
+      props.splitSet?.split,
     ]);
 
     const rightClass = ref([
       "splitter-pane splitter-paneR",
-      props.splitSet?.split
+      props.splitSet?.split,
     ]);
 
     const cursor = computed(() => {
@@ -132,5 +132,5 @@ export default defineComponent({
         </div>
       </>
     );
-  }
+  },
 });

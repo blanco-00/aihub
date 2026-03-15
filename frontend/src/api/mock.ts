@@ -21,7 +21,7 @@ export type FileUploadResponse = {
 
 /** 文件上传 */
 export const formUpload = (data: FormData, category?: string) => {
-  const url = category 
+  const url = category
     ? `/api/files/upload?category=${category}`
     : "/api/files/upload";
   return http.request<Result<FileUploadResponse>>(
@@ -30,8 +30,8 @@ export const formUpload = (data: FormData, category?: string) => {
     { data },
     {
       headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    }
+        "Content-Type": "multipart/form-data",
+      },
+    },
   );
 };

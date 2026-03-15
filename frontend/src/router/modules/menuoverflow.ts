@@ -7,7 +7,7 @@ export default {
   meta: {
     title: $t("menus.pureMenuOverflow"),
     rank: menuoverflow,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       component: () => import("@/views/menuoverflow/index.vue"),
       meta: {
         title: $t("menus.pureChildMenuOverflow"),
-        showParent: true
-      }
-    }
-  ]
+        showParent: true,
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

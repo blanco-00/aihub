@@ -6,7 +6,7 @@ import type { DictTypeFormItemProps, DictDataFormItemProps } from "./types";
 export const dictTypeFormRules = reactive<FormRules<DictTypeFormItemProps>>({
   dictName: [
     { required: true, message: "字典名称不能为空", trigger: "blur" },
-    { max: 100, message: "字典名称长度不能超过100个字符", trigger: "blur" }
+    { max: 100, message: "字典名称长度不能超过100个字符", trigger: "blur" },
   ],
   dictType: [
     { required: true, message: "字典类型不能为空", trigger: "blur" },
@@ -14,26 +14,22 @@ export const dictTypeFormRules = reactive<FormRules<DictTypeFormItemProps>>({
     {
       pattern: /^[a-z][a-z0-9_]*$/,
       message: "字典类型只能包含小写字母、数字和下划线，且必须以字母开头",
-      trigger: "blur"
-    }
+      trigger: "blur",
+    },
   ],
-  remark: [
-    { max: 500, message: "备注长度不能超过500个字符", trigger: "blur" }
-  ]
+  remark: [{ max: 500, message: "备注长度不能超过500个字符", trigger: "blur" }],
 });
 
 /** 字典数据表单校验规则 */
 export const dictDataFormRules = reactive<FormRules<DictDataFormItemProps>>({
-  dictType: [
-    { required: true, message: "字典类型不能为空", trigger: "blur" }
-  ],
+  dictType: [{ required: true, message: "字典类型不能为空", trigger: "blur" }],
   dictLabel: [
     { required: true, message: "字典标签不能为空", trigger: "blur" },
-    { max: 100, message: "字典标签长度不能超过100个字符", trigger: "blur" }
+    { max: 100, message: "字典标签长度不能超过100个字符", trigger: "blur" },
   ],
   dictValue: [
     { required: true, message: "字典键值不能为空", trigger: "blur" },
-    { max: 100, message: "字典键值长度不能超过100个字符", trigger: "blur" }
+    { max: 100, message: "字典键值长度不能超过100个字符", trigger: "blur" },
   ],
   sortOrder: [
     {
@@ -55,10 +51,8 @@ export const dictDataFormRules = reactive<FormRules<DictDataFormItemProps>>({
         }
         callback();
       },
-      trigger: "blur"
-    }
+      trigger: "blur",
+    },
   ],
-  remark: [
-    { max: 500, message: "备注长度不能超过500个字符", trigger: "blur" }
-  ]
+  remark: [{ max: 500, message: "备注长度不能超过500个字符", trigger: "blur" }],
 });

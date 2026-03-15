@@ -8,7 +8,7 @@ import Plane from "~icons/ri/plane-line";
 import Refresh from "~icons/ep/refresh";
 
 defineOptions({
-  name: "OnlineUser"
+  name: "OnlineUser",
 });
 
 const formRef = ref();
@@ -23,7 +23,7 @@ const {
   handleOffline,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
 } = useRole();
 </script>
 
@@ -58,11 +58,7 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar
-      title="在线用户"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="在线用户" :columns="columns" @refresh="onSearch">
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           align-whole="center"
@@ -77,7 +73,7 @@ const {
           :pagination="{ ...pagination, size }"
           :header-cell-style="{
             background: 'var(--el-fill-color-light)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @selection-change="handleSelectionChange"
           @page-size-change="handleSizeChange"

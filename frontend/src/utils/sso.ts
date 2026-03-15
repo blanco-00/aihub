@@ -45,7 +45,7 @@ import { subBefore, getQueryMap } from "@pureadmin/utils";
 
     const newUrl = `${location.origin}${location.pathname}${subBefore(
       location.hash,
-      "?"
+      "?",
     )}?${JSON.stringify(params)
       .replace(/["{}]/g, "")
       .replace(/:/g, "=")

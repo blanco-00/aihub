@@ -34,7 +34,7 @@ export function useNav() {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      overflow: "hidden"
+      overflow: "hidden",
     };
   });
 
@@ -57,7 +57,7 @@ export function useNav() {
     return (locale, t) => {
       return {
         background: locale === t ? useEpThemeStoreHook().epThemeColor : "",
-        color: locale === t ? "#f4f4f5" : "#000"
+        color: locale === t ? "#f4f4f5" : "#000",
       };
     };
   });
@@ -175,6 +175,6 @@ export function useNav() {
     tooltipEffect,
     toAccountSettings,
     getDropdownItemStyle,
-    getDropdownItemClass
+    getDropdownItemClass,
   };
 }

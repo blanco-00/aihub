@@ -8,8 +8,8 @@ export default defineComponent({
   props: {
     options: {
       type: Object as PropType<TypeItOptions>,
-      default: () => ({}) as TypeItOptions
-    }
+      default: () => ({}) as TypeItOptions,
+    },
   },
   setup(props, { slots, expose }) {
     /**
@@ -43,7 +43,7 @@ export default defineComponent({
       const typeIt = new TypeIt($typed, props.options).go();
 
       expose({
-        typeIt
+        typeIt,
       });
     });
 
@@ -52,5 +52,5 @@ export default defineComponent({
         {slots.default?.() ?? <span class="type-it"></span>}
       </div>
     );
-  }
+  },
 });

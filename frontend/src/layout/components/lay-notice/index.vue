@@ -15,7 +15,7 @@ const notices = ref(noticesData);
 const activeKey = ref(noticesData[0]?.key);
 const unreadCount = ref(0);
 // 筛选模式：'all' 显示全部，'unread' 只显示未读
-const filterMode = ref<'all' | 'unread'>('unread');
+const filterMode = ref<"all" | "unread">("unread");
 
 // 加载系统通知（第一个标签页）
 async function loadSystemNotices() {
@@ -25,7 +25,7 @@ async function loadSystemNotices() {
     console.log("调用 getUnreadNoticeCount API...");
     const countResponse: any = await getUnreadNoticeCount();
     console.log("未读数量API响应:", countResponse);
-    
+
     // http.request 返回的是 response.data，即 {code, message, data}
     // 所以 countResponse 就是 {code: 200, message: "操作成功", data: 0}
     if (countResponse && countResponse.code === 200) {
@@ -41,8 +41,8 @@ async function loadSystemNotices() {
     console.log("调用 getMyNotices API...", "筛选模式:", filterMode.value);
     const listResponse: any = await getMyNotices({
       current: 1,
-      size: filterMode.value === 'unread' ? 20 : 10, // 未读模式显示更多
-      isRead: filterMode.value === 'unread' ? 0 : undefined // 只显示未读时传0
+      size: filterMode.value === "unread" ? 20 : 10, // 未读模式显示更多
+      isRead: filterMode.value === "unread" ? 0 : undefined, // 只显示未读时传0
     });
     console.log("通知列表API原始响应:", listResponse);
 
@@ -51,11 +51,11 @@ async function loadSystemNotices() {
     if (listResponse && listResponse.code === 200 && listResponse.data) {
       const records = listResponse.data.records || [];
       console.log("通知记录数:", records.length, "记录:", records);
-      
+
       // 转换为通知列表格式
       notices.value[0].list = records.map((item: any) => {
         console.log("处理通知项:", item);
-        
+
         // 处理内容：移除HTML标签，只保留文本
         let description = item.content || "";
         if (description) {
@@ -68,27 +68,33 @@ async function loadSystemNotices() {
             description = description.substring(0, 50) + "...";
           }
         }
-        
+
         // 如果内容为空，使用默认提示
         if (!description || description.trim() === "") {
           description = "暂无内容";
         }
-        
+
         const noticeItem = {
           avatar: "",
           title: item.title || "无标题",
           description: description,
           datetime: formatRelativeTime(item.publishTime),
           type: "1",
-          status: item.type === 3 ? "danger" : item.type === 2 ? "warning" : "info",
+          status:
+            item.type === 3 ? "danger" : item.type === 2 ? "warning" : "info",
           extra: item.isRead === 0 ? "未读" : "已读",
-          noticeId: item.noticeId || item.id
+          noticeId: item.noticeId || item.id,
         };
-        
+
         console.log("转换后的通知项:", noticeItem);
         return noticeItem;
       });
-      console.log("系统通知加载成功:", notices.value[0].list.length, "条", notices.value[0].list);
+      console.log(
+        "系统通知加载成功:",
+        notices.value[0].list.length,
+        "条",
+        notices.value[0].list,
+      );
     } else {
       notices.value[0].list = [];
       console.log("系统通知响应格式异常:", listResponse);
@@ -101,24 +107,24 @@ async function loadSystemNotices() {
 }
 
 // 计算标签显示（包含未读数量）
-const getLabel = computed(
-  () => item => {
-    if (item.key === "1") {
-      // 系统通知标签，显示未读数量（使用服务器返回的未读数量）
-      return t(item.name) + (unreadCount.value > 0 ? `(${unreadCount.value})` : "");
-    }
-    return t(item.name) + (item.list.length > 0 ? `(${item.list.length})` : "");
+const getLabel = computed(() => (item) => {
+  if (item.key === "1") {
+    // 系统通知标签，显示未读数量（使用服务器返回的未读数量）
+    return (
+      t(item.name) + (unreadCount.value > 0 ? `(${unreadCount.value})` : "")
+    );
   }
-);
+  return t(item.name) + (item.list.length > 0 ? `(${item.list.length})` : "");
+});
 
 // 计算过滤后的通知列表
 const filteredNoticeList = computed(() => {
   if (activeKey.value !== "1") {
-    return notices.value.find(n => n.key === activeKey.value)?.list || [];
+    return notices.value.find((n) => n.key === activeKey.value)?.list || [];
   }
-  
+
   const list = notices.value[0].list || [];
-  if (filterMode.value === 'unread') {
+  if (filterMode.value === "unread") {
     // 只显示未读
     return list.filter((n: any) => n.extra === "未读");
   } else {
@@ -139,7 +145,9 @@ watch(activeKey, (newKey) => {
 // 处理通知已读事件
 function handleNoticeRead(noticeId: number) {
   // 更新本地通知列表中的已读状态
-  const notice = notices.value[0].list.find((n: any) => n.noticeId === noticeId);
+  const notice = notices.value[0].list.find(
+    (n: any) => n.noticeId === noticeId,
+  );
   if (notice) {
     notice.extra = "已读";
   }
@@ -167,11 +175,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-dropdown trigger="click" placement="bottom-end" @visible-change="handleDropdownVisibleChange">
+  <el-dropdown
+    trigger="click"
+    placement="bottom-end"
+    @visible-change="handleDropdownVisibleChange"
+  >
     <span
       :class="['dropdown-badge', 'navbar-bg-hover', 'select-none', 'mr-[7px]']"
     >
-      <el-badge :value="unreadCount > 0 ? unreadCount : ''" :hidden="unreadCount === 0">
+      <el-badge
+        :value="unreadCount > 0 ? unreadCount : ''"
+        :hidden="unreadCount === 0"
+      >
         <span class="header-notice-icon">
           <IconifyIconOffline :icon="BellIcon" />
         </span>
@@ -195,15 +210,19 @@ onMounted(() => {
               <el-tab-pane :label="getLabel(item)" :name="`${item.key}`">
                 <!-- 系统通知标签页：显示筛选按钮 -->
                 <div v-if="item.key === '1'" class="notice-filter-bar">
-                  <el-radio-group v-model="filterMode" size="small" @change="loadSystemNotices">
+                  <el-radio-group
+                    v-model="filterMode"
+                    size="small"
+                    @change="loadSystemNotices"
+                  >
                     <el-radio-button label="unread">未读</el-radio-button>
                     <el-radio-button label="all">全部</el-radio-button>
                   </el-radio-group>
                 </div>
                 <el-scrollbar max-height="330px">
                   <div class="noticeList-container">
-                    <NoticeList 
-                      :list="item.key === '1' ? filteredNoticeList : item.list" 
+                    <NoticeList
+                      :list="item.key === '1' ? filteredNoticeList : item.list"
                       :emptyText="item.emptyText"
                       @read="handleNoticeRead"
                     />
@@ -270,17 +289,17 @@ onMounted(() => {
   .noticeList-container {
     padding: 15px 24px 0;
   }
-  
+
   .notice-filter-bar {
     padding: 8px 24px;
     border-bottom: 1px solid #f0f0f0;
     display: flex;
     justify-content: center;
-    
+
     .dark & {
       border-bottom-color: #303030;
     }
-    
+
     :deep(.el-radio-group) {
       .el-radio-button__inner {
         padding: 5px 15px;

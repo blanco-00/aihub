@@ -20,8 +20,8 @@ import Check from "~icons/ep/check";
 const menuRef = ref();
 const showLogo = ref(
   storageLocal().getItem<StorageConfigs>(
-    `${responsiveStorageNameSpace()}configure`
-  )?.showLogo ?? true
+    `${responsiveStorageNameSpace()}configure`,
+  )?.showLogo ?? true,
 );
 
 const { t, route, locale, translationCh, translationEn } =
@@ -37,11 +37,11 @@ const {
   avatarsStyle,
   toAccountSettings,
   getDropdownItemStyle,
-  getDropdownItemClass
+  getDropdownItemClass,
 } = useNav();
 
 const defaultActive = computed(() =>
-  !isAllEmpty(route.meta?.activePath) ? route.meta.activePath : route.path
+  !isAllEmpty(route.meta?.activePath) ? route.meta.activePath : route.path,
 );
 
 nextTick(() => {
@@ -49,7 +49,7 @@ nextTick(() => {
 });
 
 onMounted(() => {
-  emitter.on("logoChange", key => {
+  emitter.on("logoChange", (key) => {
     showLogo.value = key;
   });
 });

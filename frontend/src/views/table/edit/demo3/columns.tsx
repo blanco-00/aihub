@@ -10,7 +10,7 @@ export function useColumns() {
   const dataList = ref(tableDataEdit);
 
   const editing = computed(() => {
-    return index => {
+    return (index) => {
       return editMap.value[index]?.editing;
     };
   });
@@ -24,7 +24,7 @@ export function useColumns() {
         "delay-100",
         other
           ? ["hover:scale-110", "hover:text-red-500"]
-          : editing.value(index) && ["scale-150", "text-red-500"]
+          : editing.value(index) && ["scale-150", "text-red-500"],
       ];
     };
   });
@@ -58,12 +58,12 @@ export function useColumns() {
             onClick={() => onEdit(row, index)}
           />
         </div>
-      )
+      ),
     },
     {
       label: "地址",
-      prop: "address"
-    }
+      prop: "address",
+    },
   ];
 
   function onMouseleave(index) {
@@ -82,6 +82,6 @@ export function useColumns() {
 
   return {
     columns,
-    dataList
+    dataList,
   };
 }

@@ -82,14 +82,18 @@ export type ResetPasswordRequest = {
  * 用户登录
  */
 export const login = (data: LoginRequest) => {
-  return http.request<Result<LoginResponse>>("post", "/api/auth/login", { data });
+  return http.request<Result<LoginResponse>>("post", "/api/auth/login", {
+    data,
+  });
 };
 
 /**
  * 刷新Token
  */
 export const refreshToken = (data: RefreshTokenRequest) => {
-  return http.request<Result<LoginResponse>>("post", "/api/auth/refresh", { data });
+  return http.request<Result<LoginResponse>>("post", "/api/auth/refresh", {
+    data,
+  });
 };
 
 /**
@@ -117,12 +121,18 @@ export const register = (data: RegisterRequest) => {
  * 发送忘记密码验证码
  */
 export const forgotPassword = (data: ForgotPasswordRequest) => {
-  return http.request<Result<ForgotPasswordResponse>>("post", "/api/auth/forgot-password", { data });
+  return http.request<Result<ForgotPasswordResponse>>(
+    "post",
+    "/api/auth/forgot-password",
+    { data },
+  );
 };
 
 /**
  * 重置密码
  */
 export const resetPassword = (data: ResetPasswordRequest) => {
-  return http.request<Result<void>>("post", "/api/auth/reset-password", { data });
+  return http.request<Result<void>>("post", "/api/auth/reset-password", {
+    data,
+  });
 };

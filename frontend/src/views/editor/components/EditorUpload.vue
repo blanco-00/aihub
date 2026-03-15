@@ -4,7 +4,7 @@ import "@wangeditor/editor/dist/css/style.css";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 
 defineOptions({
-  name: "picUpload"
+  name: "picUpload",
 });
 
 const mode = "default";
@@ -13,7 +13,7 @@ const editorRef = shallowRef();
 
 // 内容 HTML
 const valueHtml = ref(
-  "<p>仅提供代码参考，暂不可上传图片，可根据实际业务改写</p>"
+  "<p>仅提供代码参考，暂不可上传图片，可根据实际业务改写</p>",
 );
 const toolbarConfig: any = { excludeKeys: "fullScreen" };
 const editorConfig = { placeholder: "请输入内容...", MENU_CONF: {} };
@@ -35,10 +35,10 @@ editorConfig.MENU_CONF["uploadImage"] = {
         insertFn(res.data.url);
       }, 2000);
     }
-  }
+  },
 };
 
-const handleCreated = editor => {
+const handleCreated = (editor) => {
   // 记录 editor 实例，重要！
   editorRef.value = editor;
 };

@@ -7,7 +7,7 @@ export default {
     icon: "ep/set-up",
     title: "vue-flow",
     rank: vueflow,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -15,8 +15,8 @@ export default {
       name: "VueFlow",
       component: () => import("@/views/vue-flow/layouting/index.vue"),
       meta: {
-        title: "vue-flow"
-      }
-    }
-  ]
+        title: "vue-flow",
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

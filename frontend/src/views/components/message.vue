@@ -6,7 +6,7 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Check from "~icons/ep/check";
 
 defineOptions({
-  name: "Message"
+  name: "Message",
 });
 </script>
 
@@ -66,7 +66,7 @@ defineOptions({
           message('分组消息合并', {
             customClass: 'el',
             type: 'success',
-            grouping: true
+            grouping: true,
           })
         "
       >
@@ -76,7 +76,7 @@ defineOptions({
         @click="
           message('自定义消息图标', {
             customClass: 'el',
-            icon: useRenderIcon(Check)
+            icon: useRenderIcon(Check),
           })
         "
       >
@@ -88,7 +88,7 @@ defineOptions({
             customClass: 'el',
             duration: 3000,
             onClose: () =>
-              message('消息已关闭', { customClass: 'el', type: 'success' })
+              message('消息已关闭', { customClass: 'el', type: 'success' }),
           })
         "
       >
@@ -99,9 +99,9 @@ defineOptions({
           message(
             h('p', null, [
               h('span', null, 'Message can be '),
-              h('i', { style: 'color: teal' }, 'VNode')
+              h('i', { style: 'color: teal' }, 'VNode'),
             ]),
-            { customClass: 'el' }
+            { customClass: 'el' },
           )
         "
       >
@@ -111,7 +111,7 @@ defineOptions({
         @click="
           message('<strong>This is <i>HTML</i> string</strong>', {
             customClass: 'el',
-            dangerouslyUseHTMLString: true
+            dangerouslyUseHTMLString: true,
           })
         "
       >
@@ -158,7 +158,7 @@ defineOptions({
       <el-button
         @click="
           message('自定义消息图标', {
-            icon: hot
+            icon: hot,
           })
         "
       >
@@ -168,7 +168,7 @@ defineOptions({
         @click="
           message('3秒后关闭', {
             duration: 3000,
-            onClose: () => message('消息已关闭', { type: 'success' })
+            onClose: () => message('消息已关闭', { type: 'success' }),
           })
         "
       >
@@ -179,8 +179,8 @@ defineOptions({
           message(
             h('p', null, [
               h('span', null, 'Message can be '),
-              h('i', { style: 'color: teal' }, 'VNode')
-            ])
+              h('i', { style: 'color: teal' }, 'VNode'),
+            ]),
           )
         "
       >
@@ -189,7 +189,7 @@ defineOptions({
       <el-button
         @click="
           message('<strong>This is <i>HTML</i> string</strong>', {
-            dangerouslyUseHTMLString: true
+            dangerouslyUseHTMLString: true,
           })
         "
       >

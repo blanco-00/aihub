@@ -8,7 +8,7 @@ export default {
     icon: "ri/edit-box-line",
     title: $t("menus.pureSchemaForm"),
     rank: form,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       name: "SchemaForm",
       component: () => import("@/views/schema-form/index.vue"),
       meta: {
-        title: $t("menus.pureSchemaForm")
-      }
-    }
-  ]
+        title: $t("menus.pureSchemaForm"),
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

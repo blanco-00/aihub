@@ -12,8 +12,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     dictName: "",
     dictType: "",
     status: 1,
-    remark: ""
-  })
+    remark: "",
+  }),
 });
 
 const ruleFormRef = ref();

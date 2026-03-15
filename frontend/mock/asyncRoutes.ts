@@ -14,7 +14,7 @@ const systemManagementRouter = {
   meta: {
     icon: "ri:settings-3-line",
     title: "menus.pureSysManagement",
-    rank: system
+    rank: system,
   },
   children: [
     {
@@ -24,8 +24,8 @@ const systemManagementRouter = {
       meta: {
         icon: "ri:admin-line",
         title: "menus.pureUser",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/system/role/index",
@@ -34,8 +34,8 @@ const systemManagementRouter = {
       meta: {
         icon: "ri:admin-fill",
         title: "menus.pureRole",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/system/menu/index",
@@ -44,8 +44,8 @@ const systemManagementRouter = {
       meta: {
         icon: "ep:menu",
         title: "menus.pureSystemMenu",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/system/dept/index",
@@ -54,10 +54,10 @@ const systemManagementRouter = {
       meta: {
         icon: "ri:git-branch-line",
         title: "menus.pureDept",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
-    }
-  ]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
+    },
+  ],
 };
 
 const systemMonitorRouter = {
@@ -66,7 +66,7 @@ const systemMonitorRouter = {
   meta: {
     icon: "ep:monitor",
     title: "menus.pureSysMonitor",
-    rank: monitor
+    rank: monitor,
   },
   children: [
     {
@@ -76,8 +76,8 @@ const systemMonitorRouter = {
       meta: {
         icon: "ep:monitor",
         title: "menus.pureSystemMonitor",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/monitor/online-user",
@@ -86,8 +86,8 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:user-voice-line",
         title: "menus.pureOnlineUser",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/monitor/login-logs",
@@ -96,8 +96,8 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:window-line",
         title: "menus.pureLoginLog",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/monitor/operation-logs",
@@ -106,8 +106,8 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:history-fill",
         title: "menus.pureOperationLog",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
     },
     {
       path: "/monitor/system-logs",
@@ -116,25 +116,24 @@ const systemMonitorRouter = {
       meta: {
         icon: "ri:file-search-line",
         title: "menus.pureSystemLog",
-        roles: ["SUPER_ADMIN", "ADMIN", "USER"]
-      }
-    }
-  ]
+        roles: ["SUPER_ADMIN", "ADMIN", "USER"],
+      },
+    },
+  ],
 };
-
 
 const frameRouter = {
   path: "/iframe",
   meta: {
     icon: "ri:links-fill",
     title: "menus.pureExternalPage",
-    rank: frame
+    rank: frame,
   },
   children: [
     {
       path: "/iframe/embedded",
       meta: {
-        title: "menus.pureEmbeddedDoc"
+        title: "menus.pureEmbeddedDoc",
       },
       children: [
         {
@@ -144,8 +143,8 @@ const frameRouter = {
             title: "menus.pureColorHuntDoc",
             frameSrc: "https://colorhunt.co/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/uigradients",
@@ -154,8 +153,8 @@ const frameRouter = {
             title: "menus.pureUiGradients",
             frameSrc: "https://uigradients.com/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/ep",
@@ -164,8 +163,8 @@ const frameRouter = {
             title: "menus.pureEpDoc",
             frameSrc: "https://element-plus.org/zh-CN/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/tailwindcss",
@@ -174,8 +173,8 @@ const frameRouter = {
             title: "menus.pureTailwindcssDoc",
             frameSrc: "https://tailwindcss.com/docs/installation",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/vue3",
@@ -184,8 +183,8 @@ const frameRouter = {
             title: "menus.pureVueDoc",
             frameSrc: "https://cn.vuejs.org/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/vite",
@@ -194,8 +193,8 @@ const frameRouter = {
             title: "menus.pureViteDoc",
             frameSrc: "https://cn.vitejs.dev/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/pinia",
@@ -204,8 +203,8 @@ const frameRouter = {
             title: "menus.purePiniaDoc",
             frameSrc: "https://pinia.vuejs.org/zh/index.html",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/iframe/vue-router",
@@ -214,15 +213,15 @@ const frameRouter = {
             title: "menus.pureRouterDoc",
             frameSrc: "https://router.vuejs.org/zh/",
             keepAlive: true,
-            roles: ["admin", "common"]
-          }
-        }
-      ]
+            roles: ["admin", "common"],
+          },
+        },
+      ],
     },
     {
       path: "/iframe/external",
       meta: {
-        title: "menus.pureExternalDoc"
+        title: "menus.pureExternalDoc",
       },
       children: [
         {
@@ -230,20 +229,20 @@ const frameRouter = {
           name: "https://pure-admin.cn/",
           meta: {
             title: "menus.pureExternalLink",
-            roles: ["admin", "common"]
-          }
+            roles: ["admin", "common"],
+          },
         },
         {
           path: "/pureUtilsLink",
           name: "https://pure-admin-utils.netlify.app/",
           meta: {
             title: "menus.pureUtilsLink",
-            roles: ["admin", "common"]
-          }
-        }
-      ]
-    }
-  ]
+            roles: ["admin", "common"],
+          },
+        },
+      ],
+    },
+  ],
 };
 
 const tabsRouter = {
@@ -251,7 +250,7 @@ const tabsRouter = {
   meta: {
     icon: "ri:bookmark-2-line",
     title: "menus.pureTabs",
-    rank: tabs
+    rank: tabs,
   },
   children: [
     {
@@ -259,8 +258,8 @@ const tabsRouter = {
       name: "Tabs",
       meta: {
         title: "menus.pureTabs",
-        roles: ["admin", "common"]
-      }
+        roles: ["admin", "common"],
+      },
     },
     // query 传参模式
     {
@@ -270,8 +269,8 @@ const tabsRouter = {
         // 不在menu菜单中显示
         showLink: false,
         activePath: "/tabs/index",
-        roles: ["admin", "common"]
-      }
+        roles: ["admin", "common"],
+      },
     },
     // params 传参模式
     {
@@ -282,10 +281,10 @@ const tabsRouter = {
         // 不在menu菜单中显示
         showLink: false,
         activePath: "/tabs/index",
-        roles: ["admin", "common"]
-      }
-    }
-  ]
+        roles: ["admin", "common"],
+      },
+    },
+  ],
 };
 
 export default defineFakeRoute([
@@ -298,11 +297,8 @@ export default defineFakeRoute([
       return {
         code: 0,
         message: "操作成功",
-        data: [
-          frameRouter,
-          tabsRouter
-        ]
+        data: [frameRouter, tabsRouter],
       };
-    }
-  }
+    },
+  },
 ]);

@@ -40,7 +40,10 @@ export const getInitStatus = () => {
  * 检查数据库状态
  */
 export const getDatabaseStatus = () => {
-  return http.request<Result<DatabaseStatus>>("get", "/api/init/database/status");
+  return http.request<Result<DatabaseStatus>>(
+    "get",
+    "/api/init/database/status",
+  );
 };
 
 /**
@@ -49,5 +52,7 @@ export const getDatabaseStatus = () => {
 export const createSuperAdmin = (data: InitSuperAdminRequest) => {
   // 只传必要字段，不传 confirmPassword
   const { confirmPassword, ...requestData } = data;
-  return http.request<Result<void>>("post", "/api/init/super-admin", { data: requestData });
+  return http.request<Result<void>>("post", "/api/init/super-admin", {
+    data: requestData,
+  });
 };

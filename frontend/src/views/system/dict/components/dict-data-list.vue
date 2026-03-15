@@ -12,7 +12,7 @@ import {
   updateDictData,
   deleteDictData,
   type CreateDictDataRequest,
-  type UpdateDictDataRequest
+  type UpdateDictDataRequest,
 } from "@/api/dict";
 import { message } from "@/utils/message";
 import { ElMessageBox } from "element-plus";
@@ -39,7 +39,7 @@ const pagination = reactive<PaginationProps>({
   total: 0,
   pageSize: 10,
   currentPage: 1,
-  background: true
+  background: true,
 });
 
 const columns: TableColumnList = [
@@ -47,56 +47,60 @@ const columns: TableColumnList = [
     label: "勾选列",
     type: "selection",
     fixed: "left",
-    reserveSelection: true
+    reserveSelection: true,
   },
   {
     label: "字典编码",
     prop: "id",
-    width: 90
+    width: 90,
   },
   {
     label: "字典标签",
     prop: "dictLabel",
-    minWidth: 130
+    minWidth: 130,
   },
   {
     label: "字典键值",
     prop: "dictValue",
-    minWidth: 130
+    minWidth: 130,
   },
   {
     label: "字典排序",
     prop: "sortOrder",
-    width: 100
+    width: 100,
   },
   {
     label: "状态",
     prop: "status",
     minWidth: 90,
     cellRenderer: ({ row }) =>
-      h("el-tag", {
-        type: row.status === 1 ? "success" : "danger",
-        effect: "plain"
-      }, row.status === 1 ? "正常" : "停用")
+      h(
+        "el-tag",
+        {
+          type: row.status === 1 ? "success" : "danger",
+          effect: "plain",
+        },
+        row.status === 1 ? "正常" : "停用",
+      ),
   },
   {
     label: "备注",
     prop: "remark",
-    minWidth: 160
+    minWidth: 160,
   },
   {
     label: "创建时间",
     prop: "createdAt",
     minWidth: 160,
     formatter: ({ createdAt }) =>
-      createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-"
+      createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-",
   },
   {
     label: "操作",
     fixed: "right",
     width: 150,
-    slot: "operation"
-  }
+    slot: "operation",
+  },
 ];
 
 async function onSearch() {
@@ -105,11 +109,11 @@ async function onSearch() {
   try {
     const response = await getDictDataList(props.dictType, {
       current: pagination.currentPage,
-      size: pagination.pageSize
+      size: pagination.pageSize,
     });
-    
+
     if (!isMounted.value) return;
-    
+
     if (response.code === 200 && response.data) {
       dataList.value = response.data.records || [];
       pagination.total = response.data.total || 0;
@@ -156,8 +160,8 @@ async function handleDelete(row: any) {
       cancelButtonText: "取消",
       type: "warning",
       dangerouslyUseHTMLString: true,
-      draggable: true
-    }
+      draggable: true,
+    },
   )
     .then(async () => {
       if (!isMounted.value) return;
@@ -166,7 +170,7 @@ async function handleDelete(row: any) {
         if (!isMounted.value) return;
         if (response.code === 200) {
           message(`您删除了字典标签为${row.dictLabel}的这条数据`, {
-            type: "success"
+            type: "success",
           });
           onSearch();
         } else {
@@ -191,16 +195,17 @@ function openDialog(title = "新增", row?: any) {
         dictValue: row?.dictValue ?? "",
         sortOrder: row?.sortOrder ?? 0,
         status: row?.status ?? 1,
-        remark: row?.remark ?? ""
-      }
+        remark: row?.remark ?? "",
+      },
     },
     width: "40%",
     draggable: true,
     fullscreen: deviceDetection(),
     fullscreenIcon: true,
     closeOnClickModal: false,
-    contentRenderer: () => h(dictDataForm, { ref: dictDataFormRef, formInline: null }),
-      beforeSure: async (done, { options }) => {
+    contentRenderer: () =>
+      h(dictDataForm, { ref: dictDataFormRef, formInline: null }),
+    beforeSure: async (done, { options }) => {
       const FormRef = dictDataFormRef.value.getRef();
       const curData = options.props.formInline;
       FormRef.validate(async (valid: boolean) => {
@@ -214,18 +219,20 @@ function openDialog(title = "新增", row?: any) {
                 dictValue: curData.dictValue,
                 sortOrder: curData.sortOrder ?? 0,
                 status: curData.status ?? 1,
-                remark: curData.remark
+                remark: curData.remark,
               };
               const response = await createDictData(request);
               if (!isMounted.value) return;
               if (response.code === 200) {
                 message(`您${title}了字典项${curData.dictLabel}`, {
-                  type: "success"
+                  type: "success",
                 });
                 done();
                 onSearch();
               } else {
-                message(response.message || "创建字典项失败", { type: "error" });
+                message(response.message || "创建字典项失败", {
+                  type: "error",
+                });
               }
             } else {
               const request: UpdateDictDataRequest = {
@@ -234,18 +241,20 @@ function openDialog(title = "新增", row?: any) {
                 dictValue: curData.dictValue,
                 sortOrder: curData.sortOrder ?? 0,
                 status: curData.status,
-                remark: curData.remark
+                remark: curData.remark,
               };
               const response = await updateDictData(curData.id, request);
               if (!isMounted.value) return;
               if (response.code === 200) {
                 message(`您${title}了字典项${curData.dictLabel}`, {
-                  type: "success"
+                  type: "success",
                 });
                 done();
                 onSearch();
               } else {
-                message(response.message || "更新字典项失败", { type: "error" });
+                message(response.message || "更新字典项失败", {
+                  type: "error",
+                });
               }
             }
           } catch (error: any) {
@@ -254,7 +263,7 @@ function openDialog(title = "新增", row?: any) {
           }
         }
       });
-    }
+    },
   });
 }
 
@@ -270,11 +279,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <PureTableBar
-      title="字典项列表"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="字典项列表" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
@@ -315,18 +320,26 @@ onBeforeUnmount(() => {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning',
-                    draggable: true
-                  }
-                ).then(async () => {
-                  try {
-                    const deletePromises = selectedRows.map((row: any) => deleteDictData(row.id));
-                    await Promise.all(deletePromises);
-                    message(`成功删除${selectedRows.length}条数据`, { type: 'success' });
-                    onSearch();
-                  } catch (error: any) {
-                    message(error.message || '批量删除失败', { type: 'error' });
-                  }
-                }).catch(() => {});
+                    draggable: true,
+                  },
+                )
+                  .then(async () => {
+                    try {
+                      const deletePromises = selectedRows.map((row: any) =>
+                        deleteDictData(row.id),
+                      );
+                      await Promise.all(deletePromises);
+                      message(`成功删除${selectedRows.length}条数据`, {
+                        type: 'success',
+                      });
+                      onSearch();
+                    } catch (error: any) {
+                      message(error.message || '批量删除失败', {
+                        type: 'error',
+                      });
+                    }
+                  })
+                  .catch(() => {});
               }
             }
           "
@@ -350,7 +363,7 @@ onBeforeUnmount(() => {
           :paginationSmall="size === 'small'"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"

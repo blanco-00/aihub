@@ -26,12 +26,12 @@ const instance = getCurrentInstance()!;
 const props = withDefaults(defineProps<Props>(), {});
 
 const itemStyle = computed(() => {
-  return item => {
+  return (item) => {
     return {
       background:
         item?.path === active.value ? useEpThemeStoreHook().epThemeColor : "",
       color: item.path === active.value ? "#fff" : "",
-      fontSize: item.path === active.value ? "16px" : "14px"
+      fontSize: item.path === active.value ? "16px" : "14px",
     };
   };
 });
@@ -39,7 +39,7 @@ const itemStyle = computed(() => {
 const titleStyle = computed(() => {
   return {
     color: useEpThemeStoreHook().epThemeColor,
-    fontWeight: 500
+    fontWeight: 500,
   };
 });
 
@@ -49,26 +49,26 @@ const active = computed({
   },
   set(val: string) {
     emit("update:value", val);
-  }
+  },
 });
 
 watch(
   () => props.value,
-  newValue => {
+  (newValue) => {
     if (newValue) {
       if (stopMouseEvent.value) {
         delay(100).then(() => (stopMouseEvent.value = false));
       }
     }
-  }
+  },
 );
 
 const historyList = computed(() => {
-  return props.options.filter(item => item.type === "history");
+  return props.options.filter((item) => item.type === "history");
 });
 
 const collectList = computed(() => {
-  return props.options.filter(item => item.type === "collect");
+  return props.options.filter((item) => item.type === "collect");
 });
 
 function handleCollect(item) {
@@ -114,7 +114,7 @@ let sortableInstance = null;
 
 watch(
   collectList,
-  val => {
+  (val) => {
     if (val.length > 1) {
       nextTick(() => {
         const wrapper: HTMLElement =
@@ -122,19 +122,19 @@ watch(
         if (!wrapper || sortableInstance) return;
         sortableInstance = Sortable.create(wrapper, {
           animation: 160,
-          onStart: event => {
+          onStart: (event) => {
             event.item.style.cursor = "move";
           },
-          onEnd: event => {
+          onEnd: (event) => {
             event.item.style.cursor = "pointer";
           },
-          onUpdate: handleChangeIndex
+          onUpdate: handleChangeIndex,
         });
         resizeResult();
       });
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 );
 
 defineExpose({ handleScroll });

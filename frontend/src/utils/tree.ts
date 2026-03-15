@@ -79,18 +79,18 @@ export const buildHierarchyTree = (tree: any[], pathList = []): any => {
  */
 export const getNodeByUniqueId = (
   tree: any[],
-  uniqueId: number | string
+  uniqueId: number | string,
 ): any => {
   if (!Array.isArray(tree)) {
     console.warn("menuTree must be an array");
     return [];
   }
   if (!tree || tree.length === 0) return [];
-  const item = tree.find(node => node.uniqueId === uniqueId);
+  const item = tree.find((node) => node.uniqueId === uniqueId);
   if (item) return item;
   const childrenList = tree
-    .filter(node => node.children)
-    .map(i => i.children)
+    .filter((node) => node.children)
+    .map((i) => i.children)
     .flat(1) as unknown;
   return getNodeByUniqueId(childrenList as any[], uniqueId);
 };
@@ -105,7 +105,7 @@ export const getNodeByUniqueId = (
 export const appendFieldByUniqueId = (
   tree: any[],
   uniqueId: number | string,
-  fields: object
+  fields: object,
 ): any => {
   if (!Array.isArray(tree)) {
     console.warn("menuTree must be an array");
@@ -138,7 +138,7 @@ export const handleTree = (
   data: any[],
   id?: string,
   parentId?: string,
-  children?: string
+  children?: string,
 ): any => {
   if (!Array.isArray(data)) {
     console.warn("data must be an array");
@@ -147,7 +147,7 @@ export const handleTree = (
   const config = {
     id: id || "id",
     parentId: parentId || "parentId",
-    childrenList: children || "children"
+    childrenList: children || "children",
   };
 
   const childrenListMap: any = {};

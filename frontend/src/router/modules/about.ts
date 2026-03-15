@@ -8,7 +8,7 @@ export default {
     icon: "ri/file-info-line",
     title: $t("menus.pureAbout"),
     rank: about,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       name: "About",
       component: () => import("@/views/about/index.vue"),
       meta: {
-        title: $t("menus.pureAbout")
-      }
-    }
-  ]
+        title: $t("menus.pureAbout"),
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

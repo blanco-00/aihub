@@ -16,7 +16,7 @@ import AddFill from "~icons/ri/add-circle-line";
 import List from "~icons/ri/list-check";
 
 defineOptions({
-  name: "SystemDict"
+  name: "SystemDict",
 });
 
 const formRef = ref();
@@ -38,7 +38,7 @@ const {
   handleRefreshCache,
   handleSizeChange,
   handleCurrentChange,
-  handleSelectionChange
+  handleSelectionChange,
 } = useDictType(tableRef);
 
 // 打开字典项列表对话框
@@ -47,18 +47,19 @@ function handleDictDataList(row: any) {
     title: `字典项列表 - ${row.dictName}`,
     props: {
       dictType: row.dictType,
-      dictTypeId: row.id
+      dictTypeId: row.id,
     },
     width: "60%",
     draggable: true,
     fullscreen: deviceDetection(),
     fullscreenIcon: true,
     closeOnClickModal: false,
-    contentRenderer: () => h(dictDataList, { 
-      ref: dictDataFormRef,
-      dictType: row.dictType,
-      dictTypeId: row.id
-    })
+    contentRenderer: () =>
+      h(dictDataList, {
+        ref: dictDataFormRef,
+        dictType: row.dictType,
+        dictTypeId: row.id,
+      }),
   });
 }
 
@@ -136,11 +137,7 @@ function handleExport() {
       </el-form-item>
     </el-form>
 
-    <PureTableBar
-      title="字典管理"
-      :columns="columns"
-      @refresh="onSearch"
-    >
+    <PureTableBar title="字典管理" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
@@ -210,7 +207,7 @@ function handleExport() {
           :paginationSmall="size === 'small'"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"

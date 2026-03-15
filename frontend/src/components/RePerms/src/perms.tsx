@@ -6,8 +6,8 @@ export default defineComponent({
   props: {
     value: {
       type: undefined,
-      default: []
-    }
+      default: [],
+    },
   },
   setup(props, { slots }) {
     return () => {
@@ -16,5 +16,5 @@ export default defineComponent({
         <Fragment>{slots.default?.()}</Fragment>
       ) : null;
     };
-  }
+  },
 });

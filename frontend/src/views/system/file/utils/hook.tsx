@@ -11,7 +11,7 @@ export function useFile() {
     category: undefined,
     keyword: undefined,
     current: 1,
-    size: 10
+    size: 10,
   });
 
   const formRef = ref();
@@ -19,12 +19,12 @@ export function useFile() {
   const dataList = ref<FileInfo[]>([]);
   const loading = ref(true);
   const selectedNum = ref(0);
-  
+
   const pagination = reactive({
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
 
   const columns: TableColumnList = [
@@ -33,17 +33,17 @@ export function useFile() {
       prop: "filename",
       minWidth: 200,
       align: "left",
-      showOverflowTooltip: true
+      showOverflowTooltip: true,
     },
     {
       label: "文件类型",
       prop: "contentType",
-      minWidth: 120
+      minWidth: 120,
     },
     {
       label: "文件分类",
       prop: "category",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       label: "文件大小",
@@ -57,31 +57,31 @@ export function useFile() {
         } else {
           return (size / 1024 / 1024).toFixed(2) + " MB";
         }
-      }
+      },
     },
     {
       label: "上传用户",
       prop: "uploadUsername",
-      minWidth: 120
+      minWidth: 120,
     },
     {
       label: "引用次数",
       prop: "referenceCount",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       label: "上传时间",
       prop: "uploadTime",
       minWidth: 180,
       formatter: ({ uploadTime }) =>
-        uploadTime ? dayjs(uploadTime).format("YYYY-MM-DD HH:mm:ss") : ""
+        uploadTime ? dayjs(uploadTime).format("YYYY-MM-DD HH:mm:ss") : "",
     },
     {
       label: "操作",
       fixed: "right",
       width: 200,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   function handleSelectionChange(val: FileInfo[]) {
@@ -105,9 +105,9 @@ export function useFile() {
         category: form.category || undefined,
         keyword: form.keyword || undefined,
         current: pagination.currentPage,
-        size: pagination.pageSize
+        size: pagination.pageSize,
       };
-      
+
       const { code, data } = await getFileList(params);
       if (code === 200 && data) {
         dataList.value = data.records || [];
@@ -153,10 +153,10 @@ export function useFile() {
         {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
-          type: "warning"
-        }
+          type: "warning",
+        },
       );
-      
+
       const { code } = await deleteFile(row.url);
       if (code === 200) {
         message("删除成功", { type: "success" });
@@ -221,6 +221,6 @@ export function useFile() {
     handleSizeChange,
     handleCurrentChange,
     handleSelectionChange,
-    onSelectionCancel
+    onSelectionCancel,
   };
 }

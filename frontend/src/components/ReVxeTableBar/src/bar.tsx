@@ -9,7 +9,7 @@ import {
   computed,
   nextTick,
   defineComponent,
-  getCurrentInstance
+  getCurrentInstance,
 } from "vue";
 
 import Fullscreen from "~icons/ri/fullscreen-fill";
@@ -24,29 +24,29 @@ const props = {
   /** 头部最左边的标题 */
   title: {
     type: String,
-    default: $t("tableBar.pureList")
+    default: $t("tableBar.pureList"),
   },
   vxeTableRef: {
-    type: Object as PropType<any>
+    type: Object as PropType<any>,
   },
   /** 需要展示的列 */
   columns: {
     type: Array as PropType<any>,
-    default: () => []
+    default: () => [],
   },
   /** 是否为树列表 */
   tree: {
     type: Boolean,
-    default: false
+    default: false,
   },
   isExpandAll: {
     type: Boolean,
-    default: true
+    default: true,
   },
   tableKey: {
     type: [String, Number] as PropType<string | number>,
-    default: "0"
-  }
+    default: "0",
+  },
 };
 
 export default defineComponent({
@@ -66,11 +66,11 @@ export default defineComponent({
     const dynamicColumns = ref(cloneDeep(props?.columns));
 
     const getDropdownItemStyle = computed(() => {
-      return s => {
+      return (s) => {
         return {
           background:
             s === size.value ? useEpThemeStoreHook().epThemeColor : "",
-          color: s === size.value ? "#fff" : "var(--el-text-color-primary)"
+          color: s === size.value ? "#fff" : "var(--el-text-color-primary)",
         };
       };
     });
@@ -82,7 +82,7 @@ export default defineComponent({
         "duration-100",
         "hover:text-primary!",
         "cursor-pointer",
-        "outline-hidden"
+        "outline-hidden",
       ];
     });
 
@@ -95,7 +95,7 @@ export default defineComponent({
         "border-b-[1px]",
         "border-b-solid",
         "border-[#dcdfe6]",
-        "dark:border-[#303030]"
+        "dark:border-[#303030]",
       ];
     });
 
@@ -119,8 +119,8 @@ export default defineComponent({
     }
 
     function reloadColumn() {
-      const curCheckedColumns = cloneDeep(dynamicColumns.value).filter(item =>
-        checkedColumns.value.includes(item.title)
+      const curCheckedColumns = cloneDeep(dynamicColumns.value).filter((item) =>
+        checkedColumns.value.includes(item.title),
       );
       props.vxeTableRef.reloadColumn(curCheckedColumns);
     }
@@ -176,7 +176,7 @@ export default defineComponent({
             {transformI18n($t("tableBar.pureSmall"))}
           </el-dropdown-item>
         </el-dropdown-menu>
-      )
+      ),
     };
 
     /** 列展示拖拽排序 */
@@ -202,7 +202,7 @@ export default defineComponent({
               } else {
                 wrapperElem.insertBefore(
                   targetThElem,
-                  oldThElem ? oldThElem.nextElementSibling : oldThElem
+                  oldThElem ? oldThElem.nextElementSibling : oldThElem,
                 );
               }
               return;
@@ -210,14 +210,14 @@ export default defineComponent({
             const currentRow = dynamicColumns.value.splice(oldIndex, 1)[0];
             dynamicColumns.value.splice(newIndex, 0, currentRow);
             reloadColumn();
-          }
+          },
         });
       });
     };
 
     const isFixedColumn = (title: string) => {
       return dynamicColumns.value.filter(
-        item => transformI18n(item.title) === transformI18n(title)
+        (item) => transformI18n(item.title) === transformI18n(title),
       )[0].fixed
         ? true
         : false;
@@ -230,7 +230,7 @@ export default defineComponent({
         offset: [0, 18],
         duration: [300, 0],
         followCursor: true,
-        hideOnClick: "toggle"
+        hideOnClick: "toggle",
       };
     };
 
@@ -239,10 +239,10 @@ export default defineComponent({
         <SettingIcon
           class={["w-[16px]", iconClass.value]}
           v-tippy={rendTippyProps(
-            transformI18n($t("tableBar.pureColumnSettings"))
+            transformI18n($t("tableBar.pureColumnSettings")),
           )}
         />
-      )
+      ),
     };
 
     return () => (
@@ -256,7 +256,7 @@ export default defineComponent({
             "bg-bg_color",
             isFullscreen.value
               ? ["h-full!", "z-2002", "fixed", "inset-0"]
-              : "mt-2"
+              : "mt-2",
           ]}
         >
           <div class="flex justify-between w-full h-[60px] p-4">
@@ -274,12 +274,12 @@ export default defineComponent({
                   <ExpandIcon
                     class={["w-[16px]", iconClass.value]}
                     style={{
-                      transform: isExpandAll.value ? "none" : "rotate(-90deg)"
+                      transform: isExpandAll.value ? "none" : "rotate(-90deg)",
                     }}
                     v-tippy={rendTippyProps(
                       isExpandAll.value
                         ? transformI18n($t("tableBar.pureCollapse"))
-                        : transformI18n($t("tableBar.pureExpand"))
+                        : transformI18n($t("tableBar.pureExpand")),
                     )}
                     onClick={() => onExpand()}
                   />
@@ -290,10 +290,10 @@ export default defineComponent({
                 class={[
                   "w-[16px]",
                   iconClass.value,
-                  loading.value ? "animate-spin" : ""
+                  loading.value ? "animate-spin" : "",
                 ]}
                 v-tippy={rendTippyProps(
-                  transformI18n($t("tableBar.pureRefresh"))
+                  transformI18n($t("tableBar.pureRefresh")),
                 )}
                 onClick={() => onReFresh()}
               />
@@ -302,7 +302,7 @@ export default defineComponent({
                 v-slots={dropdown}
                 trigger="click"
                 v-tippy={rendTippyProps(
-                  transformI18n($t("tableBar.pureDensity"))
+                  transformI18n($t("tableBar.pureDensity")),
                 )}
               >
                 <CollapseIcon class={["w-[16px]", iconClass.value]} />
@@ -322,7 +322,7 @@ export default defineComponent({
                     label={transformI18n($t("tableBar.pureColumnDisplay"))}
                     v-model={checkAll.value}
                     indeterminate={isIndeterminate.value}
-                    onChange={value => handleCheckAllChange(value)}
+                    onChange={(value) => handleCheckAllChange(value)}
                   />
                   <el-button type="primary" link onClick={() => onReset()}>
                     {transformI18n($t("tableBar.pureReset"))}
@@ -334,7 +334,7 @@ export default defineComponent({
                     <el-checkbox-group
                       ref={`VxeGroupRef${unref(props.tableKey)}`}
                       modelValue={checkedColumns.value}
-                      onChange={value => handleCheckedColumnsChange(value)}
+                      onChange={(value) => handleCheckedColumnsChange(value)}
                     >
                       <el-space
                         direction="vertical"
@@ -349,7 +349,7 @@ export default defineComponent({
                                   "drag-btn w-[16px] mr-2",
                                   isFixedColumn(item)
                                     ? "cursor-no-drop!"
-                                    : "cursor-grab!"
+                                    : "cursor-grab!",
                                 ]}
                                 onMouseenter={(event: {
                                   preventDefault: () => void;
@@ -392,10 +392,10 @@ export default defineComponent({
           </div>
           {slots.default({
             size: size.value,
-            dynamicColumns: dynamicColumns.value
+            dynamicColumns: dynamicColumns.value,
           })}
         </div>
       </>
     );
-  }
+  },
 });

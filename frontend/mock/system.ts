@@ -21,10 +21,10 @@ export default defineFakeRoute([
             // 部门id
             id: 103,
             // 部门名称
-            name: "研发部门"
+            name: "研发部门",
           },
           remark: "管理员",
-          createTime: 1605456000000
+          createTime: 1605456000000,
         },
         {
           avatar: "https://avatars.githubusercontent.com/u/52823142",
@@ -37,18 +37,19 @@ export default defineFakeRoute([
           status: 1,
           dept: {
             id: 105,
-            name: "测试部门"
+            name: "测试部门",
           },
           remark: "普通用户",
-          createTime: 1605456000000
-        }
+          createTime: 1605456000000,
+        },
       ];
-      list = list.filter(item => item.username.includes(body?.username));
-      list = list.filter(item =>
-        String(item.status).includes(String(body?.status))
+      list = list.filter((item) => item.username.includes(body?.username));
+      list = list.filter((item) =>
+        String(item.status).includes(String(body?.status)),
       );
-      if (body.phone) list = list.filter(item => item.phone === body.phone);
-      if (body.deptId) list = list.filter(item => item.dept.id === body.deptId);
+      if (body.phone) list = list.filter((item) => item.phone === body.phone);
+      if (body.deptId)
+        list = list.filter((item) => item.dept.id === body.deptId);
       return {
         code: 0,
         message: "操作成功",
@@ -56,10 +57,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 用户管理-获取所有角色列表
   {
@@ -72,10 +73,10 @@ export default defineFakeRoute([
         data: [
           { id: "SUPER_ADMIN", name: "超级管理员" },
           { id: "ADMIN", name: "管理员" },
-          { id: "USER", name: "普通用户" }
-        ]
+          { id: "USER", name: "普通用户" },
+        ],
       };
-    }
+    },
   },
   // 用户管理-根据 userId 获取对应角色 id 列表（userId：用户id）
   {
@@ -87,23 +88,23 @@ export default defineFakeRoute([
           return {
             code: 0,
             message: "操作成功",
-            data: [1]
+            data: [1],
           };
         } else if (body.userId == 2) {
           return {
             code: 0,
             message: "操作成功",
-            data: [2]
+            data: [2],
           };
         }
       } else {
         return {
           code: 10001,
           message: "请求参数缺失或格式不正确",
-          data: []
+          data: [],
         };
       }
-    }
+    },
   },
   // 角色管理
   {
@@ -118,7 +119,7 @@ export default defineFakeRoute([
           name: "超级管理员",
           code: "admin",
           status: 1, // 状态 1 启用 0 停用
-          remark: "超级管理员拥有最高权限"
+          remark: "超级管理员拥有最高权限",
         },
         {
           createTime: 1605456000000,
@@ -127,14 +128,14 @@ export default defineFakeRoute([
           name: "普通角色",
           code: "common",
           status: 1,
-          remark: "普通角色拥有部分权限"
-        }
+          remark: "普通角色拥有部分权限",
+        },
       ];
-      list = list.filter(item => item.name.includes(body?.name));
-      list = list.filter(item =>
-        String(item.status).includes(String(body?.status))
+      list = list.filter((item) => item.name.includes(body?.name));
+      list = list.filter((item) =>
+        String(item.status).includes(String(body?.status)),
       );
-      if (body.code) list = list.filter(item => item.code === body.code);
+      if (body.code) list = list.filter((item) => item.code === body.code);
       return {
         code: 0,
         message: "操作成功",
@@ -142,10 +143,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 角色管理-权限-菜单权限
   {
@@ -161,195 +162,195 @@ export default defineFakeRoute([
             parentId: 0,
             id: 100,
             menuType: 0, // 菜单类型（0代表菜单、1代表iframe、2代表外链、3代表按钮）
-            title: "menus.pureExternalPage"
+            title: "menus.pureExternalPage",
           },
           {
             parentId: 100,
             id: 101,
             menuType: 0,
-            title: "menus.pureExternalDoc"
+            title: "menus.pureExternalDoc",
           },
           {
             parentId: 101,
             id: 102,
             menuType: 2,
-            title: "menus.pureExternalLink"
+            title: "menus.pureExternalLink",
           },
           {
             parentId: 101,
             id: 103,
             menuType: 2,
-            title: "menus.pureUtilsLink"
+            title: "menus.pureUtilsLink",
           },
           {
             parentId: 100,
             id: 104,
             menuType: 1,
-            title: "menus.pureEmbeddedDoc"
+            title: "menus.pureEmbeddedDoc",
           },
           {
             parentId: 104,
             id: 105,
             menuType: 1,
-            title: "menus.pureEpDoc"
+            title: "menus.pureEpDoc",
           },
           {
             parentId: 104,
             id: 106,
             menuType: 1,
-            title: "menus.pureTailwindcssDoc"
+            title: "menus.pureTailwindcssDoc",
           },
           {
             parentId: 104,
             id: 107,
             menuType: 1,
-            title: "menus.pureVueDoc"
+            title: "menus.pureVueDoc",
           },
           {
             parentId: 104,
             id: 108,
             menuType: 1,
-            title: "menus.pureViteDoc"
+            title: "menus.pureViteDoc",
           },
           {
             parentId: 104,
             id: 109,
             menuType: 1,
-            title: "menus.purePiniaDoc"
+            title: "menus.purePiniaDoc",
           },
           {
             parentId: 104,
             id: 110,
             menuType: 1,
-            title: "menus.pureRouterDoc"
+            title: "menus.pureRouterDoc",
           },
           // 权限管理
           {
             parentId: 0,
             id: 200,
             menuType: 0,
-            title: "menus.purePermission"
+            title: "menus.purePermission",
           },
           {
             parentId: 200,
             id: 201,
             menuType: 0,
-            title: "menus.purePermissionPage"
+            title: "menus.purePermissionPage",
           },
           {
             parentId: 200,
             id: 202,
             menuType: 0,
-            title: "menus.purePermissionButton"
+            title: "menus.purePermissionButton",
           },
           {
             parentId: 202,
             id: 203,
             menuType: 3,
-            title: "添加"
+            title: "添加",
           },
           {
             parentId: 202,
             id: 204,
             menuType: 3,
-            title: "修改"
+            title: "修改",
           },
           {
             parentId: 202,
             id: 205,
             menuType: 3,
-            title: "删除"
+            title: "删除",
           },
           // 系统管理
           {
             parentId: 0,
             id: 300,
             menuType: 0,
-            title: "menus.pureSysManagement"
+            title: "menus.pureSysManagement",
           },
           {
             parentId: 300,
             id: 301,
             menuType: 0,
-            title: "menus.pureUser"
+            title: "menus.pureUser",
           },
           {
             parentId: 300,
             id: 302,
             menuType: 0,
-            title: "menus.pureRole"
+            title: "menus.pureRole",
           },
           {
             parentId: 300,
             id: 303,
             menuType: 0,
-            title: "menus.pureSystemMenu"
+            title: "menus.pureSystemMenu",
           },
           {
             parentId: 300,
             id: 304,
             menuType: 0,
-            title: "menus.pureDept"
+            title: "menus.pureDept",
           },
           // 系统监控
           {
             parentId: 0,
             id: 400,
             menuType: 0,
-            title: "menus.pureSysMonitor"
+            title: "menus.pureSysMonitor",
           },
           {
             parentId: 400,
             id: 401,
             menuType: 0,
-            title: "menus.pureOnlineUser"
+            title: "menus.pureOnlineUser",
           },
           {
             parentId: 400,
             id: 402,
             menuType: 0,
-            title: "menus.pureLoginLog"
+            title: "menus.pureLoginLog",
           },
           {
             parentId: 400,
             id: 403,
             menuType: 0,
-            title: "menus.pureOperationLog"
+            title: "menus.pureOperationLog",
           },
           {
             parentId: 400,
             id: 404,
             menuType: 0,
-            title: "menus.pureSystemLog"
+            title: "menus.pureSystemLog",
           },
           // 标签页操作
           {
             parentId: 0,
             id: 500,
             menuType: 0,
-            title: "menus.pureTabs"
+            title: "menus.pureTabs",
           },
           {
             parentId: 500,
             id: 501,
             menuType: 0,
-            title: "menus.pureTabs"
+            title: "menus.pureTabs",
           },
           {
             parentId: 500,
             id: 502,
             menuType: 0,
-            title: "query传参模式"
+            title: "query传参模式",
           },
           {
             parentId: 500,
             id: 503,
             menuType: 0,
-            title: "params传参模式"
-          }
-        ]
+            title: "params传参模式",
+          },
+        ],
       };
-    }
+    },
   },
   // 角色管理-权限-菜单权限-根据角色 id 查对应菜单
   {
@@ -363,8 +364,8 @@ export default defineFakeRoute([
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 200, 201,
             202, 203, 204, 205, 300, 301, 302, 303, 304, 400, 401, 402, 403,
-            404, 500, 501, 502, 503
-          ]
+            404, 500, 501, 502, 503,
+          ],
         };
       } else if (body.id == 2) {
         return {
@@ -372,11 +373,11 @@ export default defineFakeRoute([
           message: "操作成功",
           data: [
             100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 404, 500,
-            501, 502, 503
-          ]
+            501, 502, 503,
+          ],
         };
       }
-    }
+    },
   },
   // 菜单管理
   {
@@ -410,7 +411,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 100,
@@ -434,7 +435,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 101,
@@ -458,7 +459,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 101,
@@ -482,7 +483,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 100,
@@ -506,7 +507,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -530,7 +531,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -554,7 +555,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -578,7 +579,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -602,7 +603,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -626,7 +627,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 104,
@@ -650,7 +651,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           // 权限管理
           {
@@ -675,7 +676,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 200,
@@ -699,7 +700,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 200,
@@ -723,7 +724,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 202,
@@ -747,7 +748,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 203,
@@ -771,7 +772,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 203,
@@ -795,7 +796,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 203,
@@ -819,7 +820,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 202,
@@ -843,7 +844,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 204,
@@ -867,7 +868,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 204,
@@ -891,7 +892,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 204,
@@ -915,7 +916,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           // 系统管理
           {
@@ -940,7 +941,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 300,
@@ -964,7 +965,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 300,
@@ -988,7 +989,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 300,
@@ -1012,7 +1013,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 300,
@@ -1036,7 +1037,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           // 系统监控
           {
@@ -1061,7 +1062,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 400,
@@ -1085,7 +1086,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 400,
@@ -1109,7 +1110,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 400,
@@ -1133,7 +1134,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 400,
@@ -1157,7 +1158,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           // 标签页操作
           {
@@ -1182,7 +1183,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 500,
@@ -1206,7 +1207,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: true,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 500,
@@ -1230,7 +1231,7 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: false,
-            showParent: false
+            showParent: false,
           },
           {
             parentId: 500,
@@ -1254,11 +1255,11 @@ export default defineFakeRoute([
             hiddenTag: false,
             fixedTag: false,
             showLink: false,
-            showParent: false
-          }
-        ]
+            showParent: false,
+          },
+        ],
       };
-    }
+    },
   },
   // 部门管理
   {
@@ -1280,7 +1281,7 @@ export default defineFakeRoute([
             status: 1, // 状态 1 启用 0 停用
             type: 1, // 1 公司 2 分公司 3 部门
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "郑州分公司",
@@ -1293,7 +1294,7 @@ export default defineFakeRoute([
             status: 1,
             type: 2,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "研发部门",
@@ -1306,7 +1307,7 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "市场部门",
@@ -1319,7 +1320,7 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "深圳分公司",
@@ -1332,7 +1333,7 @@ export default defineFakeRoute([
             status: 1,
             type: 2,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "市场部门",
@@ -1345,7 +1346,7 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "财务部门",
@@ -1358,7 +1359,7 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "测试部门",
@@ -1371,7 +1372,7 @@ export default defineFakeRoute([
             status: 0,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "财务部门",
@@ -1384,7 +1385,7 @@ export default defineFakeRoute([
             status: 1,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
           },
           {
             name: "运维部门",
@@ -1397,11 +1398,11 @@ export default defineFakeRoute([
             status: 0,
             type: 3,
             createTime: 1605456000000,
-            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息"
-          }
-        ]
+            remark: "这里是备注信息这里是备注信息这里是备注信息这里是备注信息",
+          },
+        ],
       };
-    }
+    },
   },
   // 在线用户
   {
@@ -1416,7 +1417,7 @@ export default defineFakeRoute([
           address: "中国河南省信阳市",
           system: "macOS",
           browser: "Chrome",
-          loginTime: new Date()
+          loginTime: new Date(),
         },
         {
           id: 2,
@@ -1425,10 +1426,10 @@ export default defineFakeRoute([
           address: "中国广东省深圳市",
           system: "Windows",
           browser: "Firefox",
-          loginTime: new Date()
-        }
+          loginTime: new Date(),
+        },
       ];
-      list = list.filter(item => item.username.includes(body?.username));
+      list = list.filter((item) => item.username.includes(body?.username));
       return {
         code: 0,
         message: "操作成功",
@@ -1436,10 +1437,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 登录日志
   {
@@ -1456,7 +1457,7 @@ export default defineFakeRoute([
           browser: "Chrome",
           status: 1, // 登录状态 1 成功 0 失败
           behavior: "账号登录",
-          loginTime: new Date()
+          loginTime: new Date(),
         },
         {
           id: 2,
@@ -1467,12 +1468,12 @@ export default defineFakeRoute([
           browser: "Firefox",
           status: 0,
           behavior: "第三方登录",
-          loginTime: new Date()
-        }
+          loginTime: new Date(),
+        },
       ];
-      list = list.filter(item => item.username.includes(body?.username));
-      list = list.filter(item =>
-        String(item.status).includes(String(body?.status))
+      list = list.filter((item) => item.username.includes(body?.username));
+      list = list.filter((item) =>
+        String(item.status).includes(String(body?.status)),
       );
       return {
         code: 0,
@@ -1481,10 +1482,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 操作日志
   {
@@ -1502,7 +1503,7 @@ export default defineFakeRoute([
           status: 1, // 操作状态 1 成功 0 失败
           summary: "菜单管理-添加菜单", // 操作概要
           module: "系统管理", // 所属模块
-          operatingTime: new Date() // 操作时间
+          operatingTime: new Date(), // 操作时间
         },
         {
           id: 2,
@@ -1514,12 +1515,12 @@ export default defineFakeRoute([
           status: 0,
           summary: "列表分页查询",
           module: "在线用户",
-          operatingTime: new Date()
-        }
+          operatingTime: new Date(),
+        },
       ];
-      list = list.filter(item => item.module.includes(body?.module));
-      list = list.filter(item =>
-        String(item.status).includes(String(body?.status))
+      list = list.filter((item) => item.module.includes(body?.module));
+      list = list.filter((item) =>
+        String(item.status).includes(String(body?.status)),
       );
       return {
         code: 0,
@@ -1528,10 +1529,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 系统日志
   {
@@ -1563,7 +1564,7 @@ export default defineFakeRoute([
            * 较慢耗时：在1秒以上的耗时可以被认为是较慢的请求，但具体是否较慢还需要根据具体业务场景和性能要求来判断
            */
           takesTime: 10,
-          requestTime: new Date() // 请求时间
+          requestTime: new Date(), // 请求时间
         },
         {
           id: 2,
@@ -1576,10 +1577,10 @@ export default defineFakeRoute([
           system: "Windows",
           browser: "Firefox",
           takesTime: 1200,
-          requestTime: new Date()
-        }
+          requestTime: new Date(),
+        },
       ];
-      list = list.filter(item => item.module.includes(body?.module));
+      list = list.filter((item) => item.module.includes(body?.module));
       return {
         code: 0,
         message: "操作成功",
@@ -1587,10 +1588,10 @@ export default defineFakeRoute([
           list,
           total: list.length, // 总条目数
           pageSize: 10, // 每页显示条目个数
-          currentPage: 1 // 当前页数
-        }
+          currentPage: 1, // 当前页数
+        },
       };
-    }
+    },
   },
   // 系统日志-根据 id 查日志详情
   {
@@ -1614,7 +1615,7 @@ export default defineFakeRoute([
             "Content-Type": "application/json",
             Connection: "keep-alive",
             "Keep-Alive": "timeout=5",
-            "Content-Length": 17019
+            "Content-Length": 17019,
           },
           responseBody: {
             code: 0,
@@ -1642,7 +1643,7 @@ export default defineFakeRoute([
                 hiddenTag: false,
                 fixedTag: false,
                 showLink: true,
-                showParent: false
+                showParent: false,
               },
               {
                 parentId: 400,
@@ -1666,7 +1667,7 @@ export default defineFakeRoute([
                 hiddenTag: false,
                 fixedTag: false,
                 showLink: true,
-                showParent: false
+                showParent: false,
               },
               {
                 parentId: 400,
@@ -1690,7 +1691,7 @@ export default defineFakeRoute([
                 hiddenTag: false,
                 fixedTag: false,
                 showLink: true,
-                showParent: false
+                showParent: false,
               },
               {
                 parentId: 400,
@@ -1714,7 +1715,7 @@ export default defineFakeRoute([
                 hiddenTag: false,
                 fixedTag: false,
                 showLink: true,
-                showParent: false
+                showParent: false,
               },
               {
                 parentId: 400,
@@ -1738,9 +1739,9 @@ export default defineFakeRoute([
                 hiddenTag: false,
                 fixedTag: false,
                 showLink: true,
-                showParent: false
-              }
-            ]
+                showParent: false,
+              },
+            ],
           },
           requestHeaders: {
             Accept: "application/json, text/plain, */*",
@@ -1756,13 +1757,13 @@ export default defineFakeRoute([
             Referer: "http://192.168.2.121:8848/",
             "User-Agent":
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "X-Requested-With": "XMLHttpRequest"
+            "X-Requested-With": "XMLHttpRequest",
           },
           requestBody: {
-            title: "系统监控"
+            title: "系统监控",
           },
           traceId: "1495502411171032",
-          requestTime: new Date()
+          requestTime: new Date(),
         };
       } else if (body.id == 2) {
         return {
@@ -1781,14 +1782,14 @@ export default defineFakeRoute([
             "Content-Type": "application/json",
             Connection: "keep-alive",
             "Keep-Alive": "timeout=5",
-            "Content-Length": 28693
+            "Content-Length": 28693,
           },
           responseBody: {
             plateNumber: "豫A59778U",
             driver: "子骞",
             orientation: 289,
             lng: 113.8564,
-            lat: 34.373
+            lat: 34.373,
           },
           requestHeaders: {
             Accept: "application/json, text/plain, */*",
@@ -1804,13 +1805,13 @@ export default defineFakeRoute([
             Referer: "http://192.168.2.121:8848/",
             "User-Agent":
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "X-Requested-With": "XMLHttpRequest"
+            "X-Requested-With": "XMLHttpRequest",
           },
           requestBody: null,
           traceId: "2280443117103208",
-          requestTime: new Date()
+          requestTime: new Date(),
         };
       }
-    }
-  }
+    },
+  },
 ]);

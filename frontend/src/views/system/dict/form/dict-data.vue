@@ -14,8 +14,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     dictValue: "",
     sortOrder: 0,
     status: 1,
-    remark: ""
-  })
+    remark: "",
+  }),
 });
 
 const ruleFormRef = ref();

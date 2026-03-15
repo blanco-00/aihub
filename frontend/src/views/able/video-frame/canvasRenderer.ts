@@ -37,7 +37,7 @@ export class CanvasRenderer {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ) {
     const img = new Image();
     img.src = url;
@@ -47,7 +47,7 @@ export class CanvasRenderer {
       x,
       y,
       width,
-      height
+      height,
     });
 
     this.render();
@@ -56,14 +56,14 @@ export class CanvasRenderer {
   public render() {
     this.clearRect();
 
-    this.images.forEach(imgProps => {
+    this.images.forEach((imgProps) => {
       const x = imgProps.x + this.positionX;
       this.ctx.drawImage(
         imgProps.img,
         x,
         imgProps.y,
         imgProps.width,
-        imgProps.height
+        imgProps.height,
       );
     });
   }
@@ -82,7 +82,7 @@ export class CanvasRenderer {
     // 当前勾选图片的索引
     const index =
       Math.ceil(
-        (Math.abs(this.positionX) + event.offsetX) / this.images[0].width
+        (Math.abs(this.positionX) + event.offsetX) / this.images[0].width,
       ) - 1;
     const x = event.offsetX;
     const y = event.offsetY;
@@ -164,7 +164,7 @@ export class CanvasRenderer {
       this.images.length * this.images[0].width - this.container.clientWidth;
     this.positionX = Math.max(
       Math.min(this.positionX + deltaX, 0),
-      -maxPositionX
+      -maxPositionX,
     );
     this.startX = clientX;
 

@@ -18,7 +18,7 @@ dayjs.locale("zh-cn");
  */
 export function formatDateTime(
   date: string | number | Date | null | undefined,
-  format: string = "YYYY-MM-DD HH:mm:ss"
+  format: string = "YYYY-MM-DD HH:mm:ss",
 ): string {
   if (!date) {
     return "-";
@@ -38,7 +38,7 @@ export function formatDateTime(
  */
 export function formatDate(
   date: string | number | Date | null | undefined,
-  format: string = "YYYY-MM-DD"
+  format: string = "YYYY-MM-DD",
 ): string {
   if (!date) {
     return "-";
@@ -58,7 +58,7 @@ export function formatDate(
  */
 export function formatTime(
   date: string | number | Date | null | undefined,
-  format: string = "HH:mm:ss"
+  format: string = "HH:mm:ss",
 ): string {
   if (!date) {
     return "-";
@@ -76,7 +76,7 @@ export function formatTime(
  * @returns 相对时间字符串，如果日期无效则返回 "-"
  */
 export function formatRelativeTime(
-  date: string | number | Date | null | undefined
+  date: string | number | Date | null | undefined,
 ): string {
   if (!date) {
     return "-";
@@ -94,7 +94,7 @@ export function formatRelativeTime(
  * @returns 格式化后的日期时间字符串，如果日期无效则返回 "-"
  */
 export function formatDateTimeShort(
-  date: string | number | Date | null | undefined
+  date: string | number | Date | null | undefined,
 ): string {
   return formatDateTime(date, "YYYY-MM-DD HH:mm");
 }
@@ -105,7 +105,7 @@ export function formatDateTimeShort(
  * @returns 格式化后的日期时间字符串，如果日期无效则返回 "-"
  */
 export function formatDateTimeFull(
-  date: string | number | Date | null | undefined
+  date: string | number | Date | null | undefined,
 ): string {
   return formatDateTime(date, "YYYY-MM-DD HH:mm:ss.SSS");
 }
@@ -116,7 +116,7 @@ export function formatDateTimeFull(
  * @returns 如果日期有效返回 true，否则返回 false
  */
 export function isValidDate(
-  date: string | number | Date | null | undefined
+  date: string | number | Date | null | undefined,
 ): boolean {
   if (!date) {
     return false;
@@ -129,7 +129,9 @@ export function isValidDate(
  * @param format 格式化模板，默认为 "YYYY-MM-DD HH:mm:ss"
  * @returns 格式化后的当前日期时间字符串
  */
-export function getCurrentDateTime(format: string = "YYYY-MM-DD HH:mm:ss"): string {
+export function getCurrentDateTime(
+  format: string = "YYYY-MM-DD HH:mm:ss",
+): string {
   return dayjs().format(format);
 }
 

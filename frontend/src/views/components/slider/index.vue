@@ -7,11 +7,11 @@ import {
   Placement,
   Range,
   Vertical,
-  Marks
+  Marks,
 } from "./components";
 
 defineOptions({
-  name: "PureSlider"
+  name: "PureSlider",
 });
 </script>
 

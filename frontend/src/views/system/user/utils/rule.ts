@@ -13,8 +13,8 @@ export const formRules = reactive(<FormRules>{
         // 这里在hook中动态设置验证规则
         callback();
       },
-      trigger: "blur"
-    }
+      trigger: "blur",
+    },
   ],
   role: [{ required: true, message: "用户角色为必填项", trigger: "blur" }],
   phone: [
@@ -28,9 +28,9 @@ export const formRules = reactive(<FormRules>{
           callback();
         }
       },
-      trigger: "blur"
+      trigger: "blur",
       // trigger: "click" // 如果想在点击确定按钮时触发这个校验，trigger 设置成 click 即可
-    }
+    },
   ],
   email: [
     {
@@ -43,7 +43,7 @@ export const formRules = reactive(<FormRules>{
           callback();
         }
       },
-      trigger: "blur"
-    }
-  ]
+      trigger: "blur",
+    },
+  ],
 });

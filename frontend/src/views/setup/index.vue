@@ -11,12 +11,21 @@
           <Motion>
             <h2 class="outline-hidden">
               <TypeIt
-                :options="{ strings: ['系统初始化'], cursor: false, speed: 100 }"
+                :options="{
+                  strings: ['系统初始化'],
+                  cursor: false,
+                  speed: 100,
+                }"
               />
             </h2>
           </Motion>
 
-          <el-steps :active="currentStep" finish-status="success" align-center style="margin: 32px 0">
+          <el-steps
+            :active="currentStep"
+            finish-status="success"
+            align-center
+            style="margin: 32px 0"
+          >
             <el-step title="检查数据库" />
             <el-step title="创建管理员" />
           </el-steps>
@@ -48,17 +57,19 @@
                   :closable="false"
                   style="margin-bottom: 24px"
                 />
-                
+
                 <!-- 数据库连接失败 -->
                 <el-alert
                   v-if="dbStatus && !dbStatus.connected"
                   type="error"
                   title="数据库连接失败"
-                  :description="dbStatus.errorMessage || '请检查数据库配置和连接状态'"
+                  :description="
+                    dbStatus.errorMessage || '请检查数据库配置和连接状态'
+                  "
                   style="margin-bottom: 24px"
                   :closable="false"
                 />
-                
+
                 <!-- 数据库连接成功 -->
                 <el-alert
                   v-if="dbStatus && dbStatus.connected"
@@ -68,7 +79,7 @@
                   style="margin-bottom: 24px"
                   :closable="false"
                 />
-                
+
                 <div class="flex justify-center">
                   <!-- 数据库连接成功，显示下一步按钮 -->
                   <el-button
@@ -79,7 +90,7 @@
                   >
                     下一步：创建管理员
                   </el-button>
-                  
+
                   <!-- 数据库连接失败，显示重试按钮 -->
                   <el-button
                     v-if="dbStatus && !dbStatus.connected"
@@ -89,7 +100,7 @@
                   >
                     重新检查数据库状态
                   </el-button>
-                  
+
                   <!-- 状态未加载，显示检查按钮 -->
                   <el-button
                     v-if="!dbStatus"
@@ -185,7 +196,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, toRaw } from "vue";
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import {
+  ElMessage,
+  ElMessageBox,
+  type FormInstance,
+  type FormRules,
+} from "element-plus";
 import Motion from "@/views/login/utils/motion";
 import TypeIt from "@/components/ReTypeit";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -197,7 +213,7 @@ import {
   getDatabaseStatus,
   createSuperAdmin,
   type DatabaseStatus,
-  type InitSuperAdminRequest
+  type InitSuperAdminRequest,
 } from "@/api/init";
 import { clearInitStatusCache } from "@/router";
 import { bg, avatar, illustration } from "@/views/login/utils/static";
@@ -207,7 +223,7 @@ import User from "~icons/ri/user-3-fill";
 import Info from "~icons/ri/information-line";
 
 defineOptions({
-  name: "Init"
+  name: "Init",
 });
 
 // 初始化主题（确保暗黑模式生效）
@@ -226,17 +242,22 @@ const adminForm = reactive<InitSuperAdminRequest>({
   username: "",
   email: "",
   password: "",
-  confirmPassword: ""
+  confirmPassword: "",
 });
 
 const adminRules: FormRules = {
   username: [
     { required: true, message: "请输入用户名", trigger: "blur" },
-    { min: 3, max: 50, message: "用户名长度必须在3-50个字符之间", trigger: "blur" }
+    {
+      min: 3,
+      max: 50,
+      message: "用户名长度必须在3-50个字符之间",
+      trigger: "blur",
+    },
   ],
   email: [
     { required: true, message: "请输入邮箱", trigger: "blur" },
-    { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" }
+    { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" },
   ],
   password: [
     {
@@ -249,8 +270,8 @@ const adminRules: FormRules = {
           callback();
         }
       },
-      trigger: "blur"
-    }
+      trigger: "blur",
+    },
   ],
   confirmPassword: [
     { required: true, message: "请确认密码", trigger: "blur" },
@@ -264,9 +285,9 @@ const adminRules: FormRules = {
           callback();
         }
       },
-      trigger: "blur"
-    }
-  ]
+      trigger: "blur",
+    },
+  ],
 };
 
 // 检查数据库状态
@@ -286,7 +307,9 @@ const checkDatabaseStatus = async () => {
     }
   } catch (error: any) {
     console.error("检查数据库状态失败", error);
-    ElMessage.error(error?.message || "检查数据库状态失败，请检查后端服务是否正常");
+    ElMessage.error(
+      error?.message || "检查数据库状态失败，请检查后端服务是否正常",
+    );
   } finally {
     initDbLoading.value = false;
   }
@@ -295,7 +318,7 @@ const checkDatabaseStatus = async () => {
 // 创建超级管理员
 const createAdmin = async () => {
   if (!adminFormRef.value) return;
-  await adminFormRef.value.validate(async valid => {
+  await adminFormRef.value.validate(async (valid) => {
     if (valid) {
       creating.value = true;
       try {

@@ -8,8 +8,8 @@ export const auth: Directive = {
       !hasAuth(value) && el.parentNode?.removeChild(el);
     } else {
       throw new Error(
-        "[Directive: auth]: need auths! Like v-auth=\"['btn.add','btn.edit']\""
+        "[Directive: auth]: need auths! Like v-auth=\"['btn.add','btn.edit']\"",
       );
     }
-  }
+  },
 };

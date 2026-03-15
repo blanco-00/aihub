@@ -1,4 +1,4 @@
-import { FormItemProps } from "@pureadmin/table";
+import type { FormItemProps } from "@pureadmin/table";
 
 export type DictTypeFormItemProps = {
   id?: number;

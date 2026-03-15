@@ -35,7 +35,10 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item label="发布范围" prop="publishType">
-      <el-radio-group v-model="newFormInline.publishType" @change="handlePublishTypeChange">
+      <el-radio-group
+        v-model="newFormInline.publishType"
+        @change="handlePublishTypeChange"
+      >
         <el-radio :label="1">全部用户</el-radio>
         <el-radio :label="2">指定部门</el-radio>
         <el-radio :label="3">指定角色</el-radio>
@@ -146,7 +149,7 @@ import { getAllRoles } from "@/api/role";
 import { getUserList } from "@/api/system";
 
 defineOptions({
-  name: "NoticeForm"
+  name: "NoticeForm",
 });
 
 interface FormProps {
@@ -177,8 +180,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     roleIds: [],
     userIds: [],
     expireTime: null,
-    sortOrder: 0
-  })
+    sortOrder: 0,
+  }),
 });
 
 const formRef = ref<FormInstance>();
@@ -192,27 +195,31 @@ const userOptions = ref([]);
 const rules = formRules;
 
 // 监听 formInline 变化，同步到 newFormInline
-watch(() => props.formInline, (newVal) => {
-  if (newVal) {
-    console.log("表单数据更新:", newVal);
-    console.log("通知内容:", newVal.content);
-    newFormInline.value = {
-      id: newVal.id,
-      title: newVal.title || "",
-      content: newVal.content ?? "", // 使用 ?? 而不是 ||，避免 content 为 0 时被转换为 ""
-      categoryId: newVal.categoryId || null,
-      type: newVal.type ?? 1,
-      publishType: newVal.publishType ?? 1,
-      departmentIds: newVal.departmentIds || [],
-      roleIds: newVal.roleIds || [],
-      userIds: newVal.userIds || [],
-      expireTime: newVal.expireTime || null,
-      sortOrder: newVal.sortOrder ?? 0
-    };
-    console.log("更新后的表单数据:", newFormInline.value);
-    console.log("更新后的通知内容:", newFormInline.value.content);
-  }
-}, { deep: true, immediate: true });
+watch(
+  () => props.formInline,
+  (newVal) => {
+    if (newVal) {
+      console.log("表单数据更新:", newVal);
+      console.log("通知内容:", newVal.content);
+      newFormInline.value = {
+        id: newVal.id,
+        title: newVal.title || "",
+        content: newVal.content ?? "", // 使用 ?? 而不是 ||，避免 content 为 0 时被转换为 ""
+        categoryId: newVal.categoryId || null,
+        type: newVal.type ?? 1,
+        publishType: newVal.publishType ?? 1,
+        departmentIds: newVal.departmentIds || [],
+        roleIds: newVal.roleIds || [],
+        userIds: newVal.userIds || [],
+        expireTime: newVal.expireTime || null,
+        sortOrder: newVal.sortOrder ?? 0,
+      };
+      console.log("更新后的表单数据:", newFormInline.value);
+      console.log("更新后的通知内容:", newFormInline.value.content);
+    }
+  },
+  { deep: true, immediate: true },
+);
 
 // 加载分类选项
 function loadCategoryOptions() {
@@ -244,7 +251,7 @@ function loadDepartmentOptions() {
         // 将树形结构扁平化
         const flatten = (items: any[]): any[] => {
           const result: any[] = [];
-          items.forEach(item => {
+          items.forEach((item) => {
             result.push({ id: item.id, name: item.name });
             if (item.children && item.children.length > 0) {
               result.push(...flatten(item.children));

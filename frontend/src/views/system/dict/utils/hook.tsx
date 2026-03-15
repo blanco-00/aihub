@@ -14,7 +14,7 @@ import {
   deleteDictType,
   refreshDictCache,
   type CreateDictTypeRequest,
-  type UpdateDictTypeRequest
+  type UpdateDictTypeRequest,
 } from "@/api/dict";
 import { type Ref, reactive, ref, h, onMounted, onBeforeUnmount } from "vue";
 
@@ -24,7 +24,7 @@ export function useDictType(tableRef: Ref) {
     dictType: "",
     status: "",
     startTime: "",
-    endTime: ""
+    endTime: "",
   });
   const curRow = ref();
   const formRef = ref();
@@ -38,33 +38,33 @@ export function useDictType(tableRef: Ref) {
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
   const columns: TableColumnList = [
     {
       label: "勾选列",
       type: "selection",
       fixed: "left",
-      reserveSelection: true
+      reserveSelection: true,
     },
     {
       label: "字典主键",
       prop: "id",
-      width: 90
+      width: 90,
     },
     {
       label: "字典名称",
       prop: "dictName",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       label: "字典类型",
       prop: "dictType",
-      minWidth: 130
+      minWidth: 130,
     },
     {
       label: "状态",
-      cellRenderer: scope => (
+      cellRenderer: (scope) => (
         <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
@@ -78,26 +78,26 @@ export function useDictType(tableRef: Ref) {
           onChange={() => onChange(scope as any)}
         />
       ),
-      minWidth: 90
+      minWidth: 90,
     },
     {
       label: "备注",
       prop: "remark",
-      minWidth: 160
+      minWidth: 160,
     },
     {
       label: "创建时间",
       prop: "createdAt",
       minWidth: 160,
       formatter: ({ createdAt }) =>
-        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-"
+        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "-",
     },
     {
       label: "操作",
       fixed: "right",
       width: 240,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   async function onChange({ row, index }) {
@@ -113,8 +113,8 @@ export function useDictType(tableRef: Ref) {
         cancelButtonText: "取消",
         type: "warning",
         dangerouslyUseHTMLString: true,
-        draggable: true
-      }
+        draggable: true,
+      },
     )
       .then(async () => {
         if (!isMounted.value) return;
@@ -122,8 +122,8 @@ export function useDictType(tableRef: Ref) {
           {},
           switchLoadMap.value[index],
           {
-            loading: true
-          }
+            loading: true,
+          },
         );
         try {
           const newStatus = row.status === 0 ? 1 : 0;
@@ -131,14 +131,14 @@ export function useDictType(tableRef: Ref) {
             dictName: row.dictName,
             dictType: row.dictType,
             status: newStatus,
-            remark: row.remark
+            remark: row.remark,
           };
           const response = await updateDictType(row.id, request);
           if (!isMounted.value) return;
           if (response.code === 200) {
             row.status = newStatus;
             message(`已${row.status === 0 ? "停用" : "启用"}${row.dictName}`, {
-              type: "success"
+              type: "success",
             });
           } else {
             message(response.message || "更新字典状态失败", { type: "error" });
@@ -154,8 +154,8 @@ export function useDictType(tableRef: Ref) {
               {},
               switchLoadMap.value[index],
               {
-                loading: false
-              }
+                loading: false,
+              },
             );
           }
         }
@@ -178,8 +178,8 @@ export function useDictType(tableRef: Ref) {
         cancelButtonText: "取消",
         type: "warning",
         dangerouslyUseHTMLString: true,
-        draggable: true
-      }
+        draggable: true,
+      },
     )
       .then(async () => {
         if (!isMounted.value) return;
@@ -188,7 +188,7 @@ export function useDictType(tableRef: Ref) {
           if (!isMounted.value) return;
           if (response.code === 200) {
             message(`您删除了字典名称为${row.dictName}的这条数据`, {
-              type: "success"
+              type: "success",
             });
             onSearch();
           } else {
@@ -207,7 +207,7 @@ export function useDictType(tableRef: Ref) {
       message("请选择要删除的数据", { type: "warning" });
       return;
     }
-    
+
     ElMessageBox.confirm(
       `确认要删除选中的<strong style='color:var(--el-color-primary)'>${
         rows.length
@@ -218,8 +218,8 @@ export function useDictType(tableRef: Ref) {
         cancelButtonText: "取消",
         type: "warning",
         dangerouslyUseHTMLString: true,
-        draggable: true
-      }
+        draggable: true,
+      },
     )
       .then(async () => {
         if (!isMounted.value) return;
@@ -238,16 +238,12 @@ export function useDictType(tableRef: Ref) {
   }
 
   async function handleRefreshCache() {
-    ElMessageBox.confirm(
-      "确认要刷新字典缓存吗?",
-      "系统提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true
-      }
-    )
+    ElMessageBox.confirm("确认要刷新字典缓存吗?", "系统提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+      draggable: true,
+    })
       .then(async () => {
         if (!isMounted.value) return;
         try {
@@ -292,11 +288,11 @@ export function useDictType(tableRef: Ref) {
         dictType: form.dictType || undefined,
         status: form.status ? Number(form.status) : undefined,
         startTime: form.startTime || undefined,
-        endTime: form.endTime || undefined
+        endTime: form.endTime || undefined,
       });
-      
+
       if (!isMounted.value) return;
-      
+
       if (response.code === 200 && response.data) {
         dataList.value = response.data.records || [];
         pagination.total = response.data.total || 0;
@@ -317,7 +313,7 @@ export function useDictType(tableRef: Ref) {
     }
   }
 
-  const resetForm = formEl => {
+  const resetForm = (formEl) => {
     if (!formEl) return;
     formEl.resetFields();
     form.dictName = "";
@@ -338,15 +334,16 @@ export function useDictType(tableRef: Ref) {
           dictName: row?.dictName ?? "",
           dictType: row?.dictType ?? "",
           status: row?.status ?? 1,
-          remark: row?.remark ?? ""
-        }
+          remark: row?.remark ?? "",
+        },
       },
       width: "40%",
       draggable: true,
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(dictTypeForm, { ref: formRef, formInline: null }),
+      contentRenderer: () =>
+        h(dictTypeForm, { ref: formRef, formInline: null }),
       beforeSure: async (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as DictTypeFormItemProps;
@@ -359,36 +356,46 @@ export function useDictType(tableRef: Ref) {
                   dictName: curData.dictName,
                   dictType: curData.dictType,
                   status: curData.status ?? 1,
-                  remark: curData.remark
+                  remark: curData.remark,
                 };
                 const response = await createDictType(request);
                 if (!isMounted.value) return;
                 if (response.code === 200) {
-                  message(`您${title}了字典名称为${curData.dictName}的这条数据`, {
-                    type: "success"
-                  });
+                  message(
+                    `您${title}了字典名称为${curData.dictName}的这条数据`,
+                    {
+                      type: "success",
+                    },
+                  );
                   done();
                   onSearch();
                 } else {
-                  message(response.message || "创建字典失败", { type: "error" });
+                  message(response.message || "创建字典失败", {
+                    type: "error",
+                  });
                 }
               } else {
                 const request: UpdateDictTypeRequest = {
                   dictName: curData.dictName,
                   dictType: curData.dictType,
                   status: curData.status,
-                  remark: curData.remark
+                  remark: curData.remark,
                 };
                 const response = await updateDictType(curData.id, request);
                 if (!isMounted.value) return;
                 if (response.code === 200) {
-                  message(`您${title}了字典名称为${curData.dictName}的这条数据`, {
-                    type: "success"
-                  });
+                  message(
+                    `您${title}了字典名称为${curData.dictName}的这条数据`,
+                    {
+                      type: "success",
+                    },
+                  );
                   done();
                   onSearch();
                 } else {
-                  message(response.message || "更新字典失败", { type: "error" });
+                  message(response.message || "更新字典失败", {
+                    type: "error",
+                  });
                 }
               }
             } catch (error: any) {
@@ -397,7 +404,7 @@ export function useDictType(tableRef: Ref) {
             }
           }
         });
-      }
+      },
     });
   }
 
@@ -427,6 +434,6 @@ export function useDictType(tableRef: Ref) {
     handleRefreshCache,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

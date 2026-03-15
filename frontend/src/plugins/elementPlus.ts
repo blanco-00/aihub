@@ -123,7 +123,7 @@ import {
   ElMessage, // $message 全局属性对象globalProperties
   ElMessageBox, // $msgbox、$alert、$confirm、$prompt 全局属性对象globalProperties
   ElNotification, // $notify 全局属性对象globalProperties
-  ElPopoverDirective // v-popover 指令
+  ElPopoverDirective, // v-popover 指令
 } from "element-plus";
 
 const components = [
@@ -235,7 +235,7 @@ const components = [
   ElSegmented,
   ElMention,
   ElSplitter,
-  ElSplitterPanel
+  ElSplitterPanel,
 ];
 
 const plugins = [
@@ -244,7 +244,7 @@ const plugins = [
   ElMessage,
   ElMessageBox,
   ElNotification,
-  ElPopoverDirective
+  ElPopoverDirective,
 ];
 
 /** 按需引入`element-plus` */
@@ -254,7 +254,7 @@ export function useElementPlus(app: App) {
     app.component(component.name, component);
   });
   // 全局注册插件
-  plugins.forEach(plugin => {
+  plugins.forEach((plugin) => {
     app.use(plugin);
   });
 }

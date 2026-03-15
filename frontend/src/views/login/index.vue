@@ -36,7 +36,7 @@ import Info from "~icons/ri/information-line";
 import Keyhole from "~icons/ri/shield-keyhole-line";
 
 defineOptions({
-  name: "Login"
+  name: "Login",
 });
 
 const imgCode = ref("");
@@ -62,18 +62,18 @@ const lastUsername = getLastUsername();
 const ruleForm = reactive({
   username: lastUsername,
   password: "",
-  verifyCode: ""
+  verifyCode: "",
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate(valid => {
+  await formEl.validate((valid) => {
     if (valid) {
       loading.value = true;
       useUserStoreHook()
         .loginByUsername({
           username: ruleForm.username,
-          password: ruleForm.password
+          password: ruleForm.password,
         })
         .then(async () => {
           // 获取后端路由
@@ -83,7 +83,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             message(t("login.pureLoginSuccess"), { type: "success" });
           });
         })
-        .catch(_err => {
+        .catch((_err) => {
           message(t("login.pureLoginFail"), { type: "error" });
         })
         .finally(() => {
@@ -95,9 +95,9 @@ const onLogin = async (formEl: FormInstance | undefined) => {
 };
 
 const immediateDebounce: any = debounce(
-  formRef => onLogin(formRef),
+  (formRef) => onLogin(formRef),
   1000,
-  true
+  true,
 );
 
 useEventListener(document, "keydown", ({ code }) => {
@@ -109,10 +109,10 @@ useEventListener(document, "keydown", ({ code }) => {
     immediateDebounce(ruleFormRef.value);
 });
 
-watch(imgCode, value => {
+watch(imgCode, (value) => {
   useUserStoreHook().SET_VERIFYCODE(value);
 });
-watch(checked, bool => {
+watch(checked, (bool) => {
   useUserStoreHook().SET_ISREMEMBERED(bool);
 });
 </script>
@@ -190,8 +190,8 @@ watch(checked, bool => {
                   {
                     required: true,
                     message: transformI18n($t('login.pureUsernameReg')),
-                    trigger: 'blur'
-                  }
+                    trigger: 'blur',
+                  },
                 ]"
                 prop="username"
               >
@@ -240,7 +240,7 @@ watch(checked, bool => {
                       <IconifyIconOffline
                         v-tippy="{
                           content: t('login.pureRememberInfo'),
-                          placement: 'top'
+                          placement: 'top',
                         }"
                         :icon="Info"
                         class="ml-1"

@@ -8,7 +8,7 @@ import Empty from "./empty.svg?component";
 export function useColumns(tableData?: Ref<any[]>) {
   const dataList = ref([]);
   const loading = ref(true);
-  
+
   // 监听外部传入的tableData
   if (tableData) {
     watch(
@@ -20,14 +20,14 @@ export function useColumns(tableData?: Ref<any[]>) {
           loading.value = false;
         }
       },
-      { immediate: true }
+      { immediate: true },
     );
   }
   const columns: TableColumnList = [
     {
       sortable: true,
       label: "序号",
-      prop: "id"
+      prop: "id",
     },
     {
       sortable: true,
@@ -37,23 +37,23 @@ export function useColumns(tableData?: Ref<any[]>) {
       filterClassName: "pure-table-filter",
       filters: [
         { text: "≥16000", value: "more" },
-        { text: "<16000", value: "less" }
+        { text: "<16000", value: "less" },
       ],
       filterMethod: (value, { requiredNumber }) => {
         return value === "more"
           ? requiredNumber >= 16000
           : requiredNumber < 16000;
-      }
+      },
     },
     {
       sortable: true,
       label: "提问数量",
-      prop: "questionNumber"
+      prop: "questionNumber",
     },
     {
       sortable: true,
       label: "解决数量",
-      prop: "resolveNumber"
+      prop: "resolveNumber",
     },
     {
       sortable: true,
@@ -70,18 +70,18 @@ export function useColumns(tableData?: Ref<any[]>) {
             />
           </span>
         </div>
-      )
+      ),
     },
     {
       sortable: true,
       label: "统计日期",
-      prop: "date"
+      prop: "date",
     },
     {
       label: "操作",
       fixed: "right",
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   /** 分页配置 */
@@ -90,7 +90,7 @@ export function useColumns(tableData?: Ref<any[]>) {
     currentPage: 1,
     layout: "prev, pager, next",
     total: 0,
-    align: "center"
+    align: "center",
   });
 
   function onCurrentChange(page: number) {
@@ -112,6 +112,6 @@ export function useColumns(tableData?: Ref<any[]>) {
     columns,
     dataList,
     pagination,
-    onCurrentChange
+    onCurrentChange,
   };
 }

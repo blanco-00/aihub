@@ -8,8 +8,8 @@ export default defineComponent({
   props: {
     icon: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   render() {
     const attrs = this.$attrs;
@@ -21,11 +21,11 @@ export default defineComponent({
         style: attrs?.style
           ? Object.assign(attrs.style, { outline: "none" })
           : { outline: "none" },
-        ...attrs
+        ...attrs,
       },
       {
-        default: () => []
-      }
+        default: () => [],
+      },
     );
-  }
+  },
 });

@@ -2,7 +2,12 @@ import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { getDeptList, createDepartment, updateDepartment, deleteDepartment } from "@/api/department";
+import {
+  getDeptList,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from "@/api/department";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
@@ -12,7 +17,7 @@ import { cloneDeep, isAllEmpty, deviceDetection } from "@pureadmin/utils";
 export function useDept() {
   const form = reactive({
     name: "",
-    status: null
+    status: null,
   });
 
   const formRef = ref();
@@ -25,12 +30,12 @@ export function useDept() {
       label: "部门名称",
       prop: "name",
       width: 180,
-      align: "left"
+      align: "left",
     },
     {
       label: "排序",
       prop: "sortOrder",
-      minWidth: 70
+      minWidth: 70,
     },
     {
       label: "状态",
@@ -40,27 +45,27 @@ export function useDept() {
         <el-tag size={props.size} style={tagStyle.value(row.status)}>
           {row.status === 1 ? "启用" : "停用"}
         </el-tag>
-      )
+      ),
     },
     {
       label: "创建时间",
       minWidth: 200,
       prop: "createdAt",
       formatter: ({ createdAt }) =>
-        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : ""
+        createdAt ? dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss") : "",
     },
     {
       label: "备注",
       prop: "remark",
       minWidth: 320,
-      showOverflowTooltip: true
+      showOverflowTooltip: true,
     },
     {
       label: "操作",
       fixed: "right",
       width: 210,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   function handleSelectionChange(val) {
@@ -82,11 +87,11 @@ export function useDept() {
         let newData = data;
         if (!isAllEmpty(form.name)) {
           // 前端搜索部门名称
-          newData = newData.filter(item => item.name.includes(form.name));
+          newData = newData.filter((item) => item.name.includes(form.name));
         }
         if (!isAllEmpty(form.status)) {
           // 前端搜索状态
-          newData = newData.filter(item => item.status === form.status);
+          newData = newData.filter((item) => item.status === form.status);
         }
         dataList.value = handleTree(newData); // 处理成树结构
       } else {
@@ -122,8 +127,8 @@ export function useDept() {
           name: row?.name ?? "",
           sort: row?.sortOrder ?? 0,
           status: row?.status ?? 1,
-          remark: row?.remark ?? ""
-        }
+          remark: row?.remark ?? "",
+        },
       },
       width: "40%",
       draggable: true,
@@ -136,7 +141,7 @@ export function useDept() {
         const curData = options.props.formInline as FormItemProps;
         function chores() {
           message(`您${title}了部门名称为${curData.name}的这条数据`, {
-            type: "success"
+            type: "success",
           });
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
@@ -150,7 +155,7 @@ export function useDept() {
                   parentId: curData.parentId || 0,
                   sortOrder: curData.sort || 0,
                   status: curData.status !== undefined ? curData.status : 1,
-                  remark: curData.remark || ""
+                  remark: curData.remark || "",
                 });
               } else {
                 await updateDepartment(row.id, {
@@ -158,18 +163,18 @@ export function useDept() {
                   parentId: curData.parentId || 0,
                   sortOrder: curData.sort || 0,
                   status: curData.status !== undefined ? curData.status : 1,
-                  remark: curData.remark || ""
+                  remark: curData.remark || "",
                 });
               }
               chores();
             } catch (error: any) {
               message(error?.message || `${title}部门失败`, {
-                type: "error"
+                type: "error",
               });
             }
           }
         });
-      }
+      },
     });
   }
 
@@ -180,7 +185,7 @@ export function useDept() {
       onSearch();
     } catch (error: any) {
       message(error?.message || "删除部门失败", {
-        type: "error"
+        type: "error",
       });
     }
   }
@@ -202,6 +207,6 @@ export function useDept() {
     openDialog,
     /** 删除部门 */
     handleDelete,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import noExist from "@/assets/status/404.svg?component";
 
 defineOptions({
-  name: "404"
+  name: "404",
 });
 
 const router = useRouter();
@@ -20,14 +20,14 @@ const router = useRouter();
         class="font-medium text-4xl mb-4! dark:text-white"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 80
-          }
+            delay: 80,
+          },
         }"
       >
         404
@@ -37,14 +37,14 @@ const router = useRouter();
         class="text-xl mb-4! text-gray-500"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 120
-          }
+            delay: 120,
+          },
         }"
       >
         抱歉，你访问的页面不存在
@@ -55,14 +55,14 @@ const router = useRouter();
         class="block mx-auto md:inline-block md:mx-0"
         :initial="{
           opacity: 0,
-          y: 100
+          y: 100,
         }"
         :enter="{
           opacity: 1,
           y: 0,
           transition: {
-            delay: 160
-          }
+            delay: 160,
+          },
         }"
         @click="router.push('/')"
       >

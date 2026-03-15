@@ -5,7 +5,7 @@ import "plus-pro-components/es/components/form/style/css";
 import {
   type PlusColumn,
   type FieldValues,
-  PlusForm
+  PlusForm,
 } from "plus-pro-components";
 
 const state = ref<FieldValues>({
@@ -15,16 +15,16 @@ const state = ref<FieldValues>({
   progress: 100,
   switch: true,
   time: new Date().toString(),
-  endTime: []
+  endTime: [],
 });
 
 const rules = {
   name: [
     {
       required: true,
-      message: "请输入名称"
-    }
-  ]
+      message: "请输入名称",
+    },
+  ],
 };
 
 const columns: PlusColumn[] = [
@@ -33,7 +33,7 @@ const columns: PlusColumn[] = [
     width: 120,
     prop: "name",
     valueType: "copy",
-    tooltip: "我是名称"
+    tooltip: "我是名称",
   },
   {
     label: "状态",
@@ -44,52 +44,52 @@ const columns: PlusColumn[] = [
       {
         label: "未解决",
         value: "0",
-        color: "red"
+        color: "red",
       },
       {
         label: "已解决",
         value: "1",
-        color: "blue"
+        color: "blue",
       },
       {
         label: "解决中",
         value: "2",
-        color: "yellow"
+        color: "yellow",
       },
       {
         label: "失败",
         value: "3",
-        color: "red"
-      }
-    ]
+        color: "red",
+      },
+    ],
   },
   {
     label: "执行进度",
     width: 200,
-    prop: "progress"
+    prop: "progress",
   },
   {
     label: "评分",
     width: 200,
     prop: "rate",
-    valueType: "rate"
+    valueType: "rate",
   },
   {
     label: "是否显示",
     width: 100,
     prop: "switch",
-    valueType: "switch"
+    valueType: "switch",
   },
   {
     label: "时间",
     prop: "time",
-    valueType: "date-picker"
+    valueType: "date-picker",
   },
   {
     label: "数量",
     prop: "number",
     valueType: "input-number",
-    fieldProps: { precision: 2, step: 2 }
+    fieldProps: { precision: 2, step: 2 },
   },
   {
     label: "梦想",
@@ -98,17 +98,17 @@ const columns: PlusColumn[] = [
     options: [
       {
         label: "诗",
-        value: "0"
+        value: "0",
       },
       {
         label: "远方",
-        value: "1"
+        value: "1",
       },
       {
         label: "美食",
-        value: "2"
-      }
-    ]
+        value: "2",
+      },
+    ],
   },
   {
     label: "到期时间",
@@ -117,8 +117,8 @@ const columns: PlusColumn[] = [
     fieldProps: {
       type: "datetimerange",
       startPlaceholder: "请选择开始时间",
-      endPlaceholder: "请选择结束时间"
-    }
+      endPlaceholder: "请选择结束时间",
+    },
   },
   {
     label: "说明",
@@ -127,9 +127,9 @@ const columns: PlusColumn[] = [
     fieldProps: {
       maxlength: 10,
       showWordLimit: true,
-      autosize: { minRows: 2, maxRows: 4 }
-    }
-  }
+      autosize: { minRows: 2, maxRows: 4 },
+    },
+  },
 ];
 
 const handleChange = (values: FieldValues, prop: PlusColumn) => {

@@ -4,7 +4,7 @@ import {
   type ButtonProps,
   type DialogOptions,
   closeDialog,
-  dialogStore
+  dialogStore,
 } from "./index";
 import { ref, computed } from "vue";
 import { isFunction } from "@pureadmin/utils";
@@ -12,7 +12,7 @@ import Fullscreen from "~icons/ri/fullscreen-fill";
 import ExitFullscreen from "~icons/ri/fullscreen-exit-fill";
 
 defineOptions({
-  name: "ReDialog"
+  name: "ReDialog",
 });
 
 const sureBtnMap = ref({});
@@ -35,7 +35,7 @@ const footerButtons = computed(() => {
               } else {
                 done();
               }
-            }
+            },
           },
           {
             label: "确定",
@@ -49,8 +49,8 @@ const footerButtons = computed(() => {
                   {},
                   sureBtnMap.value[index],
                   {
-                    loading: true
-                  }
+                    loading: true,
+                  },
                 );
               }
               const closeLoading = () => {
@@ -67,8 +67,8 @@ const footerButtons = computed(() => {
               } else {
                 done();
               }
-            }
-          }
+            },
+          },
         ] as Array<ButtonProps>);
   };
 });
@@ -79,7 +79,7 @@ const fullscreenClass = computed(() => {
     "el-dialog__close",
     "-translate-x-2",
     "cursor-pointer",
-    "hover:text-[red]!"
+    "hover:text-[red]!",
   ];
 });
 
@@ -87,7 +87,7 @@ function eventsCallBack(
   event: EventType,
   options: DialogOptions,
   index: number,
-  isClickFullScreen = false
+  isClickFullScreen = false,
 ) {
   if (!isClickFullScreen) fullscreen.value = options?.fullscreen ?? false;
   if (options?.[event] && isFunction(options?.[event])) {
@@ -98,7 +98,7 @@ function eventsCallBack(
 function handleClose(
   options: DialogOptions,
   index: number,
-  args = { command: "close" }
+  args = { command: "close" },
 ) {
   closeDialog(options, index, args);
   eventsCallBack("close", options, index);
@@ -138,7 +138,7 @@ function handleClose(
                 'fullscreenCallBack',
                 { ...options, fullscreen },
                 index,
-                true
+                true,
               );
             }
           "
@@ -163,7 +163,7 @@ function handleClose(
     <component
       v-bind="options?.props"
       :is="options.contentRenderer({ options, index })"
-      @close="args => handleClose(options, index, args)"
+      @close="(args) => handleClose(options, index, args)"
     />
     <!-- footer -->
     <template v-if="!options?.hideFooter" #footer>
@@ -178,7 +178,7 @@ function handleClose(
             @confirm="
               btn.btnClick({
                 dialog: { options, index },
-                button: { btn, index: key }
+                button: { btn, index: key },
               })
             "
           >
@@ -193,7 +193,7 @@ function handleClose(
             @click="
               btn.btnClick({
                 dialog: { options, index },
-                button: { btn, index: key }
+                button: { btn, index: key },
               })
             "
           >

@@ -9,7 +9,7 @@ export default {
     icon: "ri/artboard-line",
     title: $t("menus.pureBoard"),
     rank: board,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -19,8 +19,8 @@ export default {
       meta: {
         title: $t("menus.pureBoard"),
         keepAlive: true,
-        frameSrc: "https://songlh.top/paint-board/"
-      }
-    }
-  ]
+        frameSrc: "https://songlh.top/paint-board/",
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

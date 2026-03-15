@@ -87,5 +87,7 @@ export const getRoleMenus = (id: number) => {
  * 保存角色菜单关联
  */
 export const saveRoleMenus = (id: number, menuIds: number[]) => {
-  return http.request<Result<void>>("post", `/api/roles/${id}/menus`, { data: menuIds });
+  return http.request<Result<void>>("post", `/api/roles/${id}/menus`, {
+    data: menuIds,
+  });
 };

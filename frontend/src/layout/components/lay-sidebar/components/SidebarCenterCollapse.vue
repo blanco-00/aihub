@@ -11,7 +11,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  isActive: false
+  isActive: false,
 });
 
 const { t } = useI18n();
@@ -41,7 +41,7 @@ const toggleClick = () => {
         : t('buttons.pureClickExpand'),
       theme: tooltipEffect,
       hideOnClick: 'toggle',
-      placement: 'right'
+      placement: 'right',
     }"
     class="center-collapse"
     @click="toggleClick"

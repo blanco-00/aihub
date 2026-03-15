@@ -12,11 +12,11 @@ const siphonI18n = (function () {
   // 仅初始化一次国际化配置
   const cache = Object.fromEntries(
     Object.entries(
-      import.meta.glob("../../locales/*.y(a)?ml", { eager: true })
+      import.meta.glob("../../locales/*.y(a)?ml", { eager: true }),
     ).map(([key, value]: any) => {
       const matched = key.match(/([A-Za-z0-9-_]+)\./i)[1];
       return [matched, value.default];
-    })
+    }),
   );
   return (prefix = "zh-CN") => {
     return cache[prefix];
@@ -26,12 +26,12 @@ const siphonI18n = (function () {
 export const localesConfigs = {
   zh: {
     ...siphonI18n("zh-CN"),
-    ...zhLocale
+    ...zhLocale,
   },
   en: {
     ...siphonI18n("en"),
-    ...enLocale
-  }
+    ...enLocale,
+  },
 };
 
 /** 获取对象中所有嵌套对象的key键，并将它们用点号分割组成字符串 */
@@ -105,10 +105,10 @@ export const i18n: I18n = createI18n({
   legacy: false,
   locale:
     storageLocal().getItem<StorageConfigs>(
-      `${responsiveStorageNameSpace()}locale`
+      `${responsiveStorageNameSpace()}locale`,
     )?.locale ?? "zh",
   fallbackLocale: "en",
-  messages: localesConfigs
+  messages: localesConfigs,
 });
 
 export function useI18n(app: App) {

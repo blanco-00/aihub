@@ -4,13 +4,13 @@ import {
   type ButtonProps,
   type DrawerOptions,
   closeDrawer,
-  drawerStore
+  drawerStore,
 } from "./index";
 import { computed, ref } from "vue";
 import { isFunction } from "@pureadmin/utils";
 
 defineOptions({
-  name: "ReDrawer"
+  name: "ReDrawer",
 });
 
 const sureBtnMap = ref({});
@@ -32,7 +32,7 @@ const footerButtons = computed(() => {
               } else {
                 done();
               }
-            }
+            },
           },
           {
             label: "确定",
@@ -46,8 +46,8 @@ const footerButtons = computed(() => {
                   {},
                   sureBtnMap.value[index],
                   {
-                    loading: true
-                  }
+                    loading: true,
+                  },
                 );
               }
               const closeLoading = () => {
@@ -64,8 +64,8 @@ const footerButtons = computed(() => {
               } else {
                 done();
               }
-            }
-          }
+            },
+          },
         ] as Array<ButtonProps>);
   };
 });
@@ -73,7 +73,7 @@ const footerButtons = computed(() => {
 function eventsCallBack(
   event: EventType,
   options: DrawerOptions,
-  index: number
+  index: number,
 ) {
   if (options?.[event] && isFunction(options?.[event])) {
     return options?.[event]({ options, index });
@@ -90,7 +90,7 @@ function eventsCallBack(
 function handleClose(
   options: DrawerOptions,
   index: number,
-  args = { command: "close" }
+  args = { command: "close" },
 ) {
   closeDrawer(options, index, args);
   eventsCallBack("close", options, index);
@@ -126,7 +126,7 @@ function handleClose(
     <component
       v-bind="options?.props"
       :is="options.contentRenderer({ options, index })"
-      @close="args => handleClose(options, index, args)"
+      @close="(args) => handleClose(options, index, args)"
     />
     <!-- footer  -->
     <template v-if="!options?.hideFooter" #footer>
@@ -141,7 +141,7 @@ function handleClose(
             @confirm="
               btn.btnClick({
                 drawer: { options, index },
-                button: { btn, index: key }
+                button: { btn, index: key },
               })
             "
           >
@@ -156,7 +156,7 @@ function handleClose(
             @click="
               btn.btnClick({
                 drawer: { options, index },
-                button: { btn, index: key }
+                button: { btn, index: key },
               })
             "
           >

@@ -4,7 +4,7 @@ import {
   getNoticeCategoryList,
   createNoticeCategory,
   updateNoticeCategory,
-  deleteNoticeCategory
+  deleteNoticeCategory,
 } from "@/api/notice";
 import { addDialog } from "@/components/ReDialog";
 import { formRules } from "./rule";
@@ -16,7 +16,7 @@ export function useNoticeCategory(tableRef: any) {
   const form = reactive({
     name: "",
     code: "",
-    status: null
+    status: null,
   });
 
   const formRef = ref();
@@ -27,30 +27,30 @@ export function useNoticeCategory(tableRef: any) {
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
 
   const columns: TableColumnList = [
     {
       label: "分类名称",
       prop: "name",
-      minWidth: 120
+      minWidth: 120,
     },
     {
       label: "分类代码",
       prop: "code",
-      minWidth: 120
+      minWidth: 120,
     },
     {
       label: "描述",
       prop: "description",
       minWidth: 200,
-      showOverflowTooltip: true
+      showOverflowTooltip: true,
     },
     {
       label: "排序",
       prop: "sortOrder",
-      minWidth: 80
+      minWidth: 80,
     },
     {
       label: "状态",
@@ -60,21 +60,20 @@ export function useNoticeCategory(tableRef: any) {
         <el-tag type={row.status === 1 ? "success" : "danger"}>
           {row.status === 1 ? "启用" : "禁用"}
         </el-tag>
-      )
+      ),
     },
     {
       label: "创建时间",
       prop: "createdAt",
       minWidth: 180,
-      formatter: ({ createdAt }) =>
-        formatDateTime(createdAt)
+      formatter: ({ createdAt }) => formatDateTime(createdAt),
     },
     {
       label: "操作",
       fixed: "right",
       width: 150,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   function onSearch() {
@@ -84,7 +83,7 @@ export function useNoticeCategory(tableRef: any) {
       size: pagination.pageSize,
       name: form.name || undefined,
       code: form.code || undefined,
-      status: form.status !== null ? form.status : undefined
+      status: form.status !== null ? form.status : undefined,
     })
       .then((response: any) => {
         // 处理响应格式：可能是 { data: { code: 200, data: {...} } } 或 { code: 200, data: {...} }
@@ -125,27 +124,30 @@ export function useNoticeCategory(tableRef: any) {
       code: row?.code ?? "",
       description: row?.description ?? "",
       sortOrder: row?.sortOrder ?? 0,
-      status: row?.status ?? 1
+      status: row?.status ?? 1,
     };
-    
+
     addDialog({
       title: `${title}通知分类`,
       props: {
-        formInline: formInlineData
+        formInline: formInlineData,
       },
       width: "500px",
       draggable: true,
       fullscreen: false,
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(noticeCategoryForm, { 
-        ref: formRef,
-        formInline: formInlineData
-      }),
+      contentRenderer: () =>
+        h(noticeCategoryForm, {
+          ref: formRef,
+          formInline: formInlineData,
+        }),
       beforeSure: (done, { options, closeLoading }) => {
         const FormRef = formRef.value.getRef();
         const formComponent = formRef.value;
-        const curData = formComponent?.getFormData ? formComponent.getFormData() : (options.props.formInline as any);
+        const curData = formComponent?.getFormData
+          ? formComponent.getFormData()
+          : (options.props.formInline as any);
 
         FormRef.validate(async (valid: boolean) => {
           if (valid) {
@@ -154,49 +156,57 @@ export function useNoticeCategory(tableRef: any) {
                 const response = await createNoticeCategory(curData);
                 if (response?.code === 200 || response?.data?.code === 200) {
                   message(`成功新增通知分类：${curData.name}`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
                   closeLoading();
-                  message(response?.message || response?.data?.message || "创建失败", { type: "error" });
+                  message(
+                    response?.message || response?.data?.message || "创建失败",
+                    { type: "error" },
+                  );
                 }
               } else {
-                const response = await updateNoticeCategory(curData.id, curData);
+                const response = await updateNoticeCategory(
+                  curData.id,
+                  curData,
+                );
                 if (response?.code === 200 || response?.data?.code === 200) {
                   message(`成功修改通知分类：${curData.name}`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
                   closeLoading();
-                  message(response?.message || response?.data?.message || "更新失败", { type: "error" });
+                  message(
+                    response?.message || response?.data?.message || "更新失败",
+                    { type: "error" },
+                  );
                 }
               }
             } catch (error: any) {
               closeLoading();
-              message(error?.message || error?.response?.data?.message || "操作失败", { type: "error" });
+              message(
+                error?.message || error?.response?.data?.message || "操作失败",
+                { type: "error" },
+              );
             }
           } else {
             closeLoading();
           }
         });
-      }
+      },
     });
   }
 
   function handleDelete(row: any) {
-    ElMessageBox.confirm(
-      `确定要删除通知分类"${row.name}"吗？`,
-      "提示",
-      {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }
-    )
+    ElMessageBox.confirm(`确定要删除通知分类"${row.name}"吗？`, "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    })
       .then(async () => {
         try {
           await deleteNoticeCategory(row.id);
@@ -240,6 +250,6 @@ export function useNoticeCategory(tableRef: any) {
     handleDelete,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

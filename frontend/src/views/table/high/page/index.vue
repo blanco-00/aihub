@@ -13,7 +13,7 @@ const {
   paginationAlign,
   onChange,
   onSizeChange,
-  onCurrentChange
+  onCurrentChange,
 } = useColumns();
 </script>
 
@@ -68,7 +68,7 @@ const {
       :data="
         dataList.slice(
           (pagination.currentPage - 1) * pagination.pageSize,
-          pagination.currentPage * pagination.pageSize
+          pagination.currentPage * pagination.pageSize,
         )
       "
       :columns="columns"

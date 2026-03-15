@@ -5,7 +5,7 @@ import {
   nextTick,
   onBeforeMount,
   defineComponent,
-  getCurrentInstance
+  getCurrentInstance,
 } from "vue";
 import { addClass, removeClass, toggleClass } from "@pureadmin/utils";
 
@@ -24,29 +24,29 @@ let selectedList = [];
 const props = {
   HsKey: {
     type: Number || String,
-    default: 0
+    default: 0,
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   value: {
     type: Number,
-    default: 0
+    default: 0,
   },
   max: {
     type: Array,
     default() {
       return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    }
+    },
   },
   // 回显数据的索引，长度必须是2
   echo: {
     type: Array,
     default() {
       return [];
-    }
-  }
+    },
+  },
 };
 
 export default defineComponent({
@@ -78,7 +78,7 @@ export default defineComponent({
     });
 
     // 鼠标移入
-    const setCurrentValue = index => {
+    const setCurrentValue = (index) => {
       if (props.disabled) return;
       // 当选中一个元素后，开始添加背景色
       if (selectedList.length === 1) {
@@ -92,13 +92,13 @@ export default defineComponent({
           toggleClass(
             false,
             bothRightSides,
-            document.querySelector(".hs-select__item" + selectedList[0].index)
+            document.querySelector(".hs-select__item" + selectedList[0].index),
           );
 
           while (index >= firstIndex) {
             addClass(
               document.querySelector(".hs-select__item" + firstIndex),
-              inRange
+              inRange,
             );
             firstIndex++;
           }
@@ -107,13 +107,13 @@ export default defineComponent({
           toggleClass(
             true,
             bothRightSides,
-            document.querySelector(".hs-select__item" + selectedList[0].index)
+            document.querySelector(".hs-select__item" + selectedList[0].index),
           );
 
           while (index <= firstIndex) {
             addClass(
               document.querySelector(".hs-select__item" + firstIndex),
-              inRange
+              inRange,
             );
             firstIndex--;
           }
@@ -124,7 +124,7 @@ export default defineComponent({
     };
 
     // 鼠标离开
-    const resetCurrentValue = index => {
+    const resetCurrentValue = (index) => {
       if (props.disabled) return;
       // 移除先检查是否选中 选中则返回false 不移除
       const currentHsDom = document.querySelector("." + voidClass + index);
@@ -141,14 +141,14 @@ export default defineComponent({
           for (let i = 0; i <= index; i++) {
             removeClass(
               document.querySelector(".hs-select__item" + i),
-              inRange
+              inRange,
             );
           }
         } else {
           while (index <= firstIndex) {
             removeClass(
               document.querySelector(".hs-select__item" + index),
-              inRange
+              inRange,
             );
             index++;
           }
@@ -167,23 +167,23 @@ export default defineComponent({
 
         addClass(
           document.querySelector(".hs-select__item" + selectedList[0].index),
-          bothLeftSides
+          bothLeftSides,
         );
 
         if (selectedList[1]) {
           if (selectedDirection === "right") {
             addClass(
               document.querySelector(
-                ".hs-select__item" + selectedList[1].index
+                ".hs-select__item" + selectedList[1].index,
               ),
-              bothRightSides
+              bothRightSides,
             );
           } else {
             addClass(
               document.querySelector(
-                ".hs-select__item" + selectedList[1].index
+                ".hs-select__item" + selectedList[1].index,
               ),
-              bothLeftSides
+              bothLeftSides,
             );
           }
         }
@@ -194,29 +194,29 @@ export default defineComponent({
             emit("selectedVal", {
               left: selectedList[0].item,
               right: selectedList[1].item,
-              whole: selectedList
+              whole: selectedList,
             });
           } else {
             emit("selectedVal", {
               left: selectedList[1].item,
               right: selectedList[0].item,
-              whole: selectedList
+              whole: selectedList,
             });
           }
         }
       } else {
         nextTick(() => {
-          selectedList.forEach(v => {
+          selectedList.forEach((v) => {
             removeClass(
               document.querySelector("." + voidClass + v.index),
               activeClass,
-              stayClass
+              stayClass,
             );
 
             removeClass(
               document.querySelector(".hs-select__item" + v.index),
               bothLeftSides,
-              bothRightSides
+              bothRightSides,
             );
           });
 
@@ -234,14 +234,14 @@ export default defineComponent({
 
           addClass(
             document.querySelector(".hs-select__item" + selectedList[0].index),
-            bothLeftSides
+            bothLeftSides,
           );
         });
       }
     };
 
     // 回显数据
-    const echoView = item => {
+    const echoView = (item) => {
       if (item.length === 0) return;
 
       if (item.length > 2 || item.length === 1) {
@@ -255,29 +255,29 @@ export default defineComponent({
       addClass(
         instance.refs["hsdiv" + props.HsKey + item[0]] as Element,
         activeClass,
-        stayClass
+        stayClass,
       );
 
       addClass(
         instance.refs["hstd" + props.HsKey + item[0]] as Element,
-        bothLeftSides
+        bothLeftSides,
       );
 
       addClass(
         instance.refs["hsdiv" + props.HsKey + item[1]] as Element,
         activeClass,
-        stayClass
+        stayClass,
       );
 
       addClass(
         instance.refs["hstd" + props.HsKey + item[1]] as Element,
-        bothRightSides
+        bothRightSides,
       );
 
       while (item[1] >= item[0]) {
         addClass(
           instance.refs["hstd" + props.HsKey + item[0]] as Element,
-          inRange
+          inRange,
         );
         item[0]++;
       }
@@ -305,7 +305,7 @@ export default defineComponent({
                     onClick={() => selectValue(key, item)}
                     style={{
                       cursor: unref(rateDisabled) ? "auto" : "pointer",
-                      textAlign: "center"
+                      textAlign: "center",
                     }}
                     key={key}
                   >
@@ -323,5 +323,5 @@ export default defineComponent({
         </table>
       </>
     );
-  }
+  },
 });

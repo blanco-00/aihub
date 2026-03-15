@@ -109,7 +109,11 @@ export type UpdateDictDataRequest = {
  * 获取字典类型列表（分页、搜索、筛选）
  */
 export const getDictTypeList = (params?: DictTypeListParams) => {
-  return http.request<Result<PageResult<DictTypeInfo>>>("get", "/api/dict-types", { params });
+  return http.request<Result<PageResult<DictTypeInfo>>>(
+    "get",
+    "/api/dict-types",
+    { params },
+  );
 };
 
 /**
@@ -150,10 +154,17 @@ export const refreshDictCache = () => {
 /**
  * 根据字典类型获取字典数据列表（分页）
  */
-export const getDictDataList = (dictType: string, params?: { current?: number; size?: number }) => {
-  return http.request<Result<PageResult<DictDataInfo>>>("get", "/api/dict-data", { 
-    params: { dictType, ...params } 
-  });
+export const getDictDataList = (
+  dictType: string,
+  params?: { current?: number; size?: number },
+) => {
+  return http.request<Result<PageResult<DictDataInfo>>>(
+    "get",
+    "/api/dict-data",
+    {
+      params: { dictType, ...params },
+    },
+  );
 };
 
 /**

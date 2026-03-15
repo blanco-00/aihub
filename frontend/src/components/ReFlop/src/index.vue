@@ -3,7 +3,7 @@ import flippers from "./filpper";
 import { ref, unref, nextTick, onUnmounted } from "vue";
 
 defineOptions({
-  name: "ReFlop"
+  name: "ReFlop",
 });
 
 const timer = ref(null);
@@ -51,7 +51,7 @@ const formatDate = (date: Date, dateFormat: string) => {
   if (/(y+)/.test(dateFormat)) {
     dateFormat = dateFormat.replace(
       RegExp.$1,
-      (date.getFullYear() + "").substr(4 - RegExp.$1.length)
+      (date.getFullYear() + "").substr(4 - RegExp.$1.length),
     );
   }
   // 格式化月、日、时、分、秒
@@ -60,7 +60,7 @@ const formatDate = (date: Date, dateFormat: string) => {
     "d+": date.getDate(),
     "h+": date.getHours(),
     "i+": date.getMinutes(),
-    "s+": date.getSeconds()
+    "s+": date.getSeconds(),
   };
   for (const k in o) {
     if (new RegExp(`(${k})`).test(dateFormat)) {
@@ -73,7 +73,7 @@ const formatDate = (date: Date, dateFormat: string) => {
        */
       dateFormat = dateFormat.replace(
         RegExp.$1,
-        RegExp.$1.length === 1 ? str : padLeftZero(str)
+        RegExp.$1.length === 1 ? str : padLeftZero(str),
       );
     }
   }
@@ -92,7 +92,7 @@ nextTick(() => {
     unref(flipperMinute1),
     unref(flipperMinute2),
     unref(flipperSecond1),
-    unref(flipperSecond2)
+    unref(flipperSecond2),
   ];
 
   init();

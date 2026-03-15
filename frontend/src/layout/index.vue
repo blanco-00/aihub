@@ -15,13 +15,13 @@ import {
   computed,
   onMounted,
   onBeforeMount,
-  defineComponent
+  defineComponent,
 } from "vue";
 import {
   useDark,
   useGlobal,
   deviceDetection,
-  useResizeObserver
+  useResizeObserver,
 } from "@pureadmin/utils";
 
 import LayTag from "./components/lay-tag/index.vue";
@@ -58,13 +58,13 @@ const set: setType = reactive({
       hideSidebar: !set.sidebar.opened,
       openSidebar: set.sidebar.opened,
       withoutAnimation: set.sidebar.withoutAnimation,
-      mobile: set.device === "mobile"
+      mobile: set.device === "mobile",
     };
   }),
 
   hideTabs: computed(() => {
     return $storage?.configure.hideTabs;
-  })
+  }),
 });
 
 function setTheme(menuLayout: string) {
@@ -76,7 +76,7 @@ function setTheme(menuLayout: string) {
     sidebarStatus: $storage.layout?.sidebarStatus,
     epThemeColor: $storage.layout?.epThemeColor,
     themeColor: $storage.layout?.themeColor,
-    themeMode: $storage.layout?.themeMode
+    themeMode: $storage.layout?.themeMode,
   };
 }
 
@@ -88,7 +88,7 @@ function toggle(device: string, bool: boolean) {
 // 判断是否可自动关闭菜单栏
 let isAutoCloseSidebar = true;
 
-useResizeObserver(appWrapperRef, entries => {
+useResizeObserver(appWrapperRef, (entries) => {
   if (isMobile) return;
   const entry = entries[0];
   const [{ inlineSize: width, blockSize: height }] = entry.borderBoxSize;
@@ -138,8 +138,8 @@ const LayHeader = defineComponent({
             ? isDark.value
               ? "box-shadow: 0 1px 4px #0d0d0d"
               : "box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08)"
-            : ""
-        ]
+            : "",
+        ],
       },
       {
         default: () => [
@@ -150,11 +150,11 @@ const LayHeader = defineComponent({
           !pureSetting.hiddenSideBar && layout.value.includes("horizontal")
             ? h(NavHorizontal)
             : null,
-          h(LayTag)
-        ]
-      }
+          h(LayTag),
+        ],
+      },
     );
-  }
+  },
 });
 </script>
 
@@ -178,7 +178,7 @@ const LayHeader = defineComponent({
     <div
       :class="[
         'main-container',
-        pureSetting.hiddenSideBar ? 'main-hidden' : ''
+        pureSetting.hiddenSideBar ? 'main-hidden' : '',
       ]"
     >
       <div v-if="set.fixedHeader">

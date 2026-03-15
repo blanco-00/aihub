@@ -7,12 +7,12 @@ import { transformI18n } from "@/plugins/i18n";
 const props = defineProps({
   list: {
     type: Array as PropType<Array<ListItem>>,
-    default: () => []
+    default: () => [],
   },
   emptyText: {
     type: String,
-    default: ""
-  }
+    default: "",
+  },
 });
 
 const emit = defineEmits<{
@@ -26,9 +26,9 @@ function handleRead(noticeId: number) {
 
 <template>
   <div v-if="list.length">
-    <NoticeItem 
-      v-for="(item, index) in list" 
-      :key="index" 
+    <NoticeItem
+      v-for="(item, index) in list"
+      :key="index"
       :noticeItem="item"
       @read="handleRead"
     />

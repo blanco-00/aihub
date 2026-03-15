@@ -8,7 +8,7 @@ export default {
     icon: "ri/bar-chart-horizontal-line",
     title: $t("menus.pureGanttastic"),
     rank: ganttastic,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -16,8 +16,8 @@ export default {
       name: "Ganttastic",
       component: () => import("@/views/ganttastic/index.vue"),
       meta: {
-        title: $t("menus.pureGanttastic")
-      }
-    }
-  ]
+        title: $t("menus.pureGanttastic"),
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

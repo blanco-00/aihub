@@ -8,7 +8,7 @@ export default {
     icon: "ri/code-box-line",
     title: $t("menus.pureCodeMirror"),
     rank: codemirror,
-    showLink: false // 演示功能，隐藏
+    showLink: false, // 演示功能，隐藏
   },
   children: [
     {
@@ -17,8 +17,8 @@ export default {
       component: () => import("@/views/codemirror/index.vue"),
       meta: {
         title: $t("menus.pureCodeMirror"),
-        extraIcon: "IF-pure-iconfont-new svg"
-      }
-    }
-  ]
+        extraIcon: "IF-pure-iconfont-new svg",
+      },
+    },
+  ],
 } satisfies RouteConfigsTable;

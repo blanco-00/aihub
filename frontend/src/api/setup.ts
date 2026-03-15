@@ -40,7 +40,11 @@ export const getSetupStatus = () => {
  * 测试数据库连接
  */
 export const testConnection = (data: DatabaseConfig) => {
-  return http.request<Result<ConnectionTestResult>>("post", "/api/setup/test-connection", { data });
+  return http.request<Result<ConnectionTestResult>>(
+    "post",
+    "/api/setup/test-connection",
+    { data },
+  );
 };
 
 /**

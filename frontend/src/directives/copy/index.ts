@@ -23,11 +23,11 @@ export const copy: Directive = {
       });
     } else {
       throw new Error(
-        '[Directive: copy]: need value! Like v-copy="modelValue"'
+        '[Directive: copy]: need value! Like v-copy="modelValue"',
       );
     }
   },
   updated(el: CopyEl, binding: DirectiveBinding) {
     el.copyValue = binding.value;
-  }
+  },
 };

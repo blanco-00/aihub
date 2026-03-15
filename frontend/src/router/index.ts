@@ -12,7 +12,7 @@ import {
   openLink,
   cloneDeep,
   isAllEmpty,
-  storageLocal
+  storageLocal,
 } from "@pureadmin/utils";
 import {
   ascending,
@@ -23,19 +23,19 @@ import {
   findRouteByPath,
   handleAliveRoute,
   formatTwoStageRoutes,
-  formatFlatteningRoutes
+  formatFlatteningRoutes,
 } from "./utils";
 import {
   type Router,
   type RouteRecordRaw,
   type RouteComponent,
-  createRouter
+  createRouter,
 } from "vue-router";
 import {
   type DataInfo,
   userKey,
   removeToken,
-  multipleTabsKey
+  multipleTabsKey,
 } from "@/utils/auth";
 import { getInitStatus } from "@/api/init";
 
@@ -46,20 +46,20 @@ import { getInitStatus } from "@/api/init";
 const modules: Record<string, any> = import.meta.glob(
   ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
   {
-    eager: true
-  }
+    eager: true,
+  },
 );
 
 /** 原始静态路由（未做任何处理） */
 const routes = [];
 
-Object.keys(modules).forEach(key => {
+Object.keys(modules).forEach((key) => {
   routes.push(modules[key].default);
 });
 
 /** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
-  formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
+  formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity)))),
 );
 
 /** 初始的静态路由，用于退出登录时重置路由 */
@@ -67,11 +67,11 @@ const initConstantRoutes: Array<RouteRecordRaw> = cloneDeep(constantRoutes);
 
 /** 用于渲染菜单，保持原始层级 */
 export const constantMenus: Array<RouteComponent> = ascending(
-  routes.flat(Infinity)
+  routes.flat(Infinity),
 ).concat(...remainingRouter);
 
 /** 不参与菜单的路由 */
-export const remainingPaths = Object.keys(remainingRouter).map(v => {
+export const remainingPaths = Object.keys(remainingRouter).map((v) => {
   return remainingRouter[v].path;
 });
 
@@ -81,7 +81,7 @@ export const router: Router = createRouter({
   routes: constantRoutes.concat(...(remainingRouter as any)),
   strict: true,
   scrollBehavior(to, from, savedPosition) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (savedPosition) {
         return savedPosition;
       } else {
@@ -92,7 +92,7 @@ export const router: Router = createRouter({
         }
       }
     });
-  }
+  },
 });
 
 /** 记录已经加载的页面路径 */
@@ -127,7 +127,9 @@ export function resetRouter() {
     router.addRoute(route);
   }
   router.options.routes = formatTwoStageRoutes(
-    formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
+    formatFlatteningRoutes(
+      buildHierarchyTree(ascending(routes.flat(Infinity))),
+    ),
   );
   usePermissionStoreHook().clearAllCachePage();
   resetLoadedPaths();
@@ -156,7 +158,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   const userInfo = storageLocal().getItem<DataInfo<number>>(userKey);
   const externalLink = isUrl(to?.name as string);
   if (!externalLink) {
-    to.matched.some(item => {
+    to.matched.some((item) => {
       if (!item.meta.title) return "";
       const Title = getConfig().Title;
       if (Title)
@@ -200,7 +202,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
               const { path } = to;
               const route = findRouteByPath(
                 path,
-                router.options.routes[0].children
+                router.options.routes[0].children,
               );
               getTopMenu(true);
               // query、params模式路由传参数的标签页不在此处处理
@@ -211,14 +213,14 @@ router.beforeEach((to: ToRouteType, _from, next) => {
                   useMultiTagsStoreHook().handleTags("push", {
                     path,
                     name,
-                    meta
+                    meta,
                   });
                 } else {
                   const { path, name, meta } = route;
                   useMultiTagsStoreHook().handleTags("push", {
                     path,
                     name,
-                    meta
+                    meta,
                   });
                 }
               }
@@ -265,7 +267,7 @@ function getCachedInitStatus(): boolean | null {
     const cached = localStorage.getItem(INIT_STATUS_CACHE_KEY);
     const timestamp = localStorage.getItem(INIT_STATUS_CACHE_TIMESTAMP_KEY);
     const lastSession = sessionStorage.getItem(INIT_STATUS_CACHE_SESSION_KEY);
-    
+
     // 如果是新会话（前端重启），清除缓存，强制重新查询
     if (lastSession !== SESSION_ID) {
       // 保存当前会话 ID
@@ -277,14 +279,14 @@ function getCachedInitStatus(): boolean | null {
       }
       return null;
     }
-    
+
     if (cached === null || timestamp === null) {
       return null;
     }
-    
+
     const cacheTime = parseInt(timestamp, 10);
     const currentTime = Date.now();
-    
+
     // 检查缓存是否过期
     if (currentTime - cacheTime > CACHE_DURATION) {
       // 缓存过期，清除
@@ -292,7 +294,7 @@ function getCachedInitStatus(): boolean | null {
       localStorage.removeItem(INIT_STATUS_CACHE_TIMESTAMP_KEY);
       return null;
     }
-    
+
     // 缓存有效，返回缓存的值
     return cached === "true";
   } catch (error) {
@@ -307,7 +309,10 @@ function getCachedInitStatus(): boolean | null {
 function setCachedInitStatus(initialized: boolean): void {
   try {
     localStorage.setItem(INIT_STATUS_CACHE_KEY, initialized ? "true" : "false");
-    localStorage.setItem(INIT_STATUS_CACHE_TIMESTAMP_KEY, Date.now().toString());
+    localStorage.setItem(
+      INIT_STATUS_CACHE_TIMESTAMP_KEY,
+      Date.now().toString(),
+    );
     // 保存当前会话 ID
     sessionStorage.setItem(INIT_STATUS_CACHE_SESSION_KEY, SESSION_ID);
   } catch (error) {
@@ -351,7 +356,7 @@ function refreshInitStatusInBackground(): void {
  */
 async function checkInitStatusAndRedirect(
   to: ToRouteType,
-  next: (to?: string | { path: string }) => void
+  next: (to?: string | { path: string }) => void,
 ) {
   // 先检查本地缓存
   const cachedStatus = getCachedInitStatus();
@@ -364,7 +369,7 @@ async function checkInitStatusAndRedirect(
       // 未初始化，跳转到初始化页面
       next("/init");
     }
-    
+
     // 在后台异步更新缓存（不阻塞用户操作）
     // 这样既能快速响应，又能保持缓存新鲜度
     refreshInitStatusInBackground();
@@ -437,7 +442,7 @@ export function clearInitStatusCache() {
   initStatusCheckPromise = null;
 }
 
-router.afterEach(to => {
+router.afterEach((to) => {
   loadedPaths.add(to.path);
   NProgress.done();
 });

@@ -12,8 +12,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     name: "",
     sort: 0,
     status: 1,
-    remark: ""
-  })
+    remark: "",
+  }),
 });
 
 const ruleFormRef = ref();
@@ -45,7 +45,7 @@ defineExpose({ getRef });
               value: 'id',
               label: 'name',
               emitPath: false,
-              checkStrictly: true
+              checkStrictly: true,
             }"
             clearable
             filterable

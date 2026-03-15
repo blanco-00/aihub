@@ -8,7 +8,7 @@ import {
   publishNotice,
   withdrawNotice,
   deleteNotice,
-  getNoticeCategoryList
+  getNoticeCategoryList,
 } from "@/api/notice";
 import { addDialog } from "@/components/ReDialog";
 import { ElMessageBox } from "element-plus";
@@ -20,7 +20,7 @@ export function useNotice(tableRef: any) {
     title: "",
     categoryId: null,
     type: null,
-    status: null
+    status: null,
   });
 
   const formRef = ref();
@@ -32,7 +32,7 @@ export function useNotice(tableRef: any) {
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
   });
 
   const columns: TableColumnList = [
@@ -40,12 +40,12 @@ export function useNotice(tableRef: any) {
       label: "通知标题",
       prop: "title",
       minWidth: 200,
-      showOverflowTooltip: true
+      showOverflowTooltip: true,
     },
     {
       label: "分类",
       prop: "categoryName",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       label: "类型",
@@ -59,12 +59,12 @@ export function useNotice(tableRef: any) {
             {typeMap[row.type] || "未知"}
           </el-tag>
         );
-      }
+      },
     },
     {
       label: "发布人",
       prop: "publisherName",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       label: "状态",
@@ -78,12 +78,12 @@ export function useNotice(tableRef: any) {
             {statusMap[row.status] || "未知"}
           </el-tag>
         );
-      }
+      },
     },
     {
       label: "查看次数",
       prop: "viewCount",
-      minWidth: 100
+      minWidth: 100,
     },
     {
       label: "已读/未读",
@@ -93,20 +93,20 @@ export function useNotice(tableRef: any) {
         <span>
           {row.readCount || 0} / {row.unreadCount || 0}
         </span>
-      )
+      ),
     },
     {
       label: "发布时间",
       prop: "publishTime",
       minWidth: 180,
-      formatter: ({ publishTime }) => formatDateTime(publishTime)
+      formatter: ({ publishTime }) => formatDateTime(publishTime),
     },
     {
       label: "操作",
       fixed: "right",
       width: 250,
-      slot: "operation"
-    }
+      slot: "operation",
+    },
   ];
 
   // 加载分类选项
@@ -130,7 +130,7 @@ export function useNotice(tableRef: any) {
       title: form.title || undefined,
       categoryId: form.categoryId || undefined,
       type: form.type || undefined,
-      status: form.status !== null ? form.status : undefined
+      status: form.status !== null ? form.status : undefined,
     })
       .then((response: any) => {
         // 处理响应格式：可能是 { data: { code: 200, data: {...} } } 或 { code: 200, data: {...} }
@@ -177,7 +177,7 @@ export function useNotice(tableRef: any) {
       try {
         const response = await getNoticeDetail(row.id);
         console.log("获取通知详情原始响应:", response);
-        
+
         // http.request 在响应拦截器中返回 response.data，即 { code, message, data }
         // 所以 response 本身就是 { code, message, data } 格式
         if (response?.code === 200 && response?.data) {
@@ -196,7 +196,7 @@ export function useNotice(tableRef: any) {
         return;
       }
     }
-    
+
     const formInlineData = {
       id: noticeDetail?.id || row?.id || undefined,
       title: noticeDetail?.title || row?.title || "",
@@ -208,31 +208,34 @@ export function useNotice(tableRef: any) {
       roleIds: noticeDetail?.roleIds || row?.roleIds || [],
       userIds: noticeDetail?.userIds || row?.userIds || [],
       expireTime: noticeDetail?.expireTime || row?.expireTime || null,
-      sortOrder: noticeDetail?.sortOrder ?? row?.sortOrder ?? 0
+      sortOrder: noticeDetail?.sortOrder ?? row?.sortOrder ?? 0,
     };
-    
+
     console.log("准备传递给表单的数据:", formInlineData);
     console.log("表单内容字段值:", formInlineData.content);
     console.log("表单内容字段类型:", typeof formInlineData.content);
-    
+
     addDialog({
       title: `${title}通知`,
       props: {
-        formInline: formInlineData
+        formInline: formInlineData,
       },
       width: "800px",
       draggable: true,
       fullscreen: false,
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(noticeForm, { 
-        ref: formRef,
-        formInline: formInlineData
-      }),
+      contentRenderer: () =>
+        h(noticeForm, {
+          ref: formRef,
+          formInline: formInlineData,
+        }),
       beforeSure: (done, { options, closeLoading }) => {
         const FormRef = formRef.value.getRef();
         const formComponent = formRef.value;
-        const curData = formComponent?.getFormData ? formComponent.getFormData() : (options.props.formInline as any);
+        const curData = formComponent?.getFormData
+          ? formComponent.getFormData()
+          : (options.props.formInline as any);
 
         FormRef.validate(async (valid: boolean) => {
           if (valid) {
@@ -243,47 +246,59 @@ export function useNotice(tableRef: any) {
                 categoryId: curData.categoryId || null,
                 type: curData.type,
                 publishType: curData.publishType,
-                departmentIds: curData.publishType === 2 ? curData.departmentIds : undefined,
-                roleIds: curData.publishType === 3 ? curData.roleIds : undefined,
-                userIds: curData.publishType === 4 ? curData.userIds : undefined,
+                departmentIds:
+                  curData.publishType === 2 ? curData.departmentIds : undefined,
+                roleIds:
+                  curData.publishType === 3 ? curData.roleIds : undefined,
+                userIds:
+                  curData.publishType === 4 ? curData.userIds : undefined,
                 expireTime: curData.expireTime || null,
-                sortOrder: curData.sortOrder || 0
+                sortOrder: curData.sortOrder || 0,
               };
 
               if (title === "新增") {
                 const response = await createNotice(requestData);
                 if (response?.code === 200 || response?.data?.code === 200) {
                   message(`成功新增通知：${curData.title}`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
                   closeLoading();
-                  message(response?.message || response?.data?.message || "创建失败", { type: "error" });
+                  message(
+                    response?.message || response?.data?.message || "创建失败",
+                    { type: "error" },
+                  );
                 }
               } else {
                 const response = await updateNotice(curData.id, requestData);
                 if (response?.code === 200 || response?.data?.code === 200) {
                   message(`成功修改通知：${curData.title}`, {
-                    type: "success"
+                    type: "success",
                   });
                   done();
                   onSearch();
                 } else {
                   closeLoading();
-                  message(response?.message || response?.data?.message || "更新失败", { type: "error" });
+                  message(
+                    response?.message || response?.data?.message || "更新失败",
+                    { type: "error" },
+                  );
                 }
               }
             } catch (error: any) {
               closeLoading();
-              message(error?.message || error?.response?.data?.message || "操作失败", { type: "error" });
+              message(
+                error?.message || error?.response?.data?.message || "操作失败",
+                { type: "error" },
+              );
             }
           } else {
             closeLoading();
           }
         });
-      }
+      },
     });
   }
 
@@ -291,7 +306,7 @@ export function useNotice(tableRef: any) {
     ElMessageBox.confirm(`确定要发布通知"${row.title}"吗？`, "提示", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
-      type: "warning"
+      type: "warning",
     })
       .then(async () => {
         try {
@@ -309,7 +324,7 @@ export function useNotice(tableRef: any) {
     ElMessageBox.confirm(`确定要撤回通知"${row.title}"吗？`, "提示", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
-      type: "warning"
+      type: "warning",
     })
       .then(async () => {
         try {
@@ -327,7 +342,7 @@ export function useNotice(tableRef: any) {
     ElMessageBox.confirm(`确定要删除通知"${row.title}"吗？`, "提示", {
       confirmButtonText: "确定",
       cancelButtonText: "取消",
-      type: "warning"
+      type: "warning",
     })
       .then(async () => {
         try {
@@ -376,6 +391,6 @@ export function useNotice(tableRef: any) {
     handleDelete,
     handleSizeChange,
     handleCurrentChange,
-    handleSelectionChange
+    handleSelectionChange,
   };
 }

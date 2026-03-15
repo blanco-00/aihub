@@ -58,12 +58,12 @@ export function setToken(data: DataInfo<Date>) {
   if (expires > 0) {
     const expiresInDays = (expires - Date.now()) / 86400000; // 转换为天数
     Cookies.set(TokenKey, cookieString, {
-      expires: expiresInDays
+      expires: expiresInDays,
     });
-    
+
     // multipleTabsKey 用于判断是否已登录，过期时间与 Token Cookie 保持一致
     Cookies.set(multipleTabsKey, "true", {
-      expires: expiresInDays
+      expires: expiresInDays,
     });
   } else {
     Cookies.set(TokenKey, cookieString); // 会话 Cookie（浏览器关闭后失效）
@@ -83,7 +83,7 @@ export function setToken(data: DataInfo<Date>) {
       username,
       nickname,
       roles,
-      permissions
+      permissions,
     });
   }
 
@@ -94,7 +94,7 @@ export function setToken(data: DataInfo<Date>) {
       username,
       nickname: data?.nickname ?? "",
       roles,
-      permissions: data?.permissions ?? []
+      permissions: data?.permissions ?? [],
     });
   } else {
     const avatar =
@@ -112,7 +112,7 @@ export function setToken(data: DataInfo<Date>) {
       username,
       nickname,
       roles,
-      permissions
+      permissions,
     });
   }
 }

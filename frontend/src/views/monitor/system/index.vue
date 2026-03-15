@@ -7,7 +7,7 @@ import { ElProgress } from "element-plus";
 import Refresh from "~icons/ep/refresh";
 
 defineOptions({
-  name: "SystemMonitor"
+  name: "SystemMonitor",
 });
 
 const autoRefresh = ref(true);
@@ -18,7 +18,7 @@ const {
   formatUptime,
   fetchMonitorInfo,
   startAutoRefresh,
-  stopAutoRefresh
+  stopAutoRefresh,
 } = useSystemMonitor();
 
 // 监听自动刷新开关
@@ -66,7 +66,10 @@ const getStatusColor = (status: string) => {
       <el-card shadow="hover" class="monitor-card">
         <template #header>
           <div class="flex items-center gap-2">
-            <component :is="useRenderIcon('ep:monitor')" class="w-[18px] h-[18px]" />
+            <component
+              :is="useRenderIcon('ep:monitor')"
+              class="w-[18px] h-[18px]"
+            />
             <span class="font-semibold">主机信息</span>
           </div>
         </template>
@@ -74,7 +77,9 @@ const getStatusColor = (status: string) => {
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="text-sm text-gray-500 mb-1">操作系统</div>
-              <div class="font-medium">{{ monitorInfo.host.osName }} {{ monitorInfo.host.osVersion }}</div>
+              <div class="font-medium">
+                {{ monitorInfo.host.osName }} {{ monitorInfo.host.osVersion }}
+              </div>
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">系统架构</div>
@@ -90,12 +95,14 @@ const getStatusColor = (status: string) => {
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">运行时间</div>
-              <div class="font-medium">{{ formatUptime(monitorInfo.host.uptime) }}</div>
+              <div class="font-medium">
+                {{ formatUptime(monitorInfo.host.uptime) }}
+              </div>
             </div>
           </div>
-          
+
           <el-divider />
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">CPU使用率</span>
@@ -103,11 +110,19 @@ const getStatusColor = (status: string) => {
             </div>
             <el-progress
               :percentage="monitorInfo.host.cpuUsage"
-              :color="monitorInfo.host.cpuUsage > 80 ? '#f56c6c' : monitorInfo.host.cpuUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.host.cpuUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.host.cpuUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
-            <div class="text-xs text-gray-500 mt-1">CPU核心数: {{ monitorInfo.host.cpuCores }}</div>
+            <div class="text-xs text-gray-500 mt-1">
+              CPU核心数: {{ monitorInfo.host.cpuCores }}
+            </div>
           </div>
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">内存使用率</span>
@@ -115,14 +130,20 @@ const getStatusColor = (status: string) => {
             </div>
             <el-progress
               :percentage="monitorInfo.host.memoryUsage"
-              :color="monitorInfo.host.memoryUsage > 80 ? '#f56c6c' : monitorInfo.host.memoryUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.host.memoryUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.host.memoryUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
-              已用: {{ formatBytes(monitorInfo.host.usedMemory) }} / 
-              总计: {{ formatBytes(monitorInfo.host.totalMemory) }}
+              已用: {{ formatBytes(monitorInfo.host.usedMemory) }} / 总计:
+              {{ formatBytes(monitorInfo.host.totalMemory) }}
             </div>
           </div>
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">磁盘使用率</span>
@@ -130,11 +151,17 @@ const getStatusColor = (status: string) => {
             </div>
             <el-progress
               :percentage="monitorInfo.host.diskUsage"
-              :color="monitorInfo.host.diskUsage > 80 ? '#f56c6c' : monitorInfo.host.diskUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.host.diskUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.host.diskUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
-              已用: {{ formatBytes(monitorInfo.host.usedDisk) }} / 
-              总计: {{ formatBytes(monitorInfo.host.totalDisk) }}
+              已用: {{ formatBytes(monitorInfo.host.usedDisk) }} / 总计:
+              {{ formatBytes(monitorInfo.host.totalDisk) }}
             </div>
           </div>
         </div>
@@ -145,7 +172,10 @@ const getStatusColor = (status: string) => {
       <el-card shadow="hover" class="monitor-card">
         <template #header>
           <div class="flex items-center gap-2">
-            <component :is="useRenderIcon('ep:cpu')" class="w-[18px] h-[18px]" />
+            <component
+              :is="useRenderIcon('ep:cpu')"
+              class="w-[18px] h-[18px]"
+            />
             <span class="font-semibold">JVM信息</span>
           </div>
         </template>
@@ -153,11 +183,15 @@ const getStatusColor = (status: string) => {
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="text-sm text-gray-500 mb-1">JVM名称</div>
-              <div class="font-medium text-sm">{{ monitorInfo.jvm.jvmName }}</div>
+              <div class="font-medium text-sm">
+                {{ monitorInfo.jvm.jvmName }}
+              </div>
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">Java版本</div>
-              <div class="font-medium text-sm">{{ monitorInfo.jvm.javaVersion }}</div>
+              <div class="font-medium text-sm">
+                {{ monitorInfo.jvm.javaVersion }}
+              </div>
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">线程数</div>
@@ -168,9 +202,9 @@ const getStatusColor = (status: string) => {
               <div class="font-medium">{{ monitorInfo.jvm.gcCount }}</div>
             </div>
           </div>
-          
+
           <el-divider />
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">堆内存使用率</span>
@@ -178,14 +212,20 @@ const getStatusColor = (status: string) => {
             </div>
             <el-progress
               :percentage="monitorInfo.jvm.heapUsage"
-              :color="monitorInfo.jvm.heapUsage > 80 ? '#f56c6c' : monitorInfo.jvm.heapUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.jvm.heapUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.jvm.heapUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
-              已用: {{ formatBytes(monitorInfo.jvm.heapUsed) }} / 
-              总计: {{ formatBytes(monitorInfo.jvm.heapTotal) }}
+              已用: {{ formatBytes(monitorInfo.jvm.heapUsed) }} / 总计:
+              {{ formatBytes(monitorInfo.jvm.heapTotal) }}
             </div>
           </div>
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">非堆内存使用率</span>
@@ -193,11 +233,17 @@ const getStatusColor = (status: string) => {
             </div>
             <el-progress
               :percentage="monitorInfo.jvm.nonHeapUsage"
-              :color="monitorInfo.jvm.nonHeapUsage > 80 ? '#f56c6c' : monitorInfo.jvm.nonHeapUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.jvm.nonHeapUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.jvm.nonHeapUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
-              已用: {{ formatBytes(monitorInfo.jvm.nonHeapUsed) }} / 
-              总计: {{ formatBytes(monitorInfo.jvm.nonHeapTotal) }}
+              已用: {{ formatBytes(monitorInfo.jvm.nonHeapUsed) }} / 总计:
+              {{ formatBytes(monitorInfo.jvm.nonHeapTotal) }}
             </div>
           </div>
         </div>
@@ -208,7 +254,10 @@ const getStatusColor = (status: string) => {
       <el-card shadow="hover" class="monitor-card">
         <template #header>
           <div class="flex items-center gap-2">
-            <component :is="useRenderIcon('ep:data-base')" class="w-[18px] h-[18px]" />
+            <component
+              :is="useRenderIcon('ep:data-base')"
+              class="w-[18px] h-[18px]"
+            />
             <span class="font-semibold">MySQL数据库</span>
           </div>
         </template>
@@ -222,25 +271,35 @@ const getStatusColor = (status: string) => {
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">版本</div>
-              <div class="font-medium">{{ monitorInfo.mysql.version || "未知" }}</div>
+              <div class="font-medium">
+                {{ monitorInfo.mysql.version || "未知" }}
+              </div>
             </div>
           </div>
-          
+
           <el-divider />
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">连接池使用率</span>
-              <span class="text-sm">{{ monitorInfo.mysql.connectionUsage }}%</span>
+              <span class="text-sm"
+                >{{ monitorInfo.mysql.connectionUsage }}%</span
+              >
             </div>
             <el-progress
               :percentage="monitorInfo.mysql.connectionUsage"
-              :color="monitorInfo.mysql.connectionUsage > 80 ? '#f56c6c' : monitorInfo.mysql.connectionUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.mysql.connectionUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.mysql.connectionUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
-              活跃: {{ monitorInfo.mysql.activeConnections }} / 
-              最大: {{ monitorInfo.mysql.maxConnections }} / 
-              空闲: {{ monitorInfo.mysql.idleConnections }}
+              活跃: {{ monitorInfo.mysql.activeConnections }} / 最大:
+              {{ monitorInfo.mysql.maxConnections }} / 空闲:
+              {{ monitorInfo.mysql.idleConnections }}
             </div>
           </div>
         </div>
@@ -251,7 +310,10 @@ const getStatusColor = (status: string) => {
       <el-card shadow="hover" class="monitor-card">
         <template #header>
           <div class="flex items-center gap-2">
-            <component :is="useRenderIcon('ep:connection')" class="w-[18px] h-[18px]" />
+            <component
+              :is="useRenderIcon('ep:connection')"
+              class="w-[18px] h-[18px]"
+            />
             <span class="font-semibold">Redis缓存</span>
           </div>
         </template>
@@ -265,12 +327,14 @@ const getStatusColor = (status: string) => {
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">版本</div>
-              <div class="font-medium">{{ monitorInfo.redis.version || "未知" }}</div>
+              <div class="font-medium">
+                {{ monitorInfo.redis.version || "未知" }}
+              </div>
             </div>
           </div>
-          
+
           <el-divider />
-          
+
           <div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm font-medium">内存使用率</span>
@@ -279,7 +343,13 @@ const getStatusColor = (status: string) => {
             <el-progress
               v-if="monitorInfo.redis.memoryUsage > 0"
               :percentage="monitorInfo.redis.memoryUsage"
-              :color="monitorInfo.redis.memoryUsage > 80 ? '#f56c6c' : monitorInfo.redis.memoryUsage > 60 ? '#e6a23c' : '#67c23a'"
+              :color="
+                monitorInfo.redis.memoryUsage > 80
+                  ? '#f56c6c'
+                  : monitorInfo.redis.memoryUsage > 60
+                    ? '#e6a23c'
+                    : '#67c23a'
+              "
             />
             <div class="text-xs text-gray-500 mt-1">
               已用: {{ formatBytes(monitorInfo.redis.usedMemory) }}
@@ -288,11 +358,13 @@ const getStatusColor = (status: string) => {
               </span>
             </div>
           </div>
-          
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="text-sm text-gray-500 mb-1">连接客户端</div>
-              <div class="font-medium">{{ monitorInfo.redis.connectedClients }}</div>
+              <div class="font-medium">
+                {{ monitorInfo.redis.connectedClients }}
+              </div>
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">键数量</div>

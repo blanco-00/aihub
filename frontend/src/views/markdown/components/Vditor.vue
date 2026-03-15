@@ -12,7 +12,7 @@ const emit = defineEmits([
   "blur",
   "esc",
   "ctrlEnter",
-  "select"
+  "select",
 ]);
 
 const props = defineProps({
@@ -20,12 +20,12 @@ const props = defineProps({
     type: Object,
     default() {
       return {};
-    }
+    },
   },
   modelValue: {
     type: String,
-    default: ""
-  }
+    default: "",
+  },
 });
 
 const { isDark } = useDark();
@@ -37,10 +37,10 @@ onMounted(() => {
     ...props.options,
     value: props.modelValue,
     cache: {
-      enable: false
+      enable: false,
     },
     fullscreen: {
-      index: 10000
+      index: 10000,
     },
     after() {
       emit("after", toRaw(editor.value));
@@ -62,22 +62,22 @@ onMounted(() => {
     },
     select(value: string) {
       emit("select", value);
-    }
+    },
   });
 });
 
 watch(
   () => props.modelValue,
-  newVal => {
+  (newVal) => {
     if (newVal !== editor.value?.getValue()) {
       editor.value?.setValue(newVal);
     }
-  }
+  },
 );
 
 watch(
   () => isDark.value,
-  newVal => {
+  (newVal) => {
     const { pause } = useIntervalFn(() => {
       if (editor.value.vditor) {
         newVal
@@ -86,7 +86,7 @@ watch(
         pause();
       }
     }, 20);
-  }
+  },
 );
 
 onUnmounted(() => {

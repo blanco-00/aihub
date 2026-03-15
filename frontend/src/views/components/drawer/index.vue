@@ -3,7 +3,7 @@ import {
   addDrawer,
   closeDrawer,
   closeAllDrawer,
-  updateDrawer
+  updateDrawer,
 } from "@/components/ReDrawer/index";
 import { cloneDeep, debounce } from "@pureadmin/utils";
 import { message } from "@/utils/message";
@@ -14,7 +14,7 @@ import forms, { type FormProps } from "./form.vue";
 function onBaseClick() {
   addDrawer({
     title: "基础用法",
-    contentRenderer: () => <p>抽屉内容-基础用法</p> // jsx 语法 （注意在.vue文件启用jsx语法，需要在script开启lang="tsx"）
+    contentRenderer: () => <p>抽屉内容-基础用法</p>, // jsx 语法 （注意在.vue文件启用jsx语法，需要在script开启lang="tsx"）
   });
 }
 
@@ -22,7 +22,7 @@ function onModalClick() {
   addDrawer({
     title: "无背景遮罩层",
     modal: false,
-    contentRenderer: () => <p>抽屉内容-无背景遮罩层</p>
+    contentRenderer: () => <p>抽屉内容-无背景遮罩层</p>,
   });
 }
 
@@ -32,16 +32,16 @@ const onoOpenDelayClick = debounce(
     addDrawer({
       title: "延时2秒打开抽屉",
       openDelay: 2000 - 600,
-      contentRenderer: () => <p>抽屉内容-延时2秒打开抽屉</p>
+      contentRenderer: () => <p>抽屉内容-延时2秒打开抽屉</p>,
     }),
-  600
+  600,
 );
 
 function onCloseDelayClick() {
   addDrawer({
     title: "延时2秒关闭抽屉",
     closeDelay: 2000,
-    contentRenderer: () => <p>抽屉内容-延时2秒关闭抽屉</p>
+    contentRenderer: () => <p>抽屉内容-延时2秒关闭抽屉</p>,
   });
 }
 
@@ -49,7 +49,7 @@ function onShowCloseClick() {
   addDrawer({
     title: "不显示右上角关闭按钮图标",
     showClose: false,
-    contentRenderer: () => <p>抽屉内容-不显示右上角关闭按钮图标</p>
+    contentRenderer: () => <p>抽屉内容-不显示右上角关闭按钮图标</p>,
   });
 }
 
@@ -57,7 +57,7 @@ function onBeforeCloseClick() {
   addDrawer({
     title: "禁止通过键盘ESC关闭",
     closeOnPressEscape: false,
-    contentRenderer: () => <p>抽屉内容-禁止通过键盘ESC关闭</p>
+    contentRenderer: () => <p>抽屉内容-禁止通过键盘ESC关闭</p>,
   });
 }
 
@@ -65,7 +65,7 @@ function onCloseOnClickModalClick() {
   addDrawer({
     title: "禁止通过点击modal关闭",
     closeOnClickModal: false,
-    contentRenderer: () => <p>抽屉内容-禁止通过点击modal关闭</p>
+    contentRenderer: () => <p>抽屉内容-禁止通过点击modal关闭</p>,
   });
 }
 
@@ -73,7 +73,7 @@ function onHideFooterClick() {
   addDrawer({
     title: "隐藏底部取消、确定按钮",
     hideFooter: true,
-    contentRenderer: () => <p>抽屉内容-隐藏底部取消、确定按钮</p>
+    contentRenderer: () => <p>抽屉内容-隐藏底部取消、确定按钮</p>,
   });
 }
 
@@ -92,7 +92,7 @@ function onHeaderRendererClick() {
         </el-button>
       </div>
     ),
-    contentRenderer: () => <p>抽屉内容-自定义头部</p>
+    contentRenderer: () => <p>抽屉内容-自定义头部</p>,
   });
 }
 
@@ -104,7 +104,7 @@ function onFooterRendererClick() {
         {options.title}-{index}
       </el-button>
     ),
-    contentRenderer: () => <p>抽屉内容-自定义底部</p>
+    contentRenderer: () => <p>抽屉内容-自定义底部</p>,
   });
 }
 
@@ -119,7 +119,7 @@ function onFooterButtonsClick() {
         btnClick: ({ drawer: { options, index }, button }) => {
           console.log(options, index, button);
           closeDrawer(options, index);
-        }
+        },
       },
       {
         label: "按钮2",
@@ -128,7 +128,7 @@ function onFooterButtonsClick() {
         btnClick: ({ drawer: { options, index }, button }) => {
           console.log(options, index, button);
           closeDrawer(options, index);
-        }
+        },
       },
       {
         label: "按钮3",
@@ -137,10 +137,10 @@ function onFooterButtonsClick() {
         btnClick: ({ drawer: { options, index }, button }) => {
           console.log(options, index, button);
           closeDrawer(options, index);
-        }
-      }
+        },
+      },
     ],
-    contentRenderer: () => <p>抽屉内容-自定义底部按钮</p>
+    contentRenderer: () => <p>抽屉内容-自定义底部按钮</p>,
   });
 }
 
@@ -148,7 +148,7 @@ function onOpenClick() {
   addDrawer({
     title: "打开后的回调",
     open: ({ options, index }) => message({ options, index } as any),
-    contentRenderer: () => <p>抽屉内容-打开后的回调</p>
+    contentRenderer: () => <p>抽屉内容-打开后的回调</p>,
   });
 }
 
@@ -167,7 +167,7 @@ function onCloseCallBackClick() {
       }
       message(text);
     },
-    contentRenderer: () => <p>抽屉内容-关闭后的回调</p>
+    contentRenderer: () => <p>抽屉内容-关闭后的回调</p>,
   });
 }
 
@@ -194,19 +194,19 @@ function onNestingClick() {
                           哎呦，你干嘛，赶快关闭所有抽屉
                         </el-button>
                       </>
-                    )
+                    ),
                   })
                 }
               >
                 点击打开第{index + 1}个子抽屉
               </el-button>
-            )
+            ),
           })
         }
       >
         点击打开第{index + 1}个子抽屉
       </el-button>
-    )
+    ),
   });
 }
 
@@ -235,7 +235,7 @@ function onUpdateClick() {
           下一页
         </el-button>
       </>
-    )
+    ),
   });
 }
 
@@ -245,7 +245,7 @@ function onPopConfirmClick() {
     size: "30%",
     title: "Popconfirm确认框示例",
     popConfirm: { title: "是否确认修改当前数据" },
-    contentRenderer: () => <p>点击右下方确定按钮看看效果吧</p>
+    contentRenderer: () => <p>点击右下方确定按钮看看效果吧</p>,
   });
 }
 
@@ -259,8 +259,8 @@ function onFormOneClick() {
       // 赋默认值
       formInline: {
         user: "菜虚鲲",
-        region: "浙江"
-      }
+        region: "浙江",
+      },
     },
     closeCallBack: ({ options, args }) => {
       // options.props 是响应式的
@@ -273,17 +273,17 @@ function onFormOneClick() {
         message(`您点击了确定按钮，当前表单数据为 ${text}`);
       } else {
         message(
-          `您点击了右上角关闭按钮或空白页或按下了esc键，当前表单数据为 ${text}`
+          `您点击了右上角关闭按钮或空白页或按下了esc键，当前表单数据为 ${text}`,
         );
       }
-    }
+    },
   });
 }
 
 // 结合Form表单（第二种方式）h 渲染函数 https://cn.vuejs.org/api/render-function.html#h
 const formInline = ref({
   user: "菜虚鲲",
-  region: "浙江"
+  region: "浙江",
 });
 const resetFormInline = cloneDeep(formInline.value);
 function onFormTwoClick() {
@@ -292,22 +292,22 @@ function onFormTwoClick() {
     title: "结合Form表单（第二种方式）",
     contentRenderer: () =>
       h(forms, {
-        formInline: formInline.value
+        formInline: formInline.value,
       }),
     closeCallBack: () => {
       message(
-        `当前表单数据为 姓名：${formInline.value.user} 城市：${formInline.value.region}`
+        `当前表单数据为 姓名：${formInline.value.user} 城市：${formInline.value.region}`,
       );
       // 重置表单数据
       formInline.value = cloneDeep(resetFormInline);
-    }
+    },
   });
 }
 
 // 结合Form表单（第三种方式）createVNode 渲染函数 https://cn.vuejs.org/guide/extras/render-function.html#creating-vnodes
 const formThreeInline = ref({
   user: "菜虚鲲",
-  region: "浙江"
+  region: "浙江",
 });
 const resetFormThreeInline = cloneDeep(formThreeInline.value);
 function onFormThreeClick() {
@@ -316,15 +316,15 @@ function onFormThreeClick() {
     title: "结合Form表单（第三种方式）",
     contentRenderer: () =>
       createVNode(forms, {
-        formInline: formThreeInline.value
+        formInline: formThreeInline.value,
       }),
     closeCallBack: () => {
       message(
-        `当前表单数据为 姓名：${formThreeInline.value.user} 城市：${formThreeInline.value.region}`
+        `当前表单数据为 姓名：${formThreeInline.value.user} 城市：${formThreeInline.value.region}`,
       );
       // 重置表单数据
       formThreeInline.value = cloneDeep(resetFormThreeInline);
-    }
+    },
   });
 }
 
@@ -334,7 +334,7 @@ function onFormThreeClick() {
 // 同理如果在 tsx 文件中，这么使用 `contentRenderer: () => <forms formInline={formFourInline.value} />`，也是不会给 forms 组件进行注册，需要在 return 中写上 forms
 const formFourInline = ref({
   user: "菜虚鲲",
-  region: "浙江"
+  region: "浙江",
 });
 const resetFormFourInline = cloneDeep(formFourInline.value);
 function onFormFourClick() {
@@ -344,11 +344,11 @@ function onFormFourClick() {
     contentRenderer: () => <forms formInline={formFourInline.value} />,
     closeCallBack: () => {
       message(
-        `当前表单数据为 姓名：${formFourInline.value.user} 城市：${formFourInline.value.region}`
+        `当前表单数据为 姓名：${formFourInline.value.user} 城市：${formFourInline.value.region}`,
       );
       // 重置表单数据
       formFourInline.value = cloneDeep(resetFormFourInline);
-    }
+    },
   });
 }
 
@@ -362,13 +362,13 @@ function onFormPrimitiveFormClick() {
     contentRenderer: () =>
       h(formPrimitive, {
         data: formPrimitiveParam.value,
-        "onUpdate:data": val => (formPrimitiveParam.value = val)
+        "onUpdate:data": (val) => (formPrimitiveParam.value = val),
       }),
     closeCallBack: () => {
       message(`当前表单内容：${formPrimitiveParam.value}`);
       // 重置表单数据
       formPrimitiveParam.value = resetFormPrimitiveParam.value;
-    }
+    },
   });
 }
 
@@ -383,10 +383,10 @@ function onBeforeCancelClick() {
         "%coptions, index===>>>: ",
         "color: MidnightBlue; background: Aquamarine; font-size: 20px;",
         options,
-        index
+        index,
       );
       // done(); // 需要关闭把注释解开即可
-    }
+    },
   });
 }
 
@@ -403,10 +403,10 @@ function onBeforeSureClick() {
         "%coptions, index===>>>: ",
         "color: MidnightBlue; background: Aquamarine; font-size: 20px;",
         options,
-        index
+        index,
       );
       // done(); // 需要关闭把注释解开即可
-    }
+    },
   });
 }
 
@@ -419,7 +419,7 @@ function onSureBtnLoading() {
       // closeLoading(); // 关闭确定按钮动画，不关闭抽屉
       // done() // 关闭确定按钮动画并关闭抽屉
       setTimeout(() => done(), 800);
-    }
+    },
   });
 }
 
@@ -430,7 +430,7 @@ function onResizableClick(title, content, direction) {
     resizable: true, // 启用可调整大小的功能
     contentRenderer: () => (
       <p class="text-[var(--el-color-primary)]">{content}</p> // jsx 语法 （注意在.vue文件启用jsx语法，需要在script开启lang="tsx"）
-    )
+    ),
   });
 }
 </script>

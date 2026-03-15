@@ -51,7 +51,7 @@ import type { FormInstance } from "element-plus";
 import { formRules } from "./rule";
 
 defineOptions({
-  name: "NoticeCategoryForm"
+  name: "NoticeCategoryForm",
 });
 
 interface FormProps {
@@ -72,8 +72,8 @@ const props = withDefaults(defineProps<FormProps>(), {
     code: "",
     description: "",
     sortOrder: 0,
-    status: 1
-  })
+    status: 1,
+  }),
 });
 
 const formRef = ref<FormInstance>();
@@ -82,9 +82,13 @@ const newFormInline = ref(props.formInline);
 const rules = formRules;
 
 // 监听 formInline 变化，同步到 newFormInline
-watch(() => props.formInline, (newVal) => {
-  newFormInline.value = { ...newVal };
-}, { deep: true, immediate: true });
+watch(
+  () => props.formInline,
+  (newVal) => {
+    newFormInline.value = { ...newVal };
+  },
+  { deep: true, immediate: true },
+);
 
 function getRef() {
   return formRef.value;
