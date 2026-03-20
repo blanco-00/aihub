@@ -194,7 +194,24 @@ const exportCurrentSession = () => {
   window.open(`/api/chat/session/${currentSessionId.value}/export`, "_blank");
 };
 
-// 模型切换
+// 加载模型列表
+const loadModels = async () => {
+  try {
+    const response = await getEnabledModelConfigs();
+    if (response.code === 200 && response.data) {
+      modelList.value = response.data;
+      if (response.data.length > 0) {
+        selectedModelId.value = response.data[0].id;
+        selectedModel.value = response.data[0];
+        modelHealthy.value = true;
+      }
+    }
+  } catch (error: any) {
+    ElMessage.error("加载模型列表失败: " + error.message);
+  }
+};
+
+// 模型切换（仅手动切换时检查）
 const handleModelChange = async () => {
   selectedModel.value =
     modelList.value.find((m) => m.id === selectedModelId.value) || null;
@@ -211,23 +228,6 @@ const handleModelChange = async () => {
     modelHealthy.value = result.code === 200 && result.data === true;
   } catch {
     modelHealthy.value = false;
-  }
-};
-
-// 加载模型列表
-const loadModels = async () => {
-  try {
-    const response = await getEnabledModelConfigs();
-    if (response.code === 200 && response.data) {
-      modelList.value = response.data;
-      if (response.data.length > 0) {
-        selectedModelId.value = response.data[0].id;
-        selectedModel.value = response.data[0];
-        handleModelChange();
-      }
-    }
-  } catch (error: any) {
-    ElMessage.error("加载模型列表失败: " + error.message);
   }
 };
 
