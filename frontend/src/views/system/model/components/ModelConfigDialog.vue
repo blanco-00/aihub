@@ -87,7 +87,11 @@ const formRules: FormRules = {
 const handleVendorChange = () => {
   modelOptions.value = [];
   // 只有在baseUrl为空时才填充默认值，允许用户覆盖
-  if (formData.vendor && !formData.baseUrl && vendorDefaultUrls[formData.vendor]) {
+  if (
+    formData.vendor &&
+    !formData.baseUrl &&
+    vendorDefaultUrls[formData.vendor]
+  ) {
     formData.baseUrl = vendorDefaultUrls[formData.vendor];
   }
 };
@@ -103,7 +107,7 @@ const fetchModels = async () => {
     const res = await getModelList(
       formData.vendor,
       formData.apiKey,
-      formData.baseUrl || undefined
+      formData.baseUrl || undefined,
     );
     if (res.code === 200 && res.data) {
       modelOptions.value = res.data;
@@ -117,7 +121,8 @@ const fetchModels = async () => {
     }
   } catch (error: any) {
     console.error("获取模型列表失败", error);
-    const errMsg = error?.response?.data?.message || error?.message || "获取模型列表失败";
+    const errMsg =
+      error?.response?.data?.message || error?.message || "获取模型列表失败";
     ElMessage.error(errMsg);
   } finally {
     modelLoading.value = false;
@@ -269,7 +274,9 @@ defineExpose({
             clearable
           >
             <template #append>
-              <el-tooltip content="智谱默认: https://open.bigmodel.cn/api/paas/v4">
+              <el-tooltip
+                content="智谱默认: https://open.bigmodel.cn/api/paas/v4"
+              >
                 <el-button>?</el-button>
               </el-tooltip>
             </template>
@@ -295,7 +302,9 @@ defineExpose({
               :value="model"
             />
             <el-option
-              v-if="modelOptions.length === 0 && formData.vendor && formData.apiKey"
+              v-if="
+                modelOptions.length === 0 && formData.vendor && formData.apiKey
+              "
               label="点击获取模型或手动输入"
               value=""
               disabled
@@ -310,7 +319,7 @@ defineExpose({
             获取模型
           </el-button>
         </div>
-        <div class="text-xs text-gray-500 mt-1" v-if="!formData.apiKey">
+        <div v-if="!formData.apiKey" class="text-xs text-gray-500 mt-1">
           请先填写API Key后点击"获取模型"
         </div>
       </el-form-item>

@@ -52,12 +52,13 @@ docker compose up -d
 </td>
 <td width="50%">
 
-### 💡 Core Features
+### 💡 Core Features (v1.0)
 
-- ✅ **Multi-Model Management** - OpenAI/Claude/Zhipu/Tongyi
-- ✅ **Streaming Chat** - Real-time response, typewriter effect
-- ✅ **Prompt Templates** - 10+ built-in templates
-- ✅ **Session Management** - History & context persistence
+- ✅ **Multi-Model Management** - OpenAI/Claude/Zhipu/Tongyi + Default Model Setting
+- ✅ **Streaming Chat** - Real-time SSE response, typewriter effect
+- ✅ **Prompt Templates** - 10+ built-in templates with variable support
+- ✅ **Session Persistence** - Chat history saved to database
+- ✅ **Session Management** - Search, export, and organize conversations
 
 </td>
 </tr>

@@ -9,49 +9,34 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 模型配置实体类
+ * Prompt分类实体类
  */
 @Data
-@TableName("model_config")
-public class ModelConfig {
+@TableName("prompt_category")
+public class PromptCategory {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 模型名称
+     * 分类名称
      */
     private String name;
 
     /**
-     * 厂商 OpenAI/Claude/DeepSeek等
+     * 分类编码
      */
-    private String vendor;
+    private String code;
 
     /**
-     * 模型ID
+     * 分类描述
      */
-    private String modelId;
+    private String description;
 
     /**
-     * API Key（加密存储）
+     * 排序顺序
      */
-    private String apiKey;
-
-    /**
-     * Base URL
-     */
-    private String baseUrl;
-
-    /**
-     * 状态 0-禁用 1-启用
-     */
-    private Integer status;
-
-    /**
-     * 模型配置参数（JSON格式）
-     */
-    private String config;
+    private Integer sortOrder;
 
     @TableField("created_at")
     private LocalDateTime createdAt;
@@ -61,10 +46,4 @@ public class ModelConfig {
 
     @TableField("is_deleted")
     private Integer isDeleted;
-
-    /**
-     * 是否为默认模型
-     */
-    @TableField("is_default")
-    private Integer isDefault;
 }

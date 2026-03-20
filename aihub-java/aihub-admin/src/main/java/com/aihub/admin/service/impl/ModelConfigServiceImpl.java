@@ -169,6 +169,39 @@ public class ModelConfigServiceImpl implements ModelConfigService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setDefaultModel(Long id) {
+        ModelConfig modelConfig = modelConfigMapper.selectById(id);
+        if (modelConfig == null || modelConfig.getIsDeleted() == 1) {
+            throw new BusinessException("模型配置不存在");
+        }
+        
+        if (modelConfig.getStatus() != 1) {
+            throw new BusinessException("只能将启用的模型设置为默认模型");
+        }
+
+        modelConfigMapper.clearAllDefault();
+        
+        modelConfig.setIsDefault(1);
+        modelConfig.setUpdatedAt(LocalDateTime.now());
+        modelConfigMapper.updateById(modelConfig);
+        log.info("设置默认模型: id={}, name={}", id, modelConfig.getName());
+    }
+
+    @Override
+    public ModelConfigResponse getDefaultModel() {
+        ModelConfig modelConfig = modelConfigMapper.selectDefaultModel();
+        if (modelConfig == null) {
+            List<ModelConfig> enabledModels = modelConfigMapper.selectEnabledModels();
+            if (!enabledModels.isEmpty()) {
+                return convertToResponse(enabledModels.get(0));
+            }
+            return null;
+        }
+        return convertToResponse(modelConfig);
+    }
+
     private ModelConfigResponse convertToResponse(ModelConfig modelConfig) {
         ModelConfigResponse response = new ModelConfigResponse();
         BeanUtils.copyProperties(modelConfig, response);

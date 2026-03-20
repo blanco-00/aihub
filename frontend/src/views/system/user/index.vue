@@ -148,8 +148,8 @@ function getDepartmentName(deptId: number | undefined): string {
                       : 'ri:menu-fold-line',
                   )
                 "
-                @click="sidebarCollapsed = !sidebarCollapsed"
                 :title="sidebarCollapsed ? '展开' : '折叠'"
+                @click="sidebarCollapsed = !sidebarCollapsed"
               />
             </div>
           </div>
@@ -172,8 +172,8 @@ function getDepartmentName(deptId: number | undefined): string {
             :highlight-current="true"
             :current-node-key="selectedDepartmentId"
             node-key="id"
-            @node-click="handleDepartmentNodeClick"
             class="department-tree"
+            @node-click="handleDepartmentNodeClick"
           >
             <template #default="{ node, data }">
               <span class="flex items-center dept-tree-node">

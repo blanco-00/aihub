@@ -74,6 +74,14 @@ export const toggleModelConfigStatus = (id: number, status: number) => {
   });
 };
 
+export const setDefaultModel = (id: number) => {
+  return http.request<any>("put", `/api/model-configs/${id}/default`);
+};
+
+export const getDefaultModel = () => {
+  return http.request<any>("get", "/api/model-configs/default");
+};
+
 export const chatWithModel = (modelId: number, message: string) => {
   return http.request<any>(
     "post",
@@ -126,7 +134,11 @@ export const getTestHistory = (params: {
   return http.request<any>("get", "/api/ai/chat/history", { params });
 };
 
-export const getModelList = (vendor: string, apiKey: string, baseUrl?: string) => {
+export const getModelList = (
+  vendor: string,
+  apiKey: string,
+  baseUrl?: string,
+) => {
   return http.request<any>("get", "/api/ai/chat/models", {
     params: { vendor, apiKey, baseUrl },
   });

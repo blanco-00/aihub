@@ -31,4 +31,22 @@
         AND is_deleted = 0
     </select>
 
+    <update id="clearAllDefault">
+        UPDATE model_config
+        SET is_default = 0, updated_at = NOW()
+        WHERE is_default = 1
+        AND is_deleted = 0
+    </update>
+
+    <select id="selectDefaultModel" resultType="com.aihub.admin.entity.ModelConfig">
+        SELECT
+            id, name, vendor, model_id, api_key, base_url, status, config,
+            is_default, created_at, updated_at, is_deleted
+        FROM model_config
+        WHERE is_default = 1
+        AND status = 1
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
 </mapper>

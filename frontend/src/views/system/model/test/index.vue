@@ -178,8 +178,8 @@ onMounted(async () => {
           v-model="selectedModelId"
           placeholder="请选择模型"
           :loading="loading"
-          @change="handleModelChange"
           style="width: 300px; margin-right: 16px"
+          @change="handleModelChange"
         >
           <el-option
             v-for="model in getEnabledModelConfigs.data || []"
@@ -192,8 +192,8 @@ onMounted(async () => {
         <el-button
           :icon="useRenderIcon(Refresh)"
           :loading="loading"
-          @click="loadTestHistory"
           style="margin-right: 8px"
+          @click="loadTestHistory"
         >
           刷新历史
         </el-button>
@@ -210,7 +210,7 @@ onMounted(async () => {
     </div>
 
     <!-- 聊天界面 -->
-    <div class="chat-container" ref="chatBoxRef">
+    <div ref="chatBoxRef" class="chat-container">
       <!-- 消息列表 -->
       <div class="messages">
         <div
@@ -243,24 +243,24 @@ onMounted(async () => {
           type="textarea"
           :rows="4"
           placeholder="请输入消息内容..."
-          @keydown.enter.exact="sendMessage"
           :disabled="loading"
           class="message-input"
+          @keydown.enter.exact="sendMessage"
         />
         <el-button
           type="primary"
           :icon="useRenderIcon('ri-send-plane-fill')"
           :loading="loading"
-          @click="sendMessage"
           :disabled="!selectedModelId || loading"
           style="margin-top: 16px"
+          @click="sendMessage"
         >
           发送
         </el-button>
       </div>
 
       <!-- 模型信息 -->
-      <div class="model-info" v-if="selectedModelName">
+      <div v-if="selectedModelName" class="model-info">
         <el-card>
           <template #header>
             <div class="card-header">

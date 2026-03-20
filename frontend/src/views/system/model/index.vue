@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({
-  name: "SystemModelConfig"
+  name: "SystemModelConfig",
 });
 
 import { ref, reactive, onMounted, h } from "vue";
@@ -13,7 +13,7 @@ import {
   deleteModelConfig,
   toggleModelConfigStatus,
   type ModelConfig,
-  type ModelConfigListParams
+  type ModelConfigListParams,
 } from "@/api/modelConfig";
 import ModelConfigDialog from "./components/ModelConfigDialog.vue";
 
@@ -29,7 +29,7 @@ const dataList = ref<ModelConfig[]>([]);
 const pagination = reactive({
   total: 0,
   currentPage: 1,
-  pageSize: 10
+  pageSize: 10,
 });
 
 const searchForm = reactive<ModelConfigListParams>({
@@ -37,7 +37,7 @@ const searchForm = reactive<ModelConfigListParams>({
   vendor: "",
   status: undefined,
   current: 1,
-  size: 10
+  size: 10,
 });
 
 const vendorOptions = [
@@ -47,7 +47,7 @@ const vendorOptions = [
   { label: "百度", value: "baidu" },
   { label: "阿里", value: "ali" },
   { label: "腾讯", value: "tencent" },
-  { label: "智谱", value: "zhipuai" }
+  { label: "智谱", value: "zhipuai" },
 ];
 
 const vendorMap: Record<string, string> = {
@@ -57,14 +57,14 @@ const vendorMap: Record<string, string> = {
   baidu: "百度",
   ali: "阿里",
   tencent: "腾讯",
-  zhipuai: "智谱"
+  zhipuai: "智谱",
 };
 
 const columns: TableColumnData[] = [
   {
     label: "模型名称",
     prop: "name",
-    minWidth: 120
+    minWidth: 120,
   },
   {
     label: "厂商",
@@ -72,18 +72,18 @@ const columns: TableColumnData[] = [
     minWidth: 100,
     cellRenderer: ({ row }: { row: ModelConfig }) => {
       return h("span", vendorMap[row.vendor] || row.vendor);
-    }
+    },
   },
   {
     label: "模型ID",
     prop: "modelId",
-    minWidth: 180
+    minWidth: 180,
   },
   {
     label: "Base URL",
     prop: "baseUrl",
     minWidth: 200,
-    showOverflowTooltip: true
+    showOverflowTooltip: true,
   },
   {
     label: "状态",
@@ -93,19 +93,19 @@ const columns: TableColumnData[] = [
       return row.status === 1
         ? h("el-tag", { type: "success" }, "已启用")
         : h("el-tag", { type: "info" }, "已禁用");
-    }
+    },
   },
   {
     label: "创建时间",
     prop: "createdAt",
-    minWidth: 180
+    minWidth: 180,
   },
   {
     label: "操作",
     fixed: "right",
     width: 200,
-    slot: "operation"
-  }
+    slot: "operation",
+  },
 ];
 
 const fetchData = async () => {
@@ -159,8 +159,8 @@ const handleDelete = (row: ModelConfig) => {
     {
       type: "warning",
       confirmButtonText: "确认",
-      cancelButtonText: "取消"
-    }
+      cancelButtonText: "取消",
+    },
   )
     .then(async () => {
       try {
@@ -278,7 +278,7 @@ onMounted(() => {
           :pagination="{ ...pagination, size }"
           :header-cell-style="{
             background: 'var(--el-fill-color-light)',
-            color: 'var(--el-text-color-primary)'
+            color: 'var(--el-text-color-primary)',
           }"
           @page-size-change="handleSizeChange"
           @page-current-change="handleCurrentChange"

@@ -22,4 +22,14 @@ public interface ModelConfigMapper extends BaseMapper<ModelConfig> {
      * 统计启用的模型配置数量
      */
     Long countEnabledModels();
+
+    /**
+     * 清除所有默认模型标记
+     */
+    void clearAllDefault();
+
+    /**
+     * 查询默认模型
+     */
+    ModelConfig selectDefaultModel();
 }

@@ -73,4 +73,17 @@ public class ModelConfigController {
         modelConfigService.toggleModelConfigStatus(id, status);
         return Result.success();
     }
+
+    @OperationLog(module = "模型管理", operation = "设置默认模型", recordParams = true)
+    @PutMapping("/{id}/default")
+    public Result<Void> setDefaultModel(@PathVariable Long id) {
+        modelConfigService.setDefaultModel(id);
+        return Result.success();
+    }
+
+    @GetMapping("/default")
+    public Result<ModelConfigResponse> getDefaultModel() {
+        ModelConfigResponse modelConfig = modelConfigService.getDefaultModel();
+        return Result.success(modelConfig);
+    }
 }

@@ -106,8 +106,8 @@
                     v-if="!dbStatus"
                     type="primary"
                     size="large"
-                    @click="checkDatabaseStatus"
                     :loading="initDbLoading"
+                    @click="checkDatabaseStatus"
                   >
                     检查数据库状态
                   </el-button>

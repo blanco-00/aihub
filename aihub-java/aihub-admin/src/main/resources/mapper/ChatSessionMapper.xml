@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aihub.admin.mapper.ChatSessionMapper">
+
+    <!-- 查询用户的会话列表 -->
+    <select id="selectSessionList" resultType="com.aihub.admin.dto.response.ChatSessionResponse">
+        SELECT 
+            id, title, user_id as userId, model_id as modelId, model_name as modelName,
+            prompt_template_id as promptTemplateId, message_count as messageCount,
+            total_tokens as totalTokens, last_message_at as lastMessageAt, created_at as createdAt
+        FROM chat_session
+        WHERE is_deleted = 0
+          AND user_id = #{userId}
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="modelId != null">
+            AND model_id = #{modelId}
+        </if>
+        ORDER BY last_message_at DESC, created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计用户的会话总数 -->
+    <select id="countSessionList" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM chat_session
+        WHERE is_deleted = 0
+          AND user_id = #{userId}
+        <if test="keyword != null and keyword != ''">
+            AND title LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="modelId != null">
+            AND model_id = #{modelId}
+        </if>
+    </select>
+
+    <!-- 根据ID和用户ID查询会话（权限校验） -->
+    <select id="selectByIdAndUserId" resultType="com.aihub.admin.entity.ChatSession">
+        SELECT 
+            id, title, user_id, model_id, model_name, prompt_template_id,
+            message_count, total_tokens, last_message_at,
+            created_at, updated_at, is_deleted
+        FROM chat_session
+        WHERE id = #{id}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+</mapper>

@@ -21,5 +21,9 @@ public interface ModelConfigService {
 
     void toggleModelConfigStatus(Long id, Integer status);
 
+    void setDefaultModel(Long id);
+
+    ModelConfigResponse getDefaultModel();
+
     List<ModelConfigResponse> getEnabledModelConfigs();
 }

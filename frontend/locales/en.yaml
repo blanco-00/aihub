@@ -86,6 +86,8 @@ menus:
   pureLoginLog: Login Log
   pureOperationLog: Operation Log
   pureSystemLog: System Log
+  purePromptTemplates: Prompt Templates
+  pureModelTesting: Model Testing
   pureCodeMirror: CodeMirror
   pureMarkdown: Markdown
   pureEditor: Editor
