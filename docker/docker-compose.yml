@@ -45,12 +45,12 @@ services:
     networks:
       - aihub-network
 
-  # 后端 API 服务
-  backend:
+  # Java 后端 API 服务
+  java:
     build:
       context: ..
-      dockerfile: docker/backend/Dockerfile
-    container_name: aihub-backend
+      dockerfile: docker/aihub-java/Dockerfile
+    container_name: aihub-java
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-8080}:8080"
@@ -96,12 +96,46 @@ services:
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
-      - backend
+      - java
+      - python
     environment:
       # API 地址（使用 docker-compose 服务名）
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+      VITE_PYTHON_API_URL: ${VITE_PYTHON_API_URL:-http://localhost:8000}
     networks:
       - aihub-network
+
+  # Python AI 服务
+  python:
+    build:
+      context: ../aihub-python
+      dockerfile: Dockerfile
+    container_name: aihub-python
+    restart: unless-stopped
+    ports:
+      - "${PYTHON_PORT:-8000}:8000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-aihub}
+      DB_USER: ${MYSQL_USER:-aihub}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-aihub123456}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-aihub123456}
+      JWT_SECRET: ${JWT_SECRET:-aihub-secret-key-change-in-production}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - aihub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   aihub-network:
