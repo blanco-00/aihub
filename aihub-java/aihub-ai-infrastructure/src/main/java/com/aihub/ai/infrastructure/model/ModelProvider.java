@@ -11,7 +11,7 @@ public interface ModelProvider {
 
     void chatStream(String modelId, String apiKey, String baseUrl, Map<String, String> messages, StreamCallback onChunk);
 
-    boolean healthCheck(String apiKey, String baseUrl);
+    boolean healthCheck(String modelId, String apiKey, String baseUrl);
 
     /**
      * 获取可用的模型列表

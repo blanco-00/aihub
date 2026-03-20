@@ -57,9 +57,9 @@ public class OpenAIProvider implements ModelProvider {
     }
 
     @Override
-    public boolean healthCheck(String apiKey, String baseUrl) {
+    public boolean healthCheck(String modelId, String apiKey, String baseUrl) {
         try {
-            chat("gpt-3.5-turbo", apiKey, baseUrl, Map.of("content", "ping"));
+            chat(modelId, apiKey, baseUrl, Map.of("content", "ping"));
             return true;
         } catch (Exception e) {
             return false;

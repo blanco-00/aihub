@@ -58,11 +58,25 @@ public class ZhipuAIProvider implements ModelProvider {
     }
 
     @Override
-    public boolean healthCheck(String apiKey, String baseUrl) {
+    public boolean healthCheck(String modelId, String apiKey, String baseUrl) {
         try {
-            chat("glm-4", apiKey, baseUrl, Map.of("content", "ping"));
+            String requestBody = String.format("""
+                {
+                    "model": "%s",
+                    "messages": [{"role": "user", "content": "hi"}],
+                    "max_tokens": 10
+                }
+                """, modelId);
+
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("Authorization", "Bearer " + apiKey);
+            headers.set("Content-Type", "application/json");
+
+            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(requestBody, headers);
+            String url = chat(modelId, apiKey, baseUrl, Map.of("content", "hi"));
             return true;
         } catch (Exception e) {
+            log.warn("ZhipuAI health check failed: {}", e.getMessage());
             return false;
         }
     }

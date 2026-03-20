@@ -93,6 +93,7 @@ public class ModelChatController {
 
         boolean healthy = modelGateway.healthCheck(
             model.getVendor(),
+            model.getModelId(),
             model.getApiKey(),
             model.getBaseUrl()
         );

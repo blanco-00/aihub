@@ -35,10 +35,10 @@ public class ModelGateway {
         provider.chatStream(modelId, apiKey, baseUrl, messages, callback);
     }
 
-    public boolean healthCheck(String vendor, String apiKey, String baseUrl) {
+    public boolean healthCheck(String vendor, String modelId, String apiKey, String baseUrl) {
         try {
             ModelProvider provider = providerFactory.getProvider(vendor);
-            return provider.healthCheck(apiKey, baseUrl);
+            return provider.healthCheck(modelId, apiKey, baseUrl);
         } catch (Exception e) {
             log.error("Health check failed for vendor {}: {}", vendor, e.getMessage());
             return false;
