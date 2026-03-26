@@ -77,3 +77,4 @@ test-screenshots/
 # pnpm-lock.yaml
 # package-lock.json
 # yarn.lock
+.opencode
