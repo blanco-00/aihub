@@ -48,7 +48,7 @@ class TestMCPServer:
         
         result = server.execute_tool("exec_tool", {"arg": "value"})
         assert result == "executed"
-        handler.assert_called_once_with({"arg": "value"})
+        handler.assert_called_once_with({"arg": "value"}, server)
 
     def test_execute_tool_not_found(self):
         from aihub.mcp.server import MCPServer

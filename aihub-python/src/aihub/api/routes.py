@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Dict, Any, List, Optional, AsyncGenerator
+from typing import Optional, AsyncGenerator
 import json
-from .auth import get_current_user
-from .agents.agent import AIAgent
-from .agents.session import session_manager
-from .services.model_gateway import model_gateway
-from .tools.registry import registry
+from ..auth import get_current_user
+from ..agents.agent import AIAgent
+from ..agents.session import session_manager
 
 app = FastAPI(
     title="AIHub Python Service",
@@ -19,20 +17,27 @@ app = FastAPI(
 class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
-    model: Optional[str] = "gpt-4"
+    model: Optional[str] = "glm-4.7"
 
 
 class StreamChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
-    model: Optional[str] = "gpt-4"
+    model: Optional[str] = "glm-4.7"
 
 
-async def chat_generator(agent: AIAgent, message: str) -> AsyncGenerator[str, None]:
-    result = agent.chat(message)
-    response = result.get("output", "")
-    for char in response:
-        yield f"data: {json.dumps({'content': char})}\n\n"
+async def chat_generator(agent: AIAgent, message: str, session_id: str) -> AsyncGenerator[str, None]:
+    session_manager.add_message(session_id, "user", message)
+    
+    collected = []
+    for chunk in agent.chat_stream(message):
+        if chunk:
+            collected.append(chunk)
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+    
+    full_response = "".join(collected)
+    session_manager.add_message(session_id, "assistant", full_response)
+    
     yield "data: [DONE]\n\n"
 
 
@@ -46,10 +51,8 @@ async def chat(
     
     history = session_manager.get_session(session_id)
     
-    agent = AIAgent(
-        model_name=request.model,
-        tools=registry.get_all_funcs()
-    )
+    model_name = request.model or "glm-4.7"
+    agent = AIAgent(model_name=model_name, user_id=user_id, session_id=session_id)
     
     result = agent.chat(request.message, history)
     
@@ -70,12 +73,29 @@ async def stream_chat(
     user_id = current_user.get("user_id", 0)
     session_id = request.session_id or session_manager.create_session(user_id, "default")
     
-    agent = AIAgent(
-        model_name=request.model,
-        tools=registry.get_all_funcs()
-    )
+    model_name = request.model or "glm-4.7"
+    agent = AIAgent(model_name=model_name, user_id=user_id, session_id=session_id)
     
     return StreamingResponse(
-        chat_generator(agent, request.message),
+        chat_generator(agent, request.message, session_id),
         media_type="text/event-stream"
     )
+
+
+@app.get("/api/token/stats")
+async def get_token_stats(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    from datetime import datetime
+    from ..services.model_gateway import model_gateway
+    
+    user_id = current_user.get("user_id", 0)
+    
+    start = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+    end = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
+    
+    stats = model_gateway.get_token_stats(user_id=user_id, start_date=start, end_date=end)
+    
+    return stats

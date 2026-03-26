@@ -1,6 +1,7 @@
 package com.aihub.admin.controller;
 
 import com.aihub.admin.dto.request.CreateSessionRequest;
+import com.aihub.admin.dto.request.SaveMessageRequest;
 import com.aihub.admin.dto.request.SendMessageRequest;
 import com.aihub.admin.dto.request.SessionListRequest;
 import com.aihub.admin.dto.response.ChatMessageResponse;
@@ -93,6 +94,16 @@ public class ChatSessionController {
     public Result<Void> updateTitle(@PathVariable Long id, @RequestParam String title) {
         Long userId = getCurrentUserId();
         chatSessionService.updateSessionTitle(id, title, userId);
+        return Result.success();
+    }
+
+    /**
+     * 保存消息（供前端在SSE流完成后调用）
+     */
+    @PostMapping("/message/save")
+    public Result<Void> saveMessage(@RequestBody @Valid SaveMessageRequest request) {
+        Long userId = getCurrentUserId();
+        chatSessionService.saveMessage(request, userId);
         return Result.success();
     }
 

@@ -1,44 +1,34 @@
 import { getToken } from "@/utils/auth";
 
 export type StreamChatOptions = {
-  modelId: number;
+  model: string;
   message: string;
-  sessionId?: number;
+  sessionId?: string;
   onMessage: (chunk: string) => void;
   onError: (error: Error) => void;
   onComplete: () => void;
 };
 
-/**
- * SSE 流式聊天 API
- * @param options 流式聊天选项
- * @returns 取消函数
- */
 export const streamChat = (options: StreamChatOptions): (() => void) => {
   const token = getToken();
   const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
 
-  // 构建 URL 参数
-  const params = new URLSearchParams({
-    modelId: String(options.modelId),
-    message: options.message,
-  });
-
-  if (options.sessionId) {
-    params.append("sessionId", String(options.sessionId));
-  }
-
-  // 使用 fetch + ReadableStream 实现 SSE
-  const url = `/api/chat/stream?${params.toString()}`;
+  const url = "http://localhost:8001/api/agent/chat/stream";
 
   let abortController: AbortController | null = new AbortController();
 
   fetch(url, {
-    method: "GET",
+    method: "POST",
     headers: {
+      "Content-Type": "application/json",
       Accept: "text/event-stream",
       Authorization: tokenStr,
     },
+    body: JSON.stringify({
+      model: options.model,
+      message: options.message,
+      session_id: options.sessionId,
+    }),
     signal: abortController.signal,
   })
     .then(async (response) => {
@@ -64,14 +54,23 @@ export const streamChat = (options: StreamChatOptions): (() => void) => {
 
         buffer += decoder.decode(value, { stream: true });
 
-        // 处理 SSE 格式的数据
         const lines = buffer.split("\n");
-        buffer = lines.pop() || ""; // 保留最后一个不完整的行
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
           if (line.startsWith("data:")) {
             const data = line.slice(5).trim();
-            if (data) {
+            if (!data || data === "[DONE]") {
+              continue;
+            }
+            try {
+              // 解析 JSON 格式的 SSE 数据
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                options.onMessage(parsed.content);
+              }
+            } catch {
+              // 如果不是 JSON，直接发送（兼容纯文本格式）
               options.onMessage(data);
             }
           }
@@ -80,14 +79,12 @@ export const streamChat = (options: StreamChatOptions): (() => void) => {
     })
     .catch((error) => {
       if (error.name === "AbortError") {
-        // 用户主动取消，不算错误
         options.onComplete();
       } else {
         options.onError(error);
       }
     });
 
-  // 返回取消函数
   return () => {
     if (abortController) {
       abortController.abort();

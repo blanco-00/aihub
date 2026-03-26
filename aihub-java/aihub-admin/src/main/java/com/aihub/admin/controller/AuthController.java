@@ -68,12 +68,11 @@ public class AuthController {
      */
     @PostMapping("/login")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
-        String usernameOrEmail = request.getUsernameOrEmail();
+        String username = request.getUsername();
         try {
-            log.info("用户登录请求: usernameOrEmail={}", usernameOrEmail);
+            log.info("用户登录请求: username={}", username);
             LoginResponse response = authService.login(request);
             
-            // 记录登录成功日志
             if (response.getUser() != null) {
                 loginLogService.recordLogin(
                     response.getUser().getId(),
@@ -83,7 +82,6 @@ public class AuthController {
                     httpRequest
                 );
                 
-                // 保存在线用户信息
                 onlineUserService.saveOnlineUser(
                     response.getUser().getId(),
                     response.getUser().getUsername(),
@@ -95,10 +93,9 @@ public class AuthController {
             
             return Result.success(response);
         } catch (BusinessException e) {
-            // 记录登录失败日志
             loginLogService.recordLogin(
                 null,
-                usernameOrEmail,
+                username,
                 0,
                 "登录失败: " + e.getMessage(),
                 httpRequest
@@ -106,10 +103,9 @@ public class AuthController {
             log.error("登录失败", e);
             throw e;
         } catch (Exception e) {
-            // 记录登录失败日志
             loginLogService.recordLogin(
                 null,
-                usernameOrEmail,
+                username,
                 0,
                 "登录失败: " + e.getMessage(),
                 httpRequest

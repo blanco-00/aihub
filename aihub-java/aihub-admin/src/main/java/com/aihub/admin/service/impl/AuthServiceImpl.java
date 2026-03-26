@@ -73,16 +73,15 @@ public class AuthServiceImpl implements AuthService {
     
     @Override
     public LoginResponse login(LoginRequest request) {
-        // 查找用户（支持用户名或邮箱登录）
-        String usernameOrEmail = request.getUsernameOrEmail();
-        User user = userMapper.findByUsername(usernameOrEmail);
-        if (user == null) {
-            user = userMapper.findByEmail(usernameOrEmail);
+        String loginName = request.getUsername();
+        if (loginName == null || loginName.isBlank()) {
+            throw new BusinessException("用户名或邮箱不能为空");
         }
         
-        // 验证用户是否存在
+        User user = userMapper.findByUsernameOrEmail(loginName);
+        
         if (user == null || user.getIsDeleted() == 1) {
-            log.warn("登录失败：用户不存在 - usernameOrEmail={}", usernameOrEmail);
+            log.warn("登录失败：用户不存在 - loginName={}", loginName);
             throw new BusinessException("用户名或密码错误");
         }
         

@@ -99,3 +99,13 @@ export const deleteSession = (id: number) =>
 export const exportSession = (id: number) => {
   window.open(`/api/chat/session/${id}/export`, "_blank");
 };
+
+export type SaveMessageRequest = {
+  sessionId: number;
+  role: string;
+  content: string;
+  tokens?: number;
+};
+
+export const saveMessage = (data: SaveMessageRequest) =>
+  http.request<Result<void>>("post", "/api/chat/session/message/save", { data });

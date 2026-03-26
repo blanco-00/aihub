@@ -49,4 +49,12 @@
         LIMIT 1
     </select>
 
+    <!-- 更新会话消息统计信息 -->
+    <update id="updateMessageInfo">
+        UPDATE chat_session 
+        SET message_count = message_count + 1,
+            last_message_at = NOW()
+        WHERE id = #{sessionId}
+    </update>
+
 </mapper>

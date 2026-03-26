@@ -31,4 +31,9 @@ public interface ChatSessionMapper extends BaseMapper<ChatSession> {
      * 根据ID和用户ID查询会话（权限校验）
      */
     ChatSession selectByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
+
+    /**
+     * 更新会话消息统计信息
+     */
+    void updateMessageInfo(@Param("sessionId") Long sessionId);
 }

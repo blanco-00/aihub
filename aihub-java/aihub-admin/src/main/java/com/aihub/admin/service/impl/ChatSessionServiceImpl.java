@@ -1,6 +1,7 @@
 package com.aihub.admin.service.impl;
 
 import com.aihub.admin.dto.request.CreateSessionRequest;
+import com.aihub.admin.dto.request.SaveMessageRequest;
 import com.aihub.admin.dto.request.SendMessageRequest;
 import com.aihub.admin.dto.request.SessionListRequest;
 import com.aihub.admin.dto.response.ChatMessageResponse;
@@ -242,5 +243,26 @@ public class ChatSessionServiceImpl implements ChatSessionService {
                         .set(ChatSession::getUpdatedAt, LocalDateTime.now()));
 
         log.info("更新会话标题成功: sessionId={}, title={}, userId={}", id, title, userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveMessage(SaveMessageRequest request, Long userId) {
+        ChatSession session = chatSessionMapper.selectByIdAndUserId(request.getSessionId(), userId);
+        if (session == null) {
+            throw new BusinessException("会话不存在或无权访问");
+        }
+
+        ChatMessage message = new ChatMessage();
+        message.setSessionId(request.getSessionId());
+        message.setRole(request.getRole());
+        message.setContent(request.getContent());
+        message.setTokens(request.getTokens());
+        message.setCreatedAt(LocalDateTime.now());
+        chatMessageMapper.insert(message);
+
+        chatSessionMapper.updateMessageInfo(request.getSessionId());
+
+        log.info("保存消息成功: sessionId={}, role={}, userId={}", request.getSessionId(), request.getRole(), userId);
     }
 }

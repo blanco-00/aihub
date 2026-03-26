@@ -13,7 +13,7 @@ type Result<T = any> = {
  * 登录请求参数
  */
 export type LoginRequest = {
-  usernameOrEmail: string;
+  username: string;
   password: string;
   rememberMe?: boolean; // 是否记住我（后端固定30天）
 };

@@ -28,5 +28,14 @@ export default {
         icon: "ri/cpu-line",
       },
     },
+    {
+      path: "/ai/rag",
+      name: "AiRag",
+      component: () => import("@/views/ai/rag/index.vue"),
+      meta: {
+        title: "RAG知识库",
+        icon: "ri/book-line",
+      },
+    },
   ],
 } satisfies RouteConfigsTable;

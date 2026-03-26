@@ -1,6 +1,7 @@
 package com.aihub.admin.service;
 
 import com.aihub.admin.dto.request.CreateSessionRequest;
+import com.aihub.admin.dto.request.SaveMessageRequest;
 import com.aihub.admin.dto.request.SendMessageRequest;
 import com.aihub.admin.dto.request.SessionListRequest;
 import com.aihub.admin.dto.response.ChatMessageResponse;
@@ -75,4 +76,12 @@ public interface ChatSessionService {
      * @param userId 用户ID
      */
     void updateSessionTitle(Long id, String title, Long userId);
+
+    /**
+     * 保存消息（供前端在SSE流完成后调用）
+     *
+     * @param request 保存消息请求
+     * @param userId  用户ID
+     */
+    void saveMessage(SaveMessageRequest request, Long userId);
 }

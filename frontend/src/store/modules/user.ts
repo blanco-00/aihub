@@ -86,7 +86,7 @@ export const useUserStore = defineStore("pure-user", {
       return new Promise<UserResult>((resolve, reject) => {
         // 使用新的 auth API
         const loginData: LoginRequest = {
-          usernameOrEmail: data.username || "",
+          username: data.username || "",
           password: data.password || "",
           rememberMe: this.isRemembered,
         };

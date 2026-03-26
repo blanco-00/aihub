@@ -25,6 +25,17 @@
         LIMIT 1
     </select>
 
+    <!-- 根据用户名或邮箱查询用户（一次查询搞定） -->
+    <select id="findByUsernameOrEmail" resultType="com.aihub.admin.entity.User">
+        SELECT 
+            id, username, nickname, email, phone, avatar, description, password, role, department_id, status, remark,
+            created_at, updated_at, is_deleted
+        FROM user 
+        WHERE (username = #{loginName} OR email = #{loginName})
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
     <select id="countByRoleAndNotDeleted" resultType="java.lang.Long">
         SELECT COUNT(*) FROM user 
         WHERE role = #{role} 

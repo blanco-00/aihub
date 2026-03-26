@@ -13,6 +13,8 @@ import {
 } from "@/api/chatSession";
 import { streamChat } from "@/api/streamChat";
 import { ElMessage } from "element-plus";
+import { getEnabledModelConfigs, type ModelConfig } from "@/api/modelConfig";
+import { saveMessage } from "@/api/chatSession";
 
 type ChatState = {
   sessions: ChatSession[];
@@ -179,30 +181,34 @@ export const useChatStore = defineStore("chat", {
       }
     },
 
-    /**
-     * 发送流式消息
-     */
     async sendStreamMessage(
-      modelId: number,
+      modelName: string,
       content: string,
-      sessionId?: number,
+      sessionId?: string,
+      skillIds?: number[],
     ): Promise<() => void> {
-      // 添加用户消息
       const userMessage: ChatMessage = {
         id: Date.now(),
-        sessionId: sessionId || 0,
+        sessionId: sessionId ? Number(sessionId) : 0,
         role: "user",
         content,
         createdAt: new Date().toISOString(),
       };
       this.messages.push(userMessage);
 
-      // 开始流式响应
+      if (sessionId) {
+        saveMessage({
+          sessionId: Number(sessionId),
+          role: "user",
+          content: content,
+        }).catch((err) => console.error("Save user message failed:", err));
+      }
+
       this.streaming = true;
       this.streamingContent = "";
 
       const cancel = streamChat({
-        modelId,
+        model: modelName,
         message: content,
         sessionId,
         onMessage: (chunk: string) => {
@@ -213,21 +219,33 @@ export const useChatStore = defineStore("chat", {
           ElMessage.error("发送消息失败: " + error.message);
         },
         onComplete: () => {
-          // 流式完成，将内容保存为AI消息
-          if (this.streamingContent) {
+          const finalContent = this.streamingContent;
+          
+          if (finalContent && sessionId) {
             const assistantMessage: ChatMessage = {
               id: Date.now() + 1,
-              sessionId: sessionId || 0,
+              sessionId: Number(sessionId),
               role: "assistant",
-              content: this.streamingContent,
+              content: finalContent,
               createdAt: new Date().toISOString(),
             };
             this.messages.push(assistantMessage);
+
+            saveMessage({
+              sessionId: Number(sessionId),
+              role: "user",
+              content: content,
+            }).catch((err) => console.error("Save user message failed:", err));
+
+            saveMessage({
+              sessionId: Number(sessionId),
+              role: "assistant",
+              content: finalContent,
+            }).catch((err) => console.error("Save assistant message failed:", err));
           }
           this.streaming = false;
           this.streamingContent = "";
 
-          // 刷新会话列表以更新最后消息时间
           this.loadSessions();
         },
       });

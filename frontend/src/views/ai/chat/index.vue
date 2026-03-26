@@ -14,6 +14,8 @@ import {
   type ModelConfig,
 } from "@/api/modelConfig";
 import StreamMessage from "@/components/StreamMessage/index.vue";
+import McpToolPanel from "@/components/McpToolPanel/index.vue";
+import { getSkills, detectSkills, type Skill } from "@/api/skill";
 
 const chatStore = useChatStore();
 const {
@@ -39,6 +41,12 @@ const modelHealthy = ref<boolean | null>(null);
 const cancelStreamRef = ref<(() => void) | null>(null);
 const sessionSearchKeyword = ref("");
 const isCollapsed = ref(false);
+const showMcpPanel = ref(false);
+const showSkillPanel = ref(false);
+const skillList = ref<Skill[]>([]);
+const selectedSkillIds = ref<number[]>([]);
+const detectedSkills = ref<Skill[]>([]);
+const loadingSkills = ref(false);
 
 const vendorMap: Record<string, string> = {
   openai: "OpenAI",
@@ -65,7 +73,6 @@ const displayMessages = computed(() => {
   return msgs;
 });
 
-// 发送消息
 const sendMessage = async () => {
   const content = inputMessage.value.trim();
   if (!content) {
@@ -73,15 +80,17 @@ const sendMessage = async () => {
     return;
   }
 
-  if (!selectedModelId.value) {
+  if (!selectedModel.value) {
     ElMessage.warning("请先选择一个模型");
     return;
   }
 
+  // 自动检测技能
+  await detectMessageSkills(content);
+
   inputMessage.value = "";
 
   try {
-    // 如果没有当前会话，先创建一个
     let sessionId = currentSessionId.value;
     if (!sessionId) {
       sessionId = await chatStore.createNewSession(
@@ -95,11 +104,10 @@ const sendMessage = async () => {
       await chatStore.selectSession(sessionId);
     }
 
-    // 发送流式消息
     cancelStreamRef.value = await chatStore.sendStreamMessage(
-      selectedModelId.value,
+      selectedModel.value.modelId,
       content,
-      sessionId,
+      String(sessionId),
     );
 
     await nextTick();
@@ -211,6 +219,46 @@ const loadModels = async () => {
   }
 };
 
+// 加载技能列表
+const loadSkills = async () => {
+  try {
+    loadingSkills.value = true;
+    const skills = await getSkills();
+    skillList.value = skills.filter((s) => s.is_builtin !== false);
+  } catch (error: any) {
+    console.error("加载技能列表失败:", error);
+  } finally {
+    loadingSkills.value = false;
+  }
+};
+
+// 检测消息中的技能
+const detectMessageSkills = async (message: string) => {
+  if (!message.trim()) return;
+  try {
+    const result = await detectSkills(message);
+    if (result.matched && result.matchedSkills.length > 0) {
+      detectedSkills.value = result.matchedSkills;
+      // 自动选中检测到的技能
+      selectedSkillIds.value = [
+        ...new Set([...selectedSkillIds.value, ...result.matchedSkills.map((s) => s.id)]),
+      ];
+    }
+  } catch (error: any) {
+    console.error("检测技能失败:", error);
+  }
+};
+
+// 切换技能选择
+const toggleSkill = (skillId: number) => {
+  const index = selectedSkillIds.value.indexOf(skillId);
+  if (index === -1) {
+    selectedSkillIds.value.push(skillId);
+  } else {
+    selectedSkillIds.value.splice(index, 1);
+  }
+};
+
 // 模型切换（仅手动切换时检查）
 const handleModelChange = async () => {
   selectedModel.value =
@@ -269,6 +317,7 @@ watch(sessionSearchKeyword, () => {
 
 onMounted(() => {
   loadModels();
+  loadSkills();
   chatStore.loadSessions();
 });
 </script>
@@ -389,6 +438,81 @@ onMounted(() => {
         </div>
         <div class="header-actions">
           <el-button
+            :icon="useRenderIcon('ri:tools-line')"
+            :type="showMcpPanel ? 'primary' : 'default'"
+            @click="showMcpPanel = !showMcpPanel"
+          >
+            工具
+          </el-button>
+          <el-popover
+            v-model:visible="showSkillPanel"
+            placement="bottom-end"
+            :width="320"
+            trigger="click"
+          >
+            <template #reference>
+              <el-button
+                :type="selectedSkillIds.length > 0 ? 'primary' : 'default'"
+                :icon="useRenderIcon('ri:star-line')"
+              >
+                技能{{ selectedSkillIds.length > 0 ? `(${selectedSkillIds.length})` : "" }}
+              </el-button>
+            </template>
+            <div class="skill-panel">
+              <div class="skill-panel-header">
+                <span>选择技能</span>
+                <el-button
+                  v-if="selectedSkillIds.length > 0"
+                  text
+                  size="small"
+                  @click="selectedSkillIds = []"
+                >
+                  清空
+                </el-button>
+              </div>
+              <div v-if="loadingSkills" class="skill-loading">
+                <el-icon class="is-loading"><component :is="useRenderIcon('ep:loading')" /></el-icon>
+                加载中...
+              </div>
+              <div v-else-if="skillList.length === 0" class="skill-empty">
+                暂无可用技能
+              </div>
+              <div v-else class="skill-list">
+                <div
+                  v-for="skill in skillList"
+                  :key="skill.id"
+                  :class="['skill-item', { selected: selectedSkillIds.includes(skill.id) }]"
+                  @click="toggleSkill(skill.id)"
+                >
+                  <el-checkbox
+                    :model-value="selectedSkillIds.includes(skill.id)"
+                    @click.stop
+                    @change="() => toggleSkill(skill.id)"
+                  />
+                  <div class="skill-info">
+                    <div class="skill-name">{{ skill.name }}</div>
+                    <div class="skill-desc">{{ skill.description }}</div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="detectedSkills.length > 0" class="detected-skills">
+                <div class="detected-header">
+                  <el-icon color="var(--el-color-success)"><component :is="useRenderIcon('ep:circle-check')" /></el-icon>
+                  <span>检测到 {{ detectedSkills.length }} 个技能</span>
+                </div>
+                <el-tag
+                  v-for="skill in detectedSkills"
+                  :key="skill.id"
+                  size="small"
+                  type="success"
+                  style="margin-right: 4px"
+                >
+                  {{ skill.name }}
+                </el-tag>
+              </div>
+            </div>
+          </el-popover>
+          <el-button
             v-if="currentSessionId"
             :icon="useRenderIcon('ep:download')"
             @click="exportCurrentSession"
@@ -493,6 +617,9 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- MCP 工具面板 -->
+    <McpToolPanel v-if="showMcpPanel" />
   </div>
 </template>
 
@@ -753,6 +880,82 @@ onMounted(() => {
   .input-actions {
     display: flex;
     align-items: flex-end;
+  }
+}
+
+// 技能面板样式
+.skill-panel {
+  .skill-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    font-weight: 500;
+  }
+
+  .skill-loading,
+  .skill-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--el-text-color-secondary);
+  }
+
+  .skill-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .skill-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: var(--el-fill-color-light);
+    }
+
+    &.selected {
+      background: var(--el-color-primary-light-9);
+    }
+
+    .skill-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .skill-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .skill-desc {
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .detected-skills {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--el-border-color-lighter);
+
+    .detected-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--el-color-success);
+    }
   }
 }
 </style>
