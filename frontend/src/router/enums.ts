@@ -2,39 +2,47 @@
 
 const home = 0, // 平台规定只有 home 路由的 rank 才能为 0 ，所以后端在返回 rank 的时候需要从非 0 开始
   system = 1, // 系统管理
-  ai = 2, // AI管理
-  chatai = 3,
-  vueflow = 3,
-  ganttastic = 4,
-  components = 5,
-  able = 6,
-  table = 7,
-  form = 8,
-  list = 9,
-  result = 10,
-  error = 11,
-  frame = 12,
-  nested = 13,
-  permission = 14,
-  monitor = 15,
-  tabs = 16,
-  about = 17,
-  codemirror = 18,
-  markdown = 19,
-  editor = 20,
-  flowchart = 21,
-  formdesign = 22,
-  board = 23,
-  ppt = 24,
-  mind = 25,
-  guide = 26,
-  menuoverflow = 27;
+  ai = 2, // AI管理 (旧版，已拆分)
+  chat = 3, // AI聊天
+  rag = 4, // RAG知识库
+  model = 5, // 模型配置
+  prompt = 6, // 提示词模板
+  agent = 7, // Agent智能体
+  vueflow = 8,
+  ganttastic = 9,
+  components = 10,
+  able = 11,
+  table = 12,
+  form = 13,
+  list = 14,
+  result = 15,
+  error = 16,
+  frame = 17,
+  nested = 18,
+  permission = 19,
+  monitor = 20,
+  tabs = 21,
+  about = 22,
+  codemirror = 23,
+  markdown = 24,
+  editor = 25,
+  flowchart = 26,
+  formdesign = 27,
+  board = 28,
+  ppt = 29,
+  mind = 30,
+  guide = 31,
+  menuoverflow = 32;
 
 export {
   home,
   system,
   ai,
-  chatai,
+  chat,
+  rag,
+  model,
+  prompt,
+  agent,
   vueflow,
   ganttastic,
   components,

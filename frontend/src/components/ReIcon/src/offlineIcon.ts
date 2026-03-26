@@ -40,6 +40,13 @@ import RiInformationLine from "~icons/ri/information-line?raw";
 import RiTerminalWindowLine from "~icons/ri/terminal-window-line?raw";
 import RiCheckboxCircleLine from "~icons/ri/checkbox-circle-line?raw";
 import RiBarChartHorizontalLine from "~icons/ri/bar-chart-horizontal-line?raw";
+import RiRobotLine from "~icons/ri/robot-line?raw";
+import RiFileTextLine from "~icons/ri/file-text-line?raw";
+import RiCpuLine from "~icons/ri/cpu-line?raw";
+import RiBookLine from "~icons/ri/book-line?raw";
+import RiBook2Line from "~icons/ri/book-2-line?raw";
+import RiChat3Line from "~icons/ri/chat-3-line?raw";
+import RiSettings2Line from "~icons/ri/settings-2-line?raw";
 
 const icons = [
   // Element Plus Icon: https://github.com/element-plus/element-plus-icons
@@ -79,6 +86,13 @@ const icons = [
   ["ri/terminal-window-line", RiTerminalWindowLine],
   ["ri/checkbox-circle-line", RiCheckboxCircleLine],
   ["ri/bar-chart-horizontal-line", RiBarChartHorizontalLine],
+  ["ri/robot-line", RiRobotLine],
+  ["ri/file-text-line", RiFileTextLine],
+  ["ri/cpu-line", RiCpuLine],
+  ["ri/book-line", RiBookLine],
+  ["ri/book-2-line", RiBook2Line],
+  ["ri/chat-3-line", RiChat3Line],
+  ["ri/settings-2-line", RiSettings2Line],
 ];
 
 // 本地菜单图标，后端在路由的 icon 中返回对应的图标字符串并且前端在此处使用 addIcon 添加即可渲染菜单图标

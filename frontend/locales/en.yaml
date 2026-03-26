@@ -88,6 +88,9 @@ menus:
   pureSystemLog: System Log
   purePromptTemplates: Prompt Templates
   pureModelTesting: Model Testing
+  pureRagKnowledge: RAG Knowledge Base
+  pureChat: AI Chat
+  pureAgent: Agent
   pureCodeMirror: CodeMirror
   pureMarkdown: Markdown
   pureEditor: Editor

@@ -86,8 +86,11 @@ menus:
   pureLoginLog: 登录日志
   pureOperationLog: 操作日志
   pureSystemLog: 系统日志
-  purePromptTemplates: Prompt模板
+  purePromptTemplates: 提示词模板
   pureModelTesting: 模型测试
+  pureRagKnowledge: RAG知识库
+  pureChat: AI聊天
+  pureAgent: Agent智能体
   pureCodeMirror: 代码编辑器
   pureMarkdown: Markdown
   pureEditor: 编辑器
