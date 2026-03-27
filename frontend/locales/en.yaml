@@ -91,6 +91,7 @@ menus:
   pureRagKnowledge: RAG Knowledge Base
   pureChat: AI Chat
   pureAgent: Agent
+  pureMcp: MCP Tools
   pureCodeMirror: CodeMirror
   pureMarkdown: Markdown
   pureEditor: Editor

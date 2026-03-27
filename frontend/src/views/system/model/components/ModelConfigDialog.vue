@@ -34,6 +34,7 @@ const formData = reactive<CreateModelConfigRequest & { id?: number }>({
   baseUrl: "",
   status: 1,
   config: "",
+  modelType: "chat",
 });
 
 const vendorOptions = [
@@ -44,6 +45,14 @@ const vendorOptions = [
   { label: "阿里", value: "ali" },
   { label: "腾讯", value: "tencent" },
   { label: "智谱", value: "zhipuai" },
+];
+
+const modelTypeOptions = [
+  { label: "对话模型", value: "chat" },
+  { label: "向量模型", value: "embedding" },
+  { label: "文生图模型", value: "image" },
+  { label: "语音模型", value: "audio" },
+  { label: "重排序模型", value: "rerank" },
 ];
 
 // 厂商默认Base URL映射
@@ -143,6 +152,7 @@ const openDialog = async (mode: "create" | "edit", row?: ModelConfig) => {
     formData.baseUrl = row.baseUrl || "";
     formData.status = row.status;
     formData.config = row.config || "";
+    formData.modelType = row.modelType || "chat";
   } else {
     resetForm();
   }
@@ -162,6 +172,7 @@ const resetForm = () => {
   formData.baseUrl = "";
   formData.status = 1;
   formData.config = "";
+  formData.modelType = "chat";
   formRef.value?.clearValidate();
 };
 
@@ -180,6 +191,7 @@ const handleSubmit = async () => {
           baseUrl: formData.baseUrl || undefined,
           status: formData.status,
           config: formData.config || undefined,
+          modelType: formData.modelType,
         };
 
         let response;
@@ -329,6 +341,17 @@ defineExpose({
           <el-radio :label="1">启用</el-radio>
           <el-radio :label="0">禁用</el-radio>
         </el-radio-group>
+      </el-form-item>
+
+      <el-form-item label="模型类型" prop="modelType">
+        <el-select v-model="formData.modelType" placeholder="请选择模型类型" class="w-full!">
+          <el-option
+            v-for="option in modelTypeOptions"
+            :key="option.value"
+            :label="option.label"
+            :value="option.value"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="配置" prop="config">

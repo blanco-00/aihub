@@ -30,4 +30,6 @@ public class CreateModelConfigRequest {
     private Integer status = 1;
 
     private String config;
+
+    private String modelType = "chat";
 }

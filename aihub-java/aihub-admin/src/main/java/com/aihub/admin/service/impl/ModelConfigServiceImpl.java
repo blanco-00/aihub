@@ -30,7 +30,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public PageResult<ModelConfigResponse> getModelConfigList(String keyword, String vendor, Integer status, Long current, Long size) {
+    public PageResult<ModelConfigResponse> getModelConfigList(String keyword, String vendor, Integer status, String modelType, Long current, Long size) {
         long startTime = System.currentTimeMillis();
 
         Long offset = (current - 1) * size;
@@ -40,6 +40,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
                 .like(keyword != null && !keyword.isEmpty(), ModelConfig::getName, keyword)
                 .eq(vendor != null && !vendor.isEmpty(), ModelConfig::getVendor, vendor)
                 .eq(status != null, ModelConfig::getStatus, status)
+                .eq(modelType != null && !modelType.isEmpty(), ModelConfig::getModelType, modelType)
                 .eq(ModelConfig::getIsDeleted, 0)
                 .orderByDesc(ModelConfig::getCreatedAt)
                 .last("LIMIT " + offset + ", " + size)
@@ -50,6 +51,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
                 .like(keyword != null && !keyword.isEmpty(), ModelConfig::getName, keyword)
                 .eq(vendor != null && !vendor.isEmpty(), ModelConfig::getVendor, vendor)
                 .eq(status != null, ModelConfig::getStatus, status)
+                .eq(modelType != null && !modelType.isEmpty(), ModelConfig::getModelType, modelType)
                 .eq(ModelConfig::getIsDeleted, 0)
         );
 
@@ -99,6 +101,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         modelConfig.setBaseUrl(request.getBaseUrl());
         modelConfig.setStatus(request.getStatus() != null ? request.getStatus() : 1);
         modelConfig.setConfig(request.getConfig());
+        modelConfig.setModelType(request.getModelType() != null ? request.getModelType() : "chat");
         modelConfig.setCreatedAt(LocalDateTime.now());
         modelConfig.setUpdatedAt(LocalDateTime.now());
         modelConfig.setIsDeleted(0);
@@ -127,6 +130,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         modelConfig.setBaseUrl(request.getBaseUrl());
         modelConfig.setStatus(request.getStatus());
         modelConfig.setConfig(request.getConfig());
+        modelConfig.setModelType(request.getModelType());
         modelConfig.setUpdatedAt(LocalDateTime.now());
 
         modelConfigMapper.updateById(modelConfig);

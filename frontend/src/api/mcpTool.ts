@@ -6,7 +6,10 @@ export type MCPTool = {
   description: string;
   inputSchema: Record<string, any>;
   outputSchema?: Record<string, any>;
-  toolType?: string;
+  tool_type?: string;
+  is_enabled?: number;
+  execution_count?: number;
+  last_executed_at?: string;
 };
 
 export type ToolExecutionRequest = {
@@ -39,6 +42,25 @@ export const executeMCPTool = (data: ToolExecutionRequest): Promise<any> => {
   const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
 
   return fetch("http://localhost:8001/api/mcp/tools/execute", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: tokenStr,
+    },
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
+
+export type MCPToolUpdateRequest = {
+  name: string;
+  isEnabled?: number;
+};
+
+export const updateMCPTool = (data: MCPToolUpdateRequest): Promise<any> => {
+  const token = getToken();
+  const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
+
+  return fetch("http://localhost:8001/api/mcp/tools/update", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

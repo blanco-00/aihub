@@ -36,6 +36,7 @@ const searchForm = reactive<ModelConfigListParams>({
   keyword: "",
   vendor: "",
   status: undefined,
+  modelType: undefined,
   current: 1,
   size: 10,
 });
@@ -49,6 +50,22 @@ const vendorOptions = [
   { label: "腾讯", value: "tencent" },
   { label: "智谱", value: "zhipuai" },
 ];
+
+const modelTypeOptions = [
+  { label: "对话模型", value: "chat" },
+  { label: "向量模型", value: "embedding" },
+  { label: "文生图模型", value: "image" },
+  { label: "语音模型", value: "audio" },
+  { label: "重排序模型", value: "rerank" },
+];
+
+const modelTypeMap: Record<string, string> = {
+  chat: "对话",
+  embedding: "向量",
+  image: "文生图",
+  audio: "语音",
+  rerank: "重排序",
+};
 
 const vendorMap: Record<string, string> = {
   openai: "OpenAI",
@@ -96,6 +113,18 @@ const columns: TableColumnData[] = [
     },
   },
   {
+    label: "类型",
+    prop: "modelType",
+    minWidth: 100,
+    cellRenderer: ({ row }: { row: ModelConfig }) => {
+      return h(
+        "el-tag",
+        { type: row.modelType === "chat" ? "" : "warning" },
+        modelTypeMap[row.modelType || "chat"] || row.modelType || "对话"
+      );
+    },
+  },
+  {
     label: "创建时间",
     prop: "createdAt",
     minWidth: 180,
@@ -133,6 +162,7 @@ const handleReset = () => {
   searchForm.keyword = "";
   searchForm.vendor = "";
   searchForm.status = undefined;
+  searchForm.modelType = undefined;
   searchForm.current = 1;
   fetchData();
 };
@@ -236,6 +266,21 @@ onMounted(() => {
         >
           <el-option label="已启用" :value="1" />
           <el-option label="已禁用" :value="0" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="类型：" prop="modelType">
+        <el-select
+          v-model="searchForm.modelType"
+          placeholder="请选择类型"
+          clearable
+          class="w-[180px]!"
+        >
+          <el-option
+            v-for="option in modelTypeOptions"
+            :key="option.value"
+            :label="option.label"
+            :value="option.value"
+          />
         </el-select>
       </el-form-item>
       <el-form-item>

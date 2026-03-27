@@ -67,4 +67,10 @@ public class ModelConfig {
      */
     @TableField("is_default")
     private Integer isDefault;
+
+    /**
+     * 模型类型: chat=对话模型, embedding=向量模型, image=文生图模型, audio=语音模型, rerank=重排序模型
+     */
+    @TableField("model_type")
+    private String modelType;
 }

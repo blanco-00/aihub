@@ -30,4 +30,6 @@ public class UpdateModelConfigRequest {
     private Integer status;
 
     private String config;
+
+    private String modelType;
 }

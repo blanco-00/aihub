@@ -28,9 +28,10 @@ public class ModelConfigController {
             @RequestParam(defaultValue = "10") Long size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String vendor,
-            @RequestParam(required = false) Integer status) {
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) String modelType) {
 
-        PageResult<ModelConfigResponse> result = modelConfigService.getModelConfigList(keyword, vendor, status, current, size);
+        PageResult<ModelConfigResponse> result = modelConfigService.getModelConfigList(keyword, vendor, status, modelType, current, size);
         return Result.success(result);
     }
 

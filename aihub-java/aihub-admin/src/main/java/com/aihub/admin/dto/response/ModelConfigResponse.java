@@ -24,6 +24,8 @@ public class ModelConfigResponse {
 
     private String config;
 
+    private String modelType;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 

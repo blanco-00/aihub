@@ -91,6 +91,7 @@ menus:
   pureRagKnowledge: RAG知识库
   pureChat: AI聊天
   pureAgent: Agent智能体
+  pureMcp: MCP工具
   pureCodeMirror: 代码编辑器
   pureMarkdown: Markdown
   pureEditor: 编辑器

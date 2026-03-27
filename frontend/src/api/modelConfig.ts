@@ -9,6 +9,7 @@ export type ModelConfig = {
   baseUrl?: string;
   status: number;
   config?: string;
+  modelType?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -19,6 +20,7 @@ export type ModelConfigListParams = {
   keyword?: string;
   vendor?: string;
   status?: number;
+  modelType?: string;
 };
 
 export type CreateModelConfigRequest = {
@@ -29,6 +31,7 @@ export type CreateModelConfigRequest = {
   baseUrl?: string;
   status?: number;
   config?: string;
+  modelType?: string;
 };
 
 export type UpdateModelConfigRequest = {
@@ -39,6 +42,7 @@ export type UpdateModelConfigRequest = {
   baseUrl?: string;
   status?: number;
   config?: string;
+  modelType?: string;
 };
 
 export const getModelConfigList = (params: ModelConfigListParams) => {

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ModelConfigService {
 
-    PageResult<ModelConfigResponse> getModelConfigList(String keyword, String vendor, Integer status, Long current, Long size);
+    PageResult<ModelConfigResponse> getModelConfigList(String keyword, String vendor, Integer status, String modelType, Long current, Long size);
 
     ModelConfigResponse getModelConfigById(Long id);
 
