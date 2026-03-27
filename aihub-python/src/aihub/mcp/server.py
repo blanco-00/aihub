@@ -598,107 +598,221 @@ mcp_server = MCPServer()
 
 
 # ============================================================
-# 内置工具示例
+# 示例工具（暂不可用，仅供演示）
+# 
+# 以下工具为示例实现，线上部署时需要对接公司真实系统
+# 工具类型标记：example = True 表示仅为示例
 # ============================================================
 
 def handle_order_query(args: Dict[str, Any], server: MCPServer) -> str:
     """
-    查询订单状态的示例工具
+    [示例] 查询订单状态
     
-    这是一个模拟工具，返回固定格式的订单信息
-    实际项目中，这里会调用真实的订单系统 API
-    
-    参数:
-        args: 包含 orderId 的字典
-        server: MCPServer 实例（用于访问 HTTP 客户端等资源）
-    
-    返回:
-        str: 格式化的订单信息
+    实际用途：客户咨询"我的订单到哪了"时，AI自动查询
+    对接系统：ERP / 订单系统 / 电商平台
     """
-    # args.get("orderId", "") 安全地获取值
-    # 如果不存在，返回空字符串而不是抛出异常
     order_id = args.get("orderId", "")
-    return f"Order {order_id}: Status=Shipped, Expected delivery=2024-01-15"
+    return "[示例] 此功能需要对接公司订单系统"
 
 
 def handle_user_info(args: Dict[str, Any], server: MCPServer) -> str:
     """
-    查询用户信息的示例工具
+    [示例] 查询用户/客户信息
+    
+    实际用途：客服场景下查询客户基本信息、会员等级等
+    对接系统：CRM / 会员系统
     """
     user_id = args.get("userId", "")
-    return f"User {user_id}: Name=John Doe, Email=john@example.com"
+    return "[示例] 此功能需要对接公司CRM系统"
+
+
+def handle_data_query(args: Dict[str, Any], server: MCPServer) -> str:
+    """
+    [示例] 通用数据查询
+    
+    实际用途：AI根据自然语言生成SQL查询业务数据
+    对接系统：数据库 / 数据中台 / BI系统
+    """
+    query = args.get("query", "")
+    table = args.get("table", "")
+    return f"[示例] query={query}, table={table} - 此功能需要对接公司数据平台"
+
+
+def handle_internal_search(args: Dict[str, Any], server: MCPServer) -> str:
+    """
+    [示例] 内部文档/知识库搜索
+    
+    实际用途：员工咨询时，AI从内部wiki搜索相关文档
+    对接系统：Confluence / 内部wiki / 知识库
+    """
+    query = args.get("query", "")
+    return f"[示例] 搜索内部文档: {query} - 此功能需要对接公司知识库系统"
+
+
+def handle_business_operation(args: Dict[str, Any], server: MCPServer) -> str:
+    """
+    [示例] 业务操作
+    
+    实际用途：AI根据用户请求执行业务操作，如创建工单、审批通过等
+    对接系统：工单系统 / OA系统 / 审批流
+    """
+    action = args.get("action", "")
+    entity = args.get("entity", "")
+    return f"[示例] 操作: {action}, 实体: {entity} - 此功能需要对接公司业务系统"
+
+
+def handle_send_notification(args: Dict[str, Any], server: MCPServer) -> str:
+    """
+    [示例] 发送通知
+    
+    实际用途：AI完成复杂任务后通知相关人员
+    对接系统：邮件系统 / 钉钉/飞书 / 短信平台
+    """
+    channel = args.get("channel", "email")
+    recipient = args.get("recipient", "")
+    message = args.get("message", "")
+    return f"[示例] 通过{channel}通知{recipient}: {message} - 此功能需要对接公司通知系统"
+
+
+def handle_external_api(args: Dict[str, Any], server: MCPServer) -> str:
+    """
+    [示例] 外部API调用
+    
+    实际用途：查询快递、汇率、天气等第三方信息
+    对接系统：快递100 / 第三方支付 / 天气API
+    """
+    api_name = args.get("apiName", "")
+    params = args.get("params", {})
+    return f"[示例] 调用{api_name}，参数: {params} - 此功能需要配置第三方API"
 
 
 # ============================================================
-# 注册内置工具
+# 注册示例工具（均为演示版本，暂不可用）
 # ============================================================
 
-"""
-模块导入时自动注册工具
-
-这里展示了 Python 的特色用法：
-import 时执行代码块（side effect）
-
-这种方式的好处：
-1. 导入模块时工具就自动注册好了
-2. 不需要额外的初始化代码
-3. 工具始终可用
-
-但也有缺点：循环导入问题
-"""
-
-mcp_server.register_tool(
-    name="order_query",
-    description="Query order status by order ID",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "orderId": {"type": "string", "description": "Order ID"}
+EXAMPLE_TOOLS = [
+    {
+        "name": "order_query",
+        "description": "[示例-暂不可用] 查询订单状态。实际用途：客户咨询订单物流。需对接ERP/订单系统。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "orderId": {"type": "string", "description": "订单号"}
+            },
+            "required": ["orderId"]
         },
-        "required": ["orderId"]
+        "handler": handle_order_query,
+        "is_async": False,
+        "example": True
     },
-    handler=handle_order_query
-)
-
-mcp_server.register_tool(
-    name="user_info",
-    description="Get user information by user ID",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "userId": {"type": "string", "description": "User ID"}
+    {
+        "name": "user_info",
+        "description": "[示例-暂不可用] 查询用户/客户信息。实际用途：客服场景查询客户资料。需对接CRM系统。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "userId": {"type": "string", "description": "用户ID"}
+            },
+            "required": ["userId"]
         },
-        "required": ["userId"]
+        "handler": handle_user_info,
+        "is_async": False,
+        "example": True
     },
-    handler=handle_user_info
-)
+    {
+        "name": "data_query",
+        "description": "[示例-暂不可用] 通用数据查询。实际用途：根据自然语言查询业务数据。需对接数据中台。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "查询描述，如'本月销售额'"},
+                "table": {"type": "string", "description": "目标表/数据集"}
+            },
+            "required": ["query"]
+        },
+        "handler": handle_data_query,
+        "is_async": False,
+        "example": True
+    },
+    {
+        "name": "internal_search",
+        "description": "[示例-暂不可用] 内部文档搜索。实际用途：员工咨询时搜索内部知识库。需对接Confluence/wiki。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {"type": "string", "description": "搜索关键词"}
+            },
+            "required": ["query"]
+        },
+        "handler": handle_internal_search,
+        "is_async": False,
+        "example": True
+    },
+    {
+        "name": "business_operation",
+        "description": "[示例-暂不可用] 执行业务操作。实际用途：AI代客操作创建工单、审批等。需对接OA/工单系统。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "description": "操作类型，如'create_ticket', 'approve'"},
+                "entity": {"type": "string", "description": "实体ID"},
+                "params": {"type": "object", "description": "其他参数"}
+            },
+            "required": ["action"]
+        },
+        "handler": handle_business_operation,
+        "is_async": False,
+        "example": True
+    },
+    {
+        "name": "send_notification",
+        "description": "[示例-暂不可用] 发送通知。实际用途：任务完成后通知相关人员。需对接邮件/钉钉/飞书。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "channel": {"type": "string", "description": "通知渠道", "enum": ["email", "dingtalk", "feishu", "sms"]},
+                "recipient": {"type": "string", "description": "接收人"},
+                "message": {"type": "string", "description": "通知内容"}
+            },
+            "required": ["channel", "recipient", "message"]
+        },
+        "handler": handle_send_notification,
+        "is_async": False,
+        "example": True
+    },
+    {
+        "name": "external_api",
+        "description": "[示例-暂不可用] 外部API调用。实际用途：查询快递、汇率、天气等。需配置第三方API。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "apiName": {"type": "string", "description": "API名称，如'express_query', 'weather'"},
+                "params": {"type": "object", "description": "API参数"}
+            },
+            "required": ["apiName"]
+        },
+        "handler": handle_external_api,
+        "is_async": False,
+        "example": True
+    }
+]
+
+
+# 注册示例工具
+for tool_def in EXAMPLE_TOOLS:
+    mcp_server.register_tool(
+        name=tool_def["name"],
+        description=tool_def["description"],
+        input_schema=tool_def["input_schema"],
+        handler=tool_def["handler"],
+        is_async=tool_def.get("is_async", False)
+    )
 
 
 # ============================================================
 # 注册内置工具（从 builtin.py）
 # ============================================================
 
-"""
-延迟导入避免循环依赖
-
-如果直接在文件开头导入 builtin.py：
 from ..tools.builtin import register_builtin_tools
 
-可能会导致循环导入问题：
-- main.py 导入 mcp.server
-- server.py 导入 tools.builtin
-- builtin.py 导入 mcp.server（如果需要）
-
-解决方案：
-1. 在需要时才导入（延迟导入）
-2. 重构模块结构
-3. 使用依赖注入
-
-这里我们把导入放在最后，在所有类定义完成后才执行
-"""
-
-from ..tools.builtin import register_builtin_tools
-
-# 调用函数注册所有内置工具
-# 这个函数会遍历 BUILTIN_TOOLS 列表，逐个注册
 register_builtin_tools(mcp_server)

@@ -716,51 +716,6 @@ BUILTIN_TOOLS = [
         },
         "handler": http_request_tool,
         "is_async": False
-    },
-    {
-        "name": "file_read",
-        "description": "Read text files within the project sandbox directory. Use for reading configuration, logs, or other text files.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "path": {
-                    "type": "string",
-                    "description": "Relative path to file within sandbox directory"
-                },
-                "max_lines": {
-                    "type": "number",
-                    "description": "Maximum number of lines to read (default 100)"
-                }
-            },
-            "required": ["path"]
-        },
-        "handler": file_read_tool,
-        "is_async": False
-    },
-    {
-        "name": "file_write",
-        "description": "Write content to a file within the project sandbox directory. Supports overwrite and append modes.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "path": {
-                    "type": "string",
-                    "description": "Relative path to file within sandbox directory"
-                },
-                "content": {
-                    "type": "string",
-                    "description": "Content to write to the file"
-                },
-                "mode": {
-                    "type": "string",
-                    "description": "Write mode: 'w' (overwrite) or 'a' (append)",
-                    "enum": ["w", "a"]
-                }
-            },
-            "required": ["path", "content"]
-        },
-        "handler": file_write_tool,
-        "is_async": False
     }
 ]
 
