@@ -4,7 +4,11 @@ import pymysql
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="aihub_python_")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="aihub_python_",
+        extra="ignore"
+    )
     
     app_name: str = "AIHub Python"
     debug: bool = False

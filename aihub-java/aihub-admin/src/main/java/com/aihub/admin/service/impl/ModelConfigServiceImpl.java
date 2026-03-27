@@ -36,13 +36,14 @@ public class ModelConfigServiceImpl implements ModelConfigService {
         Long offset = (current - 1) * size;
 
         List<ModelConfig> modelConfigs = modelConfigMapper.selectList(
-            new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ModelConfig>()
-                .like(keyword != null && !keyword.isEmpty(), ModelConfig::getName, keyword)
-                .eq(vendor != null && !vendor.isEmpty(), ModelConfig::getVendor, vendor)
-                .eq(status != null, ModelConfig::getStatus, status)
-                .eq(modelType != null && !modelType.isEmpty(), ModelConfig::getModelType, modelType)
-                .eq(ModelConfig::getIsDeleted, 0)
-                .orderByDesc(ModelConfig::getCreatedAt)
+            new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<ModelConfig>()
+                .select("id, name, vendor, model_id, api_key, base_url, status, config, model_type, created_at, updated_at, is_deleted, is_default")
+                .like(keyword != null && !keyword.isEmpty(), "name", keyword)
+                .eq(vendor != null && !vendor.isEmpty(), "vendor", vendor)
+                .eq(status != null, "status", status)
+                .eq(modelType != null && !modelType.isEmpty(), "model_type", modelType)
+                .eq("is_deleted", 0)
+                .orderByDesc("created_at")
                 .last("LIMIT " + offset + ", " + size)
         );
 

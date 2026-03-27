@@ -24,28 +24,17 @@ export type ToolExecutionResult = {
   executionMs?: number;
 };
 
-export const getMCPTools = (): Promise<any> => {
-  const token = getToken();
-  const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
+const PYTHON_API_BASE = "http://localhost:9529";
 
-  return fetch("http://localhost:8001/api/mcp/tools", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: tokenStr,
-    },
-  }).then((res) => res.json());
+export const getMCPTools = (): Promise<any> => {
+  return fetch(`${PYTHON_API_BASE}/api/mcp/tools`).then((res) => res.json());
 };
 
 export const executeMCPTool = (data: ToolExecutionRequest): Promise<any> => {
-  const token = getToken();
-  const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
-
-  return fetch("http://localhost:8001/api/mcp/tools/execute", {
+  return fetch(`${PYTHON_API_BASE}/api/mcp/tools/execute`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: tokenStr,
     },
     body: JSON.stringify(data),
   }).then((res) => res.json());
@@ -57,28 +46,15 @@ export type MCPToolUpdateRequest = {
 };
 
 export const updateMCPTool = (data: MCPToolUpdateRequest): Promise<any> => {
-  const token = getToken();
-  const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
-
-  return fetch("http://localhost:8001/api/mcp/tools/update", {
+  return fetch(`${PYTHON_API_BASE}/api/mcp/tools/update`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: tokenStr,
     },
     body: JSON.stringify(data),
   }).then((res) => res.json());
 };
 
 export const getToolExecutionLogs = (): Promise<any> => {
-  const token = getToken();
-  const tokenStr = token?.accessToken ? `Bearer ${token.accessToken}` : "";
-
-  return fetch("http://localhost:8001/api/mcp/tools/logs", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: tokenStr,
-    },
-  }).then((res) => res.json());
+  return fetch(`${PYTHON_API_BASE}/api/mcp/tools/logs`).then((res) => res.json());
 };

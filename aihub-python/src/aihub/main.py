@@ -306,18 +306,7 @@ class ToolExecuteRequest(BaseModel):
 # ============================================================
 
 @app.get("/api/mcp/tools")
-def list_mcp_tools(current_user: dict = Depends(get_current_user)):
-    """
-    获取所有可用的 MCP 工具列表
-    
-    MCP (Model Context Protocol) 是什么？
-    - 一种让 AI Agent 调用外部工具的协议
-    - 定义了工具的注册、发现和调用方式
-    - AI 可以根据用户问题自主决定调用哪个工具
-    
-    返回:
-        dict: 包含工具列表和总数
-    """
+def list_mcp_tools():
     tools = mcp_server.list_tools()
     return {"tools": tools, "total": len(tools)}
 

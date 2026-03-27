@@ -78,3 +78,4 @@ test-screenshots/
 # package-lock.json
 # yarn.lock
 .opencode
+**/__pycache__/

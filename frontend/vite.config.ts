@@ -28,7 +28,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         "/api": {
           // 性能优化：使用 127.0.0.1 而不是 localhost，避免 DNS 解析延迟
           // 注意：如果使用 localhost，浏览器/Node.js 可能需要解析 DNS，可能导致延迟
-          target: "http://127.0.0.1:8080",
+          target: "http://127.0.0.1:9528",
           changeOrigin: true,
           ws: true,
           // 性能优化：配置代理超时和连接复用

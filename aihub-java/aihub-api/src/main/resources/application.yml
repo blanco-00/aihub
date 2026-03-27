@@ -60,7 +60,7 @@ mybatis-plus:
 
 # 服务器配置
 server:
-  port: 8080
+  port: 9528
   servlet:
     context-path: /
     # 性能优化：在应用启动时立即初始化 DispatcherServlet，而不是懒加载
